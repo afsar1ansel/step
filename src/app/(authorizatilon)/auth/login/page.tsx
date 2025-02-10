@@ -4,6 +4,8 @@ import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
 import style from "./page.module.css";
 import Image from "next/image";
 
+import photo from "/public/Group19697.png";
+
 
 import Link from "next/link";
 
@@ -28,13 +30,13 @@ export default function Login() {
   return (
     <div className={style.logbody}>
       <div className={style.logo}>
-        {/* <Image src={logo} alt="Logo" width={500} height={200} /> */}
-        <h1>LOGO</h1>
+        <Image src={photo} alt="Logo" width={200} height={75} />
+        {/* <h1>LOGO</h1> */}
       </div>
       <div className={style.form}>
-        <div>
-          {/* <Image src={photo} alt="pic" width={500} height={400} /> */}
-          IMAGE
+        <div style={{backgroundColor: "white"}}>
+          {/* <Image src={photo} alt="pic" width={600} height={400} /> */}
+          
         </div>
         <div>
           <h2>Login to your account</h2>

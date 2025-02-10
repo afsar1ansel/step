@@ -5,7 +5,7 @@ import Link from "next/link";
 import "./globals.css";
 import Image from "next/image";
 // import logo from "/public/Mesha_inc_logo-1.png";
-import profile from "/public/Profile.png";
+import profile from "/public/Group19697.png";
 
 import { IoIosHome } from "react-icons/io";
 import { TbDeviceAnalytics } from "react-icons/tb";
@@ -41,7 +41,7 @@ type NavItem =
   | "StudentData"
   | "CourseData"
   | "test"
-  | "dataLogs"
+  | "Resources"
   | "alertLogs"
   | "Reports"
   | "Settings"
@@ -99,8 +99,10 @@ export default function RootLayout({
             <div className="main-content">
               {/* Sidebar Navigation */}
               <nav className="sidebar">
-                <Image src={profile} alt="Logo" width={50} height={50} />
-                {/* <h1>LOGO</h1> */}
+                <div style={{ display: "flex", justifyContent: "center", padding: "20px", marginBottom: "20px", borderBottom: "1px solid #ccc"}} >
+                <Image src={profile} alt="Logo" width={200} height={200} />
+                </div>
+
                 <ul>
                   <li className={active === "dashboard" ? "active" : ""}>
                     <IoIosHome />
@@ -126,10 +128,10 @@ export default function RootLayout({
                       <p className="linkname">Test</p>
                     </Link>
                   </li>
-                  <li className={active === "dataLogs" ? "active" : ""}>
+                  <li className={active === "Resources" ? "active" : ""}>
                     <AiOutlineDatabase />
-                    <Link href="/dataLogs">
-                      <p className="linkname">Data Logs</p>
+                    <Link href="/Resources">
+                      <p className="linkname">Resources</p>
                     </Link>
                   </li>
                   <li className={active === "alertLogs" ? "active" : ""}>

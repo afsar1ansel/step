@@ -6,6 +6,7 @@ import Image from "next/image";
 // import logo from "/public/Mesha_inc_logo-1.png";
 // import photo from "/public/Photo.png";
 
+import photo from "/public/Group19697.png";
 
 import Link from "next/link";
 
@@ -36,14 +37,14 @@ export default function ForgotPassword() {
   return (
     <div className={style.logbody}>
       <div className={style.logo}>
-        {/* <Image src={logo} alt="Logo" width={500} height={200} /> */}
-        LOGO
+        <Image src={photo} alt="Logo" width={200} height={75} />
+        {/* <h1>LOGO</h1> */}
       </div>
       <div className={style.form}>
-        <div>
-          {/* <Image src={photo} alt="pic" width={500} height={400} /> */}
+        {/* <div>
+          <Image src={photo} alt="pic" width={500} height={400} />
           IMAGE
-        </div>
+        </div> */}
         <div>
           <h2>Login to your account</h2>
           <form className={style.formbox} onSubmit={handleSubmit}>
@@ -74,10 +75,10 @@ export default function ForgotPassword() {
             <div>
               <input
                 id="comfirmpassword"
-                type={showConfirmPassword ? "text" : "password"} 
+                type={showConfirmPassword ? "text" : "password"}
                 placeholder="Comfirm password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)} 
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
               <div className={style.forgot} onClick={togglePasswordVisibility1}>
                 {showConfirmPassword ? (
