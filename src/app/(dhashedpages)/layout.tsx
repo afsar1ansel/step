@@ -40,7 +40,7 @@ type NavItem =
   | "dashboard"
   | "StudentData"
   | "CourseData"
-  | "userRoll"
+  | "test"
   | "dataLogs"
   | "alertLogs"
   | "Reports"
@@ -120,10 +120,10 @@ export default function RootLayout({
                       <p className="linkname">Course</p>
                     </Link>
                   </li>
-                  <li className={active === "userRoll" ? "active" : ""}>
+                  <li className={active === "test" ? "active" : ""}>
                     <FaUserEdit />
-                    <Link href="/userRoll">
-                      <p className="linkname">User Role</p>
+                    <Link href="/test">
+                      <p className="linkname">Test</p>
                     </Link>
                   </li>
                   <li className={active === "dataLogs" ? "active" : ""}>
