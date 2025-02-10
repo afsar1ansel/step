@@ -152,12 +152,6 @@ export default function RootLayout({
                       <p className="linkname">Settings</p>
                     </Link>
                   </li>
-                  <li className={active === "Support" ? "active" : ""}>
-                    <MdHelpOutline />
-                    <Link href="/Support">
-                      <p className="linkname">Support</p>
-                    </Link>
-                  </li>
                   <li
                     className={active === "Logout" ? "active" : ""}
                     onClick={onOpen}
