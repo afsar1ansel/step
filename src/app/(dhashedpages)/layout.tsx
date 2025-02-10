@@ -146,12 +146,12 @@ export default function RootLayout({
                       <p className="linkname">Reports</p>
                     </Link>
                   </li>
-                  <li className={active === "Settings" ? "active" : ""}>
+                  {/* <li className={active === "Settings" ? "active" : ""}>
                     <IoSettingsOutline />
                     <Link href="/Settings">
                       <p className="linkname">Settings</p>
                     </Link>
-                  </li>
+                  </li> */}
                   <li
                     className={active === "Logout" ? "active" : ""}
                     onClick={onOpen}
