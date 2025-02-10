@@ -1,0 +1,250 @@
+.hello h3{
+    /* border: solid 1px red; */
+    color: rgba(25, 27, 28, 1);
+    size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.hello p{
+    color: rgba(98, 108, 112, 1);
+    size: 14px;
+    font-weight: 400;
+}
+
+.statesContainer{
+    /* border: solid 1px yellow; */
+    display: flex;
+    gap: 14px;
+}
+
+.mainBody{
+    /* border: solid 1px red; */
+    margin-top: 40px;
+    display: flex;
+    gap: 20px;
+}
+
+.profileBox{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* border: solid 1px green; */
+    width: 22vw;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border-radius: 8px;
+}
+
+
+/* profile */
+.container {
+  width: 80vw;
+  height: 60vh;
+  max-width: 1250px;
+}
+
+/* .hello {
+  margin-bottom: 20px;
+}
+
+.hello h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+} */
+
+/* .hello p {
+  font-size: 1rem;
+  color: #666;
+} */
+
+/* .mainBody {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} */
+
+/* .profileBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+} */
+
+.uploadContainer {
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+  /* border: solid 1px red; */
+}
+
+
+
+.uploadArea {
+  margin-bottom: 15px;
+  /* border: solid 1px red; */
+  width: 18vw;
+}
+
+.fileInput {
+  display: none;
+}
+
+.uploadLabel {
+  display: flex; /* Use flexbox to align items */
+  align-items: center; /* Vertically center items */
+  justify-content: center; /* Center the content horizontally */
+  padding: 10px 15px;
+  background-color: white;
+  border: 2px solid rgba(0, 181, 98, 1);
+  border-radius: 160px;
+  color: rgba(0, 181, 98, 1);
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  width: 100%;
+  gap: 8px; /* Add space between the icon and text */
+  font-size: 1rem; /* Ensure consistent font size */
+}
+
+.uploadLabel:hover {
+  background-color: rgba(0, 181, 98, 1);
+  color: #fff;
+}
+
+.uploadLabel svg {
+  font-size: 1.2rem; /* Adjust icon size to match text */
+}
+
+
+.uploadButton {
+  display: inline-block;
+  padding: 8px 12px;
+  background-color: #00b562;
+  color: #fff;
+  border: none;
+  border-radius: 160px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.uploadButton:hover {
+  background-color: #007f46;
+}
+
+.fileList {
+  margin-top: 15px;
+  list-style-type: none;
+  padding: 0;
+}
+
+.fileItem {
+  margin: 5px 0;
+  padding: 10px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+}
+
+.fileName {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.removeFile {
+  background: none;
+  border: none;
+  color: #ff4d4d;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.removeFile:hover {
+  text-decoration: underline;
+}
+
+.remember{
+    width: 19vw;
+    /* border: solid 1px red; */
+}
+
+.remember p{
+    font-size: 14px;
+    color: rgba(98, 108, 112, 1);
+    font-weight: 400;
+    line-height: 16px;
+    margin: 0;
+    padding: 0;
+}
+
+/* info */
+
+.info{
+    width: 30vw;
+    background-color: white;
+    height: 100%;
+}
+
+.info label{
+    color: rgba(149, 159, 163, 1);
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+    padding: 0;
+    margin-left: 14px;
+}
+
+.infoHead{
+    border-bottom: 1px solid rgba(229, 231, 232, 1);
+    padding: 16px;
+}
+
+.infoBody{
+    /* border: solid 1px black; */
+    display: flex;
+    flex-direction: column;
+    margin-top: 24px;
+    gap: 20px;
+    padding-bottom: 24px;
+}
+
+.editable{
+    /* border: solid 1px black; */
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    width: 27vw;
+}
+
+.infoBox{
+    /* border: solid 1px black; */
+    align-items: center;
+    display: flex;
+    margin: 6px;
+}
+
+/* PASSWORD */
+
+.password{
+    /* border: solid 1px black; */
+    background-color: white;
+    height: 100%;
+    padding: 16px;
+    border-radius: 10px;
+    width: 26vw;
+}
+
+.passBody{
+    /* border: solid 1px black; */
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 24px;
+    padding-bottom: 24px;
+}

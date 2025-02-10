@@ -1,0 +1,44 @@
+.hello h3{
+    /* border: solid 1px red; */
+    color: rgba(25, 27, 28, 1);
+    size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.hello p{
+    color: rgba(98, 108, 112, 1);
+    size: 14px;
+    font-weight: 400;
+}
+
+.statesContainer{
+    /* border: solid 1px yellow; */
+    display: flex;
+    gap: 14px;
+}
+
+.vLowAndHigh{
+     display: flex;
+  gap: 24px;
+  padding: 16px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #f8f9f9;
+  border-bottom: 1px solid #ddddde;
+}
+
+.vLowAndHigh h5 {
+  margin: 0 40px 0 0;
+}
+.vLowAndHigh p {
+  margin: 0;
+  font-weight: bold;
+  border: 1px solid #ddddde;
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+.vLowAndHigh span {
+  font-weight: normal;
+}

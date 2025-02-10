@@ -1,0 +1,139 @@
+/* globals.css */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif !important;
+  background-color: rgba(245, 246, 247, 1) !important;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  /* height: 100vh; */
+}
+
+/* Header styles */
+.header {
+  background-color: white;
+  padding: 16px 50px;
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  /* color: white; */
+  position: sticky;
+  top: 0;
+  width: 100%;
+}
+
+.header .search-bar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+   width: calc(100% - 15vw);
+  /* border: solid 1px red; */
+}
+
+.search-input {
+  padding: 5px 2.2vw;
+  width: 480px;
+  height: 38px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  background-color: rgba(242, 243, 244, 0.5);
+}
+
+.searchIcon{
+  /* border: solid 1px red; */
+  position: relative;
+  left: 0.9vw;
+  top: 24px;
+  color: rgba(98, 108, 112, 1);
+  cursor: pointer
+}
+
+.icons{
+  /* border: solid 1px red; */
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* Main content styles (Sidebar + Dynamic Content) */
+.main-content {
+  display: flex;
+  height: 100%;
+}
+
+.sidebar {
+  background-color: white;
+  border-right: 2px solid rgba(242, 243, 244, 0.5);
+  color: white;
+  width: 15vw;
+  min-width: 180px;
+  /* padding: 20px; */
+  position: fixed;
+  top: 50px;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  /* border: solid 2px green; */
+}
+
+.sidebar ul {
+  list-style-type: none;
+  /* border: solid 1px red; */
+  margin-top: 20px;
+}
+
+.sidebar ul li {
+  padding: 10px 20px;
+  /* border: solid 1px red; */
+  color: rgba(98, 108, 112, 1);
+  display: flex;
+  gap: 10px;
+}
+
+
+
+.sidebar ul li a {
+  color: rgba(98, 108, 112, 1);
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.sidebar ul li a:hover {
+  color: #8eafc4;
+}
+
+.content {
+  margin-left: 14vw;
+  margin-bottom: 20px;
+  padding: 40px 0 0 40px;
+  /* flex: 1; */
+  /* overflow-y: auto; */
+}
+
+
+
+
+/* active */
+
+
+.active{
+ background-color: rgba(236, 251, 255, 1);
+  border-left: solid 3px #32b5ba;
+  color: rgba(0, 75, 80, 1) !important; 
+
+}
+
+.active .linkname{
+  color: rgba(0, 75, 80, 1) !important; 
+}
