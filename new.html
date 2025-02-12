@@ -1,0 +1,35 @@
+<li>
+                    <Accordion allowToggle>
+                      <AccordionItem border="none">
+                        <AccordionButton
+                          className={active === "masters" ? "active" : ""}
+                          style={{ display: "flex", alignItems: "center", width: "100%" }}
+                        >
+                          <TbDeviceAnalytics />
+                          <p className="linkname" style={{ flex: 1, textAlign: "left" }}>
+                            Masters
+                          </p>
+                          <AccordionIcon />
+                        </AccordionButton>
+                        <AccordionPanel pb={4} pl={8}>
+                          <ul>
+                            <li>
+                              <Link href="/masters/option1">
+                                <p className="linkname">Option 1</p>
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/masters/option2">
+                                <p className="linkname">Option 2</p>
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/masters/option3">
+                                <p className="linkname">Option 3</p>
+                              </Link>
+                            </li>
+                          </ul>
+                        </AccordionPanel>
+                      </AccordionItem>
+                    </Accordion>
+                  </li>

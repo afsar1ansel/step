@@ -12,13 +12,11 @@ import { TbDeviceAnalytics } from "react-icons/tb";
 import { FaRegIdCard } from "react-icons/fa6";
 import { AiOutlineDatabase } from "react-icons/ai";
 import { IoMdPaper } from "react-icons/io";
-import { FaRegBell } from "react-icons/fa";
-import { IoSettingsOutline } from "react-icons/io5";
-import { MdHelpOutline } from "react-icons/md";
+
 import { FaPowerOff } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import { FaUserEdit } from "react-icons/fa";
-import { FiAlertTriangle } from "react-icons/fi";
+
 import { MdLogout } from "react-icons/md";
 
 import { usePathname } from "next/navigation";
@@ -36,6 +34,14 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
+import {
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+} from "@chakra-ui/react";
+
 type NavItem =
   | "dashboard"
   | "StudentData"
@@ -44,7 +50,7 @@ type NavItem =
   | "Resources"
   | "alertLogs"
   | "Reports"
-  | "Settings"
+  | "masters"
   | "Support"
   | "Logout";
 
@@ -83,15 +89,7 @@ export default function RootLayout({
                   />
                 </div>
                 <div className="icons">
-                  <div className="user">
-                    {/* <Image
-                      src={profile}
-                      alt="Logo"
-                      width={40}
-                      height={40}
-                      className="user-image"
-                    /> */}
-                  </div>
+                  <div className="user"></div>
                 </div>
               </div>
             </header>
@@ -99,10 +97,17 @@ export default function RootLayout({
             <div className="main-content">
               {/* Sidebar Navigation */}
               <nav className="sidebar">
-                <div style={{ display: "flex", justifyContent: "center", padding: "20px", marginBottom: "20px", borderBottom: "1px solid #ccc"}} >
-                <Image src={profile} alt="Logo" width={200} height={200} />
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    padding: "20px",
+                    marginBottom: "20px",
+                    borderBottom: "1px solid #ccc",
+                  }}
+                >
+                  <Image src={profile} alt="Logo" width={200} height={200} />
                 </div>
-
                 <ul>
                   <li className={active === "dashboard" ? "active" : ""}>
                     <IoIosHome />
@@ -119,8 +124,73 @@ export default function RootLayout({
                   <li className={active === "CourseData" ? "active" : ""}>
                     <TbDeviceAnalytics />
                     <Link href="/CourseData">
-                      <p className="linkname">Course</p>
+                      <p className="linkname">Steps</p>
                     </Link>
+                  </li>
+                  <li style={{ padding: 0, margin: 0 }} className={active === "masters" ? "active" : ""}>
+                    <Accordion allowToggle>
+                      <AccordionItem border="none">
+                        <AccordionButton
+                          className={active === "masters" ? "active" : ""}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            width: "100%",
+                            padding: "0.5rem 20px",
+                          }}
+                        >
+                          <TbDeviceAnalytics />
+                          <p
+                            className="linkname"
+                            style={{
+                              flex: 1,
+                              textAlign: "left",
+                              marginLeft: "0.5rem",
+                            }}
+                          >
+                            Masters
+                          </p>
+                          <AccordionIcon />
+                        </AccordionButton>
+                        <AccordionPanel pb={0} pl={1} margin={0} padding={0} >
+                          <ul style={{ listStyle: "none", padding: 0 }}>
+                            <li>
+                              <Link href="/masters/option1">
+                                <p
+                                  className="linkname"
+                                  style={{
+                                    margin: 0,
+                                    marginLeft: "1rem",
+                                    padding: "0",
+                                  }}
+                                >
+                                  Option 1
+                                </p>
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/masters/option2">
+                                <p
+                                  className="linkname"
+                                  style={{
+                                    margin: 0,
+                                    marginLeft: "1rem",
+                                    padding: "0",
+                                  }}
+                                >
+                                  Option 2
+                                </p>
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/masters/option3">
+                                <p className="linkname" style={{ margin: 0, marginLeft: "1rem", padding: "0" }}>Option 3</p>
+                              </Link>
+                            </li>
+                          </ul>
+                        </AccordionPanel>
+                      </AccordionItem>
+                    </Accordion>
                   </li>
                   <li className={active === "test" ? "active" : ""}>
                     <FaUserEdit />
@@ -150,7 +220,6 @@ export default function RootLayout({
                   </li>
                 </ul>
               </nav>
-
               <main className="content">{children}</main>
             </div>
             <Modal isOpen={isOpen} onClose={onClose}>
