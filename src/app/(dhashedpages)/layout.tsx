@@ -241,12 +241,12 @@ export default function RootLayout({
                       <p className="linkname">Resources</p>
                     </Link>
                   </li>
-                  <li className={active === "Reports" ? "active" : ""}>
+                  {/* <li className={active === "Reports" ? "active" : ""}>
                     <IoMdPaper />
                     <Link href="/Reports">
                       <p className="linkname">Reports</p>
                     </Link>
-                  </li>
+                  </li> */}
                   <li className={active === "Settings" ? "active" : ""}>
                     <IoMdPaper />
                     <Link href="/Settings">
