@@ -1,8 +1,6 @@
 "use client";
 import React from "react";
 
-export const description = "An interactive bar chart";
-
 
 
 
