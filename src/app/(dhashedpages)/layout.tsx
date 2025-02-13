@@ -45,13 +45,17 @@ import {
 type NavItem =
   | "dashboard"
   | "StudentData"
-  | "CourseData"
+  | "steps"
   | "test"
   | "Resources"
   | "alertLogs"
   | "Reports"
-  | "masters"
+  | "Masters"
+  | "teacher"
+  | "subject"
+  | "course"
   | "Support"
+  | "Settings"
   | "Logout";
 
 export default function RootLayout({
@@ -68,8 +72,15 @@ export default function RootLayout({
 
   const [active, setActive] = useState<NavItem>(basePath as NavItem);
 
+
+
+
   useEffect(() => {
-    setActive(basePath as NavItem); // Update active state when pathname changes
+    if (["teacher", "subject", "course"].includes(basePath)) {
+      setActive("Masters");
+    } else {
+      setActive(basePath as NavItem);
+    }
   }, [pathname]);
 
   return (
@@ -121,17 +132,23 @@ export default function RootLayout({
                       <p className="linkname">Student Data</p>
                     </Link>
                   </li>
-                  <li className={active === "CourseData" ? "active" : ""}>
+                  <li className={active === "steps" ? "active" : ""}>
                     <TbDeviceAnalytics />
-                    <Link href="/CourseData">
+                    <Link href="/steps">
                       <p className="linkname">Steps</p>
                     </Link>
                   </li>
-                  <li style={{ padding: 0, margin: 0 }} className={active === "masters" ? "active" : ""}>
+                  <li
+                    style={{ padding: 0, margin: 0 }}
+                    className={
+                      ["teacher", "subject", "course"].includes(basePath)
+                        ? "active"
+                        : ""
+                    }
+                  >
                     <Accordion allowToggle>
                       <AccordionItem border="none">
                         <AccordionButton
-                          className={active === "masters" ? "active" : ""}
                           style={{
                             display: "flex",
                             alignItems: "center",
@@ -141,7 +158,6 @@ export default function RootLayout({
                         >
                           <TbDeviceAnalytics />
                           <p
-                            className="linkname"
                             style={{
                               flex: 1,
                               textAlign: "left",
@@ -152,39 +168,60 @@ export default function RootLayout({
                           </p>
                           <AccordionIcon />
                         </AccordionButton>
-                        <AccordionPanel pb={0} pl={1} margin={0} padding={0} >
+                        <AccordionPanel pb={0} pl={1} margin={0} padding={0}>
                           <ul style={{ listStyle: "none", padding: 0 }}>
                             <li>
-                              <Link href="/masters/option1">
+                              <Link href="/teacher">
                                 <p
-                                  className="linkname"
+                                  className={
+                                    basePath === "teacher"
+                                      ? "active-sub-option"
+                                      : ""
+                                  }
                                   style={{
                                     margin: 0,
                                     marginLeft: "1rem",
                                     padding: "0",
                                   }}
                                 >
-                                  Option 1
+                                  Teacher Master
                                 </p>
                               </Link>
                             </li>
                             <li>
-                              <Link href="/masters/option2">
+                              <Link href="/subject">
                                 <p
-                                  className="linkname"
+                                  className={
+                                    basePath === "subject"
+                                      ? "active-sub-option"
+                                      : ""
+                                  }
                                   style={{
                                     margin: 0,
                                     marginLeft: "1rem",
                                     padding: "0",
                                   }}
                                 >
-                                  Option 2
+                                  Subject Master
                                 </p>
                               </Link>
                             </li>
                             <li>
-                              <Link href="/masters/option3">
-                                <p className="linkname" style={{ margin: 0, marginLeft: "1rem", padding: "0" }}>Option 3</p>
+                              <Link href="/course">
+                                <p
+                                  className={
+                                    basePath === "course"
+                                      ? "active-sub-option"
+                                      : ""
+                                  }
+                                  style={{
+                                    margin: 0,
+                                    marginLeft: "1rem",
+                                    padding: "0",
+                                  }}
+                                >
+                                  Course Master
+                                </p>
                               </Link>
                             </li>
                           </ul>
@@ -208,6 +245,12 @@ export default function RootLayout({
                     <IoMdPaper />
                     <Link href="/Reports">
                       <p className="linkname">Reports</p>
+                    </Link>
+                  </li>
+                  <li className={active === "Settings" ? "active" : ""}>
+                    <IoMdPaper />
+                    <Link href="/Settings">
+                      <p className="linkname">Settings</p>
                     </Link>
                   </li>
                   <li

@@ -125,15 +125,24 @@ body {
 
 
 /* active */
-
-
-.active{
- background-color: rgba(236, 251, 255, 1);
+.active {
+  background-color: rgba(236, 251, 255, 1);
   border-left: solid 3px #32b5ba;
-  color: rgba(0, 75, 80, 1) !important; 
-
+  color: rgba(0, 75, 80, 1) !important;
 }
 
-.active .linkname{
-  color: rgba(0, 75, 80, 1) !important; 
+.active .linkname {
+  color: rgba(0, 75, 80, 1) !important;
+}
+
+.active .linknames {
+  color: red !important;
+}
+
+/* Add this to ensure only the selected sub-option gets the active style */
+.active-sub-option {
+  background-color: rgba(236, 251, 255, 1);
+  border-left: solid 3px #32b5ba;
+  color: rgb(2, 51, 54) !important;
+  font-weight: 500;
 }

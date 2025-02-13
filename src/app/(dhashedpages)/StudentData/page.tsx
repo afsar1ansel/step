@@ -1,205 +1,270 @@
+// "StudentsTab" Component
+
 "use client";
 
 import { AgGridReact } from "ag-grid-react";
-import { useEffect, useMemo, useState } from "react";
-import { FaEye } from "react-icons/fa";
-import { CiEdit } from "react-icons/ci";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import React, { useState } from "react";
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
-import styles from "./page.module.css";
-import { Button, FormControl, FormLabel, Heading, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from "@chakra-ui/react";
-import Head from "next/head";
-
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
+  Switch,
+} from "@chakra-ui/react";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const GridComponent = () => {
+const StudentsTab = () => {
   const [rowData, setRowData] = useState<any[]>([
     {
-      deviceId: "DMS12345",
-      CustomerName: "John Doe",
-      status: "",
-      lastSync: "2025-01-10 10:30 AM",
-      action: "Edit",
+      id: "01",
+      name: "John Doe",
+      email: "john@email.com",
+      contact: "9876543210",
+      registrationDate: "2025-02-10",
+      subscription: "Active",
     },
     {
-      deviceId: "DMS56789",
-      CustomerName: "Jane Smith",
-      status: "In",
-      lastSync: "2025-01-09 03:20 PM",
-      action: "Edit",
-    },
-    {
-      deviceId: "DMS98765",
-      CustomerName: "Mike Johnson",
-      status: "",
-      lastSync: "2025-01-08 08:45 AM",
-      action: "Edit",
-    },
-    {
-      deviceId: "DMS11223",
-      CustomerName: "Emily Davis",
-      status: "",
-      lastSync: "2025-01-07 02:15 PM",
-      action: "Edit",
-    },
-    {
-      deviceId: "DMS44556",
-      CustomerName: "Chris Brown",
-      status: "In",
-      lastSync: "2025-01-06 09:00 AM",
-      action: "Edit",
+      id: "02",
+      name: "Jane Smith",
+      email: "jane@email.com",
+      contact: "9876543211",
+      registrationDate: "2025-02-09",
+      subscription: "Inactive",
     },
   ]);
 
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
+    { headerName: "Sl. No", field: "id", maxWidth: 80 },
+    { headerName: "Student Name", field: "name", minWidth: 180 },
+    { headerName: "Email", field: "email", minWidth: 200 },
+    { headerName: "Contact No.", field: "contact", minWidth: 150 },
     {
-      field: "name",
-      headerName: "Name",
-      filter: "agTextColumnFilter",
-    },
-    { field: "cource", headerName: "Cource", filter: true },
-    { field: "College", filter: "agDateColumnFilter" },
-    {
-      field: "validity",
-      headerName: "Validity",
-      filter: "agSetColumnFilter",
+      headerName: "Registration Date",
+      field: "registrationDate",
+      minWidth: 150,
     },
     {
-      field: "Time",
-      headerName: "Time Spent",
+      headerName: "Subscription Status",
+      field: "subscription",
+      cellRenderer: (params: any) => (
+        <Switch
+          isChecked={params.value === "Active"}
+          onChange={() => toggleSubscription(params.data)}
+          colorScheme="green"
+        >
+          {params.value}
+        </Switch>
+      ),
+    },
+    {
+      headerName: "Actions",
+      cellRenderer: (params: any) => (
+        <div>
+          <button
+            onClick={() => handleEdit(params.data)}
+            style={{ marginRight: "10px" }}
+          >
+            Edit
+          </button>
+          <button onClick={() => handleDelete(params.data)}>Delete</button>
+        </div>
+      ),
     },
   ]);
 
-  // const pagination = useMemo(() => {
-  //   return {
-  //     pagination: true,
-  //     paginationPageSize: 10,
-  //     paginationPageSizeSelector: [10, 20, 30, 40, 50],
-  //   };
-  // }, []);
+  // State for Add Student Modal
+  const {
+    isOpen: isAddModalOpen,
+    onOpen: onAddModalOpen,
+    onClose: onAddModalClose,
+  } = useDisclosure();
 
-  function handleEdit(data: any) {
-    console.log(data);
-  }
+  // State for Edit Student Modal
+  const {
+    isOpen: isEditModalOpen,
+    onOpen: onEditModalOpen,
+    onClose: onEditModalClose,
+  } = useDisclosure();
 
+  const [currentStudent, setCurrentStudent] = useState<any>(null);
+  const [studentName, setStudentName] = useState("");
+  const [studentEmail, setStudentEmail] = useState("");
+  const [studentContact, setStudentContact] = useState("");
 
-  // modal
-   const { isOpen, onOpen, onClose } = useDisclosure();
+  const handleEdit = (data: any) => {
+    setCurrentStudent(data);
+    setStudentName(data.name);
+    setStudentEmail(data.email);
+    setStudentContact(data.contact);
+    onEditModalOpen();
+  };
 
+  const handleDelete = (data: any) => {
+    setRowData((prev) => prev.filter((student) => student.id !== data.id));
+  };
 
-    const [deviceId, setDeviceId] = useState("");
-    const [deviceName, setDeviceName] = useState("");
-    const [info, setinfo] = useState("");
+  const toggleSubscription = (data: any) => {
+    setRowData((prev) =>
+      prev.map((student) =>
+        student.id === data.id
+          ? {
+              ...student,
+              subscription:
+                student.subscription === "Active" ? "Inactive" : "Active",
+            }
+          : student
+      )
+    );
+  };
 
-    const handleAddDevice = () => {
-      const newDevice = {
-        deviceId,
-        deviceName,
-        info,
-      };
-      console.log(newDevice);
-      // Clear inputs and close modal (optional)
-      setDeviceId("");
-      setDeviceName("");
-      setinfo("");
-      onClose();
+  const handleAddStudent = () => {
+    const newStudent = {
+      id: String(rowData.length + 1),
+      name: studentName,
+      email: studentEmail,
+      contact: studentContact,
+      registrationDate: new Date().toISOString().split("T")[0],
+      subscription: "Inactive",
     };
+    setRowData((prev) => [...prev, newStudent]);
+    resetForm();
+    onAddModalClose();
+  };
+
+  const resetForm = () => {
+    setStudentName("");
+    setStudentEmail("");
+    setStudentContact("");
+    setCurrentStudent(null);
+  };
 
   return (
     <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
-      {/* <div className={styles.hello}>
-        <h3>Device Management</h3>
-        <p>
-          Monitor and manage all connected devices, update details, and ensure
-          smooth operations with ease.
-        </p>
-      </div> */}
       <div
         style={{
-          height: "100%",
-          width: "80vw",
-          marginTop: "40px",
-          maxWidth: "1300px",
+          height: "60px",
+          width: "100%",
+          backgroundColor: "white",
+          padding: "20px",
+          borderRadius: "10px 10px 0px 0px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        <div
-          style={{
-            height: "60px",
-            width: "100%",
-            backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "10px 10px 0px 0px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <p style={{ fontSize: "16px", fontWeight: "600" }}>Student Data</p>
-          <Button onClick={onOpen}>
-            Export Data
-          </Button>
-        </div>
-        <div style={{ height: "100%", width: "100%", maxWidth: "1300px" }}>
-          <AgGridReact
-            rowData={rowData}
-            columnDefs={columnDefs}
-            pagination={true}
-            paginationPageSize={10}
-            paginationAutoPageSize={true}
-            getRowHeight={function (params) {
-              const description = params.data?.banner_description || "";
-              const words = description.split(" ").length;
-              const baseHeight = 80;
-              const heightPerWord = 6;
-              const minHeight = 80;
-              const calculatedHeight = baseHeight + words * heightPerWord;
-              return Math.max(minHeight, calculatedHeight);
-            }}
-          />
-        </div>
+        <p style={{ fontSize: "16px", fontWeight: "600" }}>Students Data</p>
+        <Button onClick={onAddModalOpen} colorScheme="green">
+          Add Student
+        </Button>
       </div>
-      {/* <Modal isOpen={isOpen} onClose={onClose}>
+      <div style={{ height: "100%", width: "100%" }}>
+        <AgGridReact
+          rowData={rowData}
+          columnDefs={columnDefs}
+          pagination={true}
+          paginationPageSize={10}
+          paginationAutoPageSize={true}
+        />
+      </div>
+
+      {/* Add Student Modal */}
+      <Modal isOpen={isAddModalOpen} onClose={onAddModalClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add new device</ModalHeader>
+          <ModalHeader>Add New Student</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
-              <FormLabel>Device ID</FormLabel>
+              <FormLabel>Student Name</FormLabel>
               <Input
-                placeholder="Enter device ID"
-                value={deviceId}
-                onChange={(e) => setDeviceId(e.target.value)}
+                placeholder="Enter Student Name"
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
               />
-              <FormLabel>Customer name</FormLabel>
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Email</FormLabel>
               <Input
-                placeholder="Enter device name"
-                value={deviceName}
-                onChange={(e) => setDeviceName(e.target.value)}
+                placeholder="Enter Email"
+                value={studentEmail}
+                onChange={(e) => setStudentEmail(e.target.value)}
               />
-
-              <FormLabel>Information</FormLabel>
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Contact No.</FormLabel>
               <Input
-                placeholder="User Extra Information"
-                value={info}
-                onChange={(e) => setinfo(e.target.value)}
+                placeholder="Enter Contact No."
+                value={studentContact}
+                onChange={(e) => setStudentContact(e.target.value)}
               />
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="gray" mr={3} onClick={onClose}>
+            <Button colorScheme="gray" mr={3} onClick={onAddModalClose}>
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleAddDevice}>
-              Add Device
+            <Button colorScheme="green" onClick={handleAddStudent}>
+              Add
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal> */}
+      </Modal>
+
+      {/* Edit Student Modal */}
+      <Modal isOpen={isEditModalOpen} onClose={onEditModalClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit Student</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel>Student Name</FormLabel>
+              <Input
+                placeholder="Enter Student Name"
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Email</FormLabel>
+              <Input
+                placeholder="Enter Email"
+                value={studentEmail}
+                onChange={(e) => setStudentEmail(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Contact No.</FormLabel>
+              <Input
+                placeholder="Enter Contact No."
+                value={studentContact}
+                onChange={(e) => setStudentContact(e.target.value)}
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="gray" mr={3} onClick={onEditModalClose}>
+              Cancel
+            </Button>
+            <Button colorScheme="green" onClick={handleAddStudent}>
+              Update
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };
 
-export default GridComponent;
+export default StudentsTab;
