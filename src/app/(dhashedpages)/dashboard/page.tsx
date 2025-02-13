@@ -1,4 +1,6 @@
 // import Image from "next/image";
+
+"use client";
 import styles from "./page.module.css";
 
 import { TbDeviceAnalytics } from "react-icons/tb";
@@ -8,9 +10,175 @@ import { VscFileSymlinkDirectory } from "react-icons/vsc";
 
 
 
+import { AgGridReact } from "ag-grid-react";
+import React, { useState } from "react";
+import type { ColDef } from "ag-grid-community";
+import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
+  Switch,
+} from "@chakra-ui/react";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 
 export default function Home() {
+
+  const [rowData, setRowData] = useState<any[]>([
+      {
+        id: "01",
+        name: "John Doe",
+        email: "john@email.com",
+        contact: "9876543210",
+        registrationDate: "2025-02-10",
+        mode: "Paid",
+        subscription: "Active",
+      },
+      {
+        id: "02",
+        name: "Jane Smith",
+        email: "jane@email.com",
+        contact: "9876543211",
+        registrationDate: "2025-02-09",
+        mode: "Free",
+        subscription: "Inactive",
+      },
+    ]);
+  
+    const [columnDefs, setColumnDefs] = useState<ColDef[]>([
+      { headerName: "Sl. No", field: "id", maxWidth: 80 },
+      { headerName: "Student Name", field: "name", minWidth: 180 },
+      { headerName: "Email", field: "email", minWidth: 200 },
+      { headerName: "Contact No.", field: "contact", maxWidth: 120 },
+      {
+        headerName: "Registration Date",
+        field: "registrationDate",
+        minWidth: 100,
+      },
+      {
+        headerName: "Subscription Status",
+        field: "subscription",
+        cellRenderer: (params: any) => (
+          <Switch
+            isChecked={params.value === "Active"}
+            onChange={() => toggleSubscription(params.data)}
+            colorScheme="green"
+          >
+            {params.value}
+          </Switch>
+        ),
+      },
+      {
+        headerName: "Mode",
+        field: "mode",
+        maxWidth: 100,
+        cellRenderer: (params: any) => (
+          <span
+            style={{
+              color: "white",
+              backgroundColor: params.value === "Paid" ? "#81C784" : "#FFB74D",
+              padding: "5px 10px",
+              borderRadius: "8px",
+            }}
+          >
+            {params.value}
+          </span>
+        ),
+      },
+      {
+        headerName: "Actions",
+        cellRenderer: (params: any) => (
+          <div>
+            <button
+              onClick={() => handleEdit(params.data)}
+              style={{ marginRight: "10px" }}
+            >
+              Edit
+            </button>
+            <button onClick={() => handleDelete(params.data)}>Delete</button>
+          </div>
+        ),
+      },
+    ]);
+  
+    // State for Add Student Modal
+    const {
+      isOpen: isAddModalOpen,
+      onOpen: onAddModalOpen,
+      onClose: onAddModalClose,
+    } = useDisclosure();
+  
+    // State for Edit Student Modal
+    const {
+      isOpen: isEditModalOpen,
+      onOpen: onEditModalOpen,
+      onClose: onEditModalClose,
+    } = useDisclosure();
+  
+    const [currentStudent, setCurrentStudent] = useState<any>(null);
+    const [studentName, setStudentName] = useState("");
+    const [studentEmail, setStudentEmail] = useState("");
+    const [studentContact, setStudentContact] = useState("");
+  
+    const handleEdit = (data: any) => {
+      setCurrentStudent(data);
+      setStudentName(data.name);
+      setStudentEmail(data.email);
+      setStudentContact(data.contact);
+      onEditModalOpen();
+    };
+  
+    const handleDelete = (data: any) => {
+      setRowData((prev) => prev.filter((student) => student.id !== data.id));
+    };
+  
+    const toggleSubscription = (data: any) => {
+      setRowData((prev) =>
+        prev.map((student) =>
+          student.id === data.id
+            ? {
+                ...student,
+                subscription:
+                  student.subscription === "Active" ? "Inactive" : "Active",
+              }
+            : student
+        )
+      );
+    };
+  
+    const handleAddStudent = () => {
+      const newStudent = {
+        id: String(rowData.length + 1),
+        name: studentName,
+        email: studentEmail,
+        contact: studentContact,
+        registrationDate: new Date().toISOString().split("T")[0],
+        subscription: "Inactive",
+      };
+      setRowData((prev) => [...prev, newStudent]);
+      resetForm();
+      onAddModalClose();
+    };
+  
+    const resetForm = () => {
+      setStudentName("");
+      setStudentEmail("");
+      setStudentContact("");
+      setCurrentStudent(null);
+    };
+
+
   return (
     <div className={styles.page}>
       {/* <div className={styles.hello}>
@@ -65,49 +233,33 @@ export default function Home() {
       </div>
 
       <div className={styles.chartBox}>
-        <h2>Business Metrics</h2>
+        <div
+                style={{
+                  height: "60px",
+                  width: "100%",
+                  backgroundColor: "white",
+                  padding: "20px",
+                  borderRadius: "10px 10px 0px 0px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <p style={{ fontSize: "16px", fontWeight: "600" }}>Students Data</p>
+                {/* <Button onClick={onAddModalOpen} colorScheme="green">
+                  Add Student
+                </Button> */}
+              </div>
+              <div style={{ height: "100%", width: "100%" }}>
+                <AgGridReact
+                  rowData={rowData}
+                  columnDefs={columnDefs}
+                  pagination={true}
+                  paginationPageSize={10}
+                  paginationAutoPageSize={true}
+                />
+              </div>
       </div>
-
-      {/* <div className={styles.charts}>
-        <div className={styles.bChart}>
-          <div>
-            <p style={{ marginBottom: "4px" }}>Data Uploads</p>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                marginBottom: "10px",
-              }}
-            >
-              <h1>159</h1> <p style={{ color: "green" }}>230%</p>
-            </div>
-          </div>
-          <BarChart />
-        </div>
-        <div className={styles.bChart}>
-          <div>
-            <p style={{ marginBottom: "4px" }}>Reports Generated</p>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                marginBottom: "10px",
-              }}
-            >
-              <h1>09</h1> <p style={{ color: "green" }}>90%</p>
-            </div>
-          </div>
-          <LineChart />
-        </div>
-        <div className={styles.bChart}>
-          <div>
-            <p style={{ marginBottom: "60px" }}>Device Activity</p>
-          </div>
-          <PieChart />
-        </div>
-      </div> */}
     </div>
   );
 }

@@ -16,8 +16,12 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
   useDisclosure,
+  Grid,
+  GridItem,
+  Radio,
+  RadioGroup,
+  Stack,
 } from "@chakra-ui/react";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -27,8 +31,9 @@ const CourseMaster = () => {
     {
       id: "01",
       name: "NEET PG Course",
-      subjects: ["Anatomy", "Biochemistry"],
+      subjects: ["Anatomy"], // Updated to handle single subject
       price: "₹5,000",
+      discountPrice: "₹4,000", // Added discount price
       description: "Full course access",
     },
   ]);
@@ -56,6 +61,10 @@ const CourseMaster = () => {
     {
       headerName: "Price",
       field: "price",
+    },
+    {
+      headerName: "Discount Price",
+      field: "discountPrice", // Added discount price column
     },
     {
       headerName: "Description",
@@ -97,6 +106,7 @@ const CourseMaster = () => {
   const [courseName, setCourseName] = useState("");
   const [assignedSubjects, setAssignedSubjects] = useState<string[]>([]);
   const [price, setPrice] = useState("");
+  const [discountPrice, setDiscountPrice] = useState(""); // Added discount price state
   const [description, setDescription] = useState("");
 
   const handleEdit = (data: any) => {
@@ -104,6 +114,7 @@ const CourseMaster = () => {
     setCourseName(data.name);
     setAssignedSubjects(data.subjects);
     setPrice(data.price);
+    setDiscountPrice(data.discountPrice); // Set discount price
     setDescription(data.description);
     onEditModalOpen(); // Open Edit Modal
   };
@@ -118,6 +129,7 @@ const CourseMaster = () => {
       name: courseName,
       subjects: assignedSubjects,
       price: price,
+      discountPrice: discountPrice, // Added discount price
       description: description,
     };
     setRowData((prev) => [...prev, newCourse]);
@@ -131,6 +143,7 @@ const CourseMaster = () => {
       name: courseName,
       subjects: assignedSubjects,
       price: price,
+      discountPrice: discountPrice, // Added discount price
       description: description,
     };
     setRowData((prev) =>
@@ -146,6 +159,7 @@ const CourseMaster = () => {
     setCourseName("");
     setAssignedSubjects([]);
     setPrice("");
+    setDiscountPrice(""); // Reset discount price
     setDescription("");
     setCurrentCourse(null);
   };
@@ -193,30 +207,44 @@ const CourseMaster = () => {
                 value={courseName}
                 onChange={(e) => setCourseName(e.target.value)}
               />
-              <FormLabel>Assign Subjects</FormLabel>
-              <Select
-                placeholder="Select Subjects"
-                value={assignedSubjects}
-                onChange={(e) =>
-                  setAssignedSubjects(
-                    Array.from(
-                      e.target.selectedOptions,
-                      (option) => option.value
-                    )
-                  )
-                }
+              <FormLabel>Assign Subject</FormLabel>
+              <RadioGroup
+                value={assignedSubjects[0] || ""} // Use the first item if array is not empty
+                onChange={(value) => setAssignedSubjects([value])} // Set as a single value in an array
               >
-                <option value="Anatomy">Anatomy</option>
-                <option value="Biochemistry">Biochemistry</option>
-                <option value="Physiology">Physiology</option>
-                <option value="Pathology">Pathology</option>
-              </Select>
-              <FormLabel>Price</FormLabel>
-              <Input
-                placeholder="Enter Price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
+                <Stack direction="column">
+                  <Radio value="Anatomy" colorScheme="green">
+                    Anatomy
+                  </Radio>
+                  <Radio value="Biochemistry" colorScheme="green">
+                    Biochemistry
+                  </Radio>
+                  <Radio value="Physiology" colorScheme="green">
+                    Physiology
+                  </Radio>
+                  <Radio value="Pathology" colorScheme="green">
+                    Pathology
+                  </Radio>
+                </Stack>
+              </RadioGroup>
+              <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>
+                <GridItem>
+                  <FormLabel>Price</FormLabel>
+                  <Input
+                    placeholder="Enter Price"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                  />
+                </GridItem>
+                <GridItem>
+                  <FormLabel>Discount Price</FormLabel>
+                  <Input
+                    placeholder="Enter Discount Price"
+                    value={discountPrice}
+                    onChange={(e) => setDiscountPrice(e.target.value)}
+                  />
+                </GridItem>
+              </Grid>
               <FormLabel>Description</FormLabel>
               <Input
                 placeholder="Enter Description"
@@ -250,30 +278,44 @@ const CourseMaster = () => {
                 value={courseName}
                 onChange={(e) => setCourseName(e.target.value)}
               />
-              <FormLabel>Assign Subjects</FormLabel>
-              <Select
-                placeholder="Select Subjects"
-                value={assignedSubjects}
-                onChange={(e) =>
-                  setAssignedSubjects(
-                    Array.from(
-                      e.target.selectedOptions,
-                      (option) => option.value
-                    )
-                  )
-                }
+              <FormLabel>Assign Subject</FormLabel>
+              <RadioGroup
+                value={assignedSubjects[0] || ""} // Use the first item if array is not empty
+                onChange={(value) => setAssignedSubjects([value])} // Set as a single value in an array
               >
-                <option value="Anatomy">Anatomy</option>
-                <option value="Biochemistry">Biochemistry</option>
-                <option value="Physiology">Physiology</option>
-                <option value="Pathology">Pathology</option>
-              </Select>
-              <FormLabel>Price</FormLabel>
-              <Input
-                placeholder="Enter Price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
+                <Stack direction="column">
+                  <Radio value="Anatomy" colorScheme="green">
+                    Anatomy
+                  </Radio>
+                  <Radio value="Biochemistry" colorScheme="green">
+                    Biochemistry
+                  </Radio>
+                  <Radio value="Physiology" colorScheme="green">
+                    Physiology
+                  </Radio>
+                  <Radio value="Pathology" colorScheme="green">
+                    Pathology
+                  </Radio>
+                </Stack>
+              </RadioGroup>
+              <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>
+                <GridItem>
+                  <FormLabel>Price</FormLabel>
+                  <Input
+                    placeholder="Enter Price"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                  />
+                </GridItem>
+                <GridItem>
+                  <FormLabel>Discount Price</FormLabel>
+                  <Input
+                    placeholder="Enter Discount Price"
+                    value={discountPrice}
+                    onChange={(e) => setDiscountPrice(e.target.value)}
+                  />
+                </GridItem>
+              </Grid>
               <FormLabel>Description</FormLabel>
               <Input
                 placeholder="Enter Description"

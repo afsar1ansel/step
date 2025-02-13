@@ -19,7 +19,17 @@ import {
   Select,
   useDisclosure,
   Textarea,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
+  Grid,
+  GridItem,
+  IconButton,
+  Box,
 } from "@chakra-ui/react";
+import { FaPlus, FaTrash } from "react-icons/fa6";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -102,9 +112,10 @@ const StepsTab = () => {
   const [videoTitle, setVideoTitle] = useState("");
   const [videoDescription, setVideoDescription] = useState("");
   const [videoDuration, setVideoDuration] = useState("");
+  const [notes, setNotes] = useState([{ title: "", description: "" }]);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [notesTitle, setNotesTitle] = useState("");
   const [notesDescription, setNotesDescription] = useState("");
-  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 
   const handleEdit = (data: any) => {
     setCurrentStep(data);
@@ -122,7 +133,31 @@ const StepsTab = () => {
       id: String(rowData.length + 1),
       subject: selectedSubject,
       steps: stepNumber,
+      preTest: {
+        link: preTestLink,
+        syllabus: preTestSyllabus,
+        instructions: preTestInstructions,
+        examDetails: preTestExamDetails,
+      },
+      postTest: {
+        link: postTestLink,
+        syllabus: postTestSyllabus,
+        instructions: postTestInstructions,
+        examDetails: postTestExamDetails,
+      },
+      video: {
+        link: videoLink,
+        title: videoTitle,
+        description: videoDescription,
+        duration: videoDuration,
+      },
+      notes: notes,
+      attachedFiles: attachedFiles,
     };
+
+    // Log all details to the console
+    console.log("New Step Details:", newStep);
+
     setRowData((prev) => [...prev, newStep]);
     resetForm();
     onAddModalClose();
@@ -157,10 +192,24 @@ const StepsTab = () => {
     setVideoTitle("");
     setVideoDescription("");
     setVideoDuration("");
-    setNotesTitle("");
-    setNotesDescription("");
+    setNotes([{ title: "", description: "" }]);
     setAttachedFiles([]);
     setCurrentStep(null);
+  };
+
+  const handleAddNoteGroup = () => {
+    setNotes([...notes, { title: "", description: "" }]);
+  };
+
+  const handleDeleteNoteGroup = (index: number) => {
+    const newNotes = notes.filter((_, i) => i !== index);
+    setNotes(newNotes);
+  };
+
+  const handleNoteChange = (index: number, field: string, value: string) => {
+    const newNotes = [...notes];
+    newNotes[index][field as keyof (typeof newNotes)[0]] = value;
+    setNotes(newNotes);
   };
 
   return (
@@ -193,108 +242,193 @@ const StepsTab = () => {
       </div>
 
       {/* Add Step Modal */}
-      <Modal isOpen={isAddModalOpen} onClose={onAddModalClose} size="xl">
+      <Modal isOpen={isAddModalOpen} onClose={onAddModalClose} size="6xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Add New Step</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <FormControl>
-              <FormLabel>Step Number</FormLabel>
-              <Input
-                placeholder="Enter Step Number"
-                value={stepNumber}
-                onChange={(e) => setStepNumber(e.target.value)}
-              />
-              <FormLabel>Select Subject</FormLabel>
-              <Select
-                placeholder="Select Subject"
-                value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
-              >
-                <option value="Anatomy">Anatomy</option>
-                <option value="Biochemistry">Biochemistry</option>
-              </Select>
-              <FormLabel>Select Teacher</FormLabel>
-              <Select
-                placeholder="Select Teacher"
-                value={selectedTeacher}
-                onChange={(e) => setSelectedTeacher(e.target.value)}
-              >
-                <option value="Dr. Smith">Dr. Smith</option>
-                <option value="Dr. John">Dr. John</option>
-              </Select>
-              <FormLabel>Pre Test MCQ Google Sheet Link</FormLabel>
-              <Input
-                placeholder="Enter Pre Test Link"
-                value={preTestLink}
-                onChange={(e) => setPreTestLink(e.target.value)}
-              />
-              <FormLabel>Pre Test Details</FormLabel>
-              <Textarea
-                placeholder="Syllabus"
-                value={preTestSyllabus}
-                onChange={(e) => setPreTestSyllabus(e.target.value)}
-              />
-              <Textarea
-                placeholder="Instructions"
-                value={preTestInstructions}
-                onChange={(e) => setPreTestInstructions(e.target.value)}
-              />
-              <Textarea
-                placeholder="Exam Details"
-                value={preTestExamDetails}
-                onChange={(e) => setPreTestExamDetails(e.target.value)}
-              />
-              <FormLabel>Post Test MCQ Google Sheet Link</FormLabel>
-              <Input
-                placeholder="Enter Post Test Link"
-                value={postTestLink}
-                onChange={(e) => setPostTestLink(e.target.value)}
-              />
-              <FormLabel>Post Test Details</FormLabel>
-              <Textarea
-                placeholder="Syllabus"
-                value={postTestSyllabus}
-                onChange={(e) => setPostTestSyllabus(e.target.value)}
-              />
-              <Textarea
-                placeholder="Instructions"
-                value={postTestInstructions}
-                onChange={(e) => setPostTestInstructions(e.target.value)}
-              />
-              <Textarea
-                placeholder="Exam Details"
-                value={postTestExamDetails}
-                onChange={(e) => setPostTestExamDetails(e.target.value)}
-              />
-              <FormLabel>Video Details</FormLabel>
-              <Input
-                placeholder="Video Link"
-                value={videoLink}
-                onChange={(e) => setVideoLink(e.target.value)}
-              />
-              <Input
-                placeholder="Title & Description"
-                value={videoTitle}
-                onChange={(e) => setVideoTitle(e.target.value)}
-              />
-              <Input
-                placeholder="Duration"
-                value={videoDuration}
-                onChange={(e) => setVideoDuration(e.target.value)}
-              />
+            <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Step Number</FormLabel>
+                  <Input
+                    placeholder="Enter Step Number"
+                    value={stepNumber}
+                    onChange={(e) => setStepNumber(e.target.value)}
+                  />
+                </FormControl>
+              </GridItem>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Select Subject</FormLabel>
+                  <Select
+                    placeholder="Select Subject"
+                    value={selectedSubject}
+                    onChange={(e) => setSelectedSubject(e.target.value)}
+                  >
+                    <option value="Anatomy">Anatomy</option>
+                    <option value="Biochemistry">Biochemistry</option>
+                  </Select>
+                </FormControl>
+              </GridItem>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Select Teacher</FormLabel>
+                  <Select
+                    placeholder="Select Teacher"
+                    value={selectedTeacher}
+                    onChange={(e) => setSelectedTeacher(e.target.value)}
+                  >
+                    <option value="Dr. Smith">Dr. Smith</option>
+                    <option value="Dr. John">Dr. John</option>
+                  </Select>
+                </FormControl>
+              </GridItem>
+              <GridItem>
+                <FormControl>
+                  <FormLabel>Video Details</FormLabel>
+                  <Input
+                    placeholder="Video Link"
+                    value={videoLink}
+                    onChange={(e) => setVideoLink(e.target.value)}
+                  />
+                  <Input
+                    placeholder="Title"
+                    value={videoTitle}
+                    onChange={(e) => setVideoTitle(e.target.value)}
+                  />
+                  <Input
+                    placeholder="Duration"
+                    value={videoDuration}
+                    onChange={(e) => setVideoDuration(e.target.value)}
+                  />
+                </FormControl>
+              </GridItem>
+            </Grid>
+
+            <Tabs mt={6}>
+              <TabList>
+                <Tab>Pre-Test Details</Tab>
+                <Tab>Post-Test Details</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+                    <GridItem>
+                      <FormControl>
+                        <FormLabel>Pre Test MCQ Google Sheet Link</FormLabel>
+                        <Input
+                          placeholder="Enter Pre Test Link"
+                          value={preTestLink}
+                          onChange={(e) => setPreTestLink(e.target.value)}
+                        />
+                      </FormControl>
+                    </GridItem>
+                    <GridItem>
+                      <FormControl>
+                        <FormLabel>Pre Test Details</FormLabel>
+                        <Textarea
+                          placeholder="Syllabus"
+                          value={preTestSyllabus}
+                          onChange={(e) => setPreTestSyllabus(e.target.value)}
+                        />
+                        <Textarea
+                          placeholder="Instructions"
+                          value={preTestInstructions}
+                          onChange={(e) =>
+                            setPreTestInstructions(e.target.value)
+                          }
+                        />
+                        <Textarea
+                          placeholder="Exam Details"
+                          value={preTestExamDetails}
+                          onChange={(e) =>
+                            setPreTestExamDetails(e.target.value)
+                          }
+                        />
+                      </FormControl>
+                    </GridItem>
+                  </Grid>
+                </TabPanel>
+                <TabPanel>
+                  <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+                    <GridItem>
+                      <FormControl>
+                        <FormLabel>Post Test MCQ Google Sheet Link</FormLabel>
+                        <Input
+                          placeholder="Enter Post Test Link"
+                          value={postTestLink}
+                          onChange={(e) => setPostTestLink(e.target.value)}
+                        />
+                      </FormControl>
+                    </GridItem>
+                    <GridItem>
+                      <FormControl>
+                        <FormLabel>Post Test Details</FormLabel>
+                        <Textarea
+                          placeholder="Syllabus"
+                          value={postTestSyllabus}
+                          onChange={(e) => setPostTestSyllabus(e.target.value)}
+                        />
+                        <Textarea
+                          placeholder="Instructions"
+                          value={postTestInstructions}
+                          onChange={(e) =>
+                            setPostTestInstructions(e.target.value)
+                          }
+                        />
+                        <Textarea
+                          placeholder="Exam Details"
+                          value={postTestExamDetails}
+                          onChange={(e) =>
+                            setPostTestExamDetails(e.target.value)
+                          }
+                        />
+                      </FormControl>
+                    </GridItem>
+                  </Grid>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+
+            <Box mt={6}>
               <FormLabel>Notes Section</FormLabel>
-              <Input
-                placeholder="Add Notes Title"
-                value={notesTitle}
-                onChange={(e) => setNotesTitle(e.target.value)}
+              {notes.map((note, index) => (
+                <Box key={index} mb={4} display="flex" alignItems="center">
+                  <Box flex={1}>
+                    <Input
+                      placeholder="Add Notes Title"
+                      value={note.title}
+                      onChange={(e) =>
+                        handleNoteChange(index, "title", e.target.value)
+                      }
+                    />
+                    <Textarea
+                      placeholder="Add Notes Description"
+                      value={note.description}
+                      onChange={(e) =>
+                        handleNoteChange(index, "description", e.target.value)
+                      }
+                    />
+                  </Box>
+                  <IconButton
+                    aria-label="Delete note group"
+                    icon={<FaTrash />}
+                    colorScheme="red"
+                    ml={2}
+                    onClick={() => handleDeleteNoteGroup(index)}
+                  />
+                </Box>
+              ))}
+              <IconButton
+                aria-label="Add note group"
+                icon={<FaPlus />}
+                onClick={handleAddNoteGroup}
               />
-              <Textarea
-                placeholder="Add Notes Description"
-                value={notesDescription}
-                onChange={(e) => setNotesDescription(e.target.value)}
-              />
+            </Box>
+
+            <FormControl mt={6}>
               <FormLabel>Attach Files (PDF, PPT, etc.)</FormLabel>
               <Input
                 type="file"

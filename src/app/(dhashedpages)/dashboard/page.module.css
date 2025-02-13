@@ -81,9 +81,9 @@ text-decoration-skip-ink: none;
 /* chart */
 
 .chartBox{
-    border: solid 1px gray;
-    height: 300px;
-    width: 80%;
-    padding: 20px;
+    /* border: solid 1px gray; */
+    height: 400px;
+    /* width: 80%; */
+    /* padding: 20px; */
 
 }

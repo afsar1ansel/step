@@ -21,6 +21,7 @@ import {
   useDisclosure,
   Switch,
 } from "@chakra-ui/react";
+import { time } from "console";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -31,7 +32,9 @@ const StudentsTab = () => {
       name: "John Doe",
       email: "john@email.com",
       contact: "9876543210",
+      timeActive: "5:43:00",
       registrationDate: "2025-02-10",
+      mode: "Paid",
       subscription: "Active",
     },
     {
@@ -39,16 +42,18 @@ const StudentsTab = () => {
       name: "Jane Smith",
       email: "jane@email.com",
       contact: "9876543211",
+      timeActive: "2:15:00",
       registrationDate: "2025-02-09",
+      mode: "Free",
       subscription: "Inactive",
     },
   ]);
 
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     { headerName: "Sl. No", field: "id", maxWidth: 80 },
-    { headerName: "Student Name", field: "name", minWidth: 180 },
+    { headerName: "Student Name", field: "name", maxWidth: 150 },
     { headerName: "Email", field: "email", minWidth: 200 },
-    { headerName: "Contact No.", field: "contact", minWidth: 150 },
+    { headerName: "Contact No.", field: "contact", maxWidth: 150 },
     {
       headerName: "Registration Date",
       field: "registrationDate",
@@ -65,6 +70,28 @@ const StudentsTab = () => {
         >
           {params.value}
         </Switch>
+      ),
+    },
+    {
+      headerName: "timeActive",
+      field: "timeActive",
+      maxWidth: 100,
+    },
+    {
+      headerName: "Mode",
+      field: "mode",
+      maxWidth: 80,
+      cellRenderer: (params: any) => (
+        <span
+          style={{
+            color: "white",
+            backgroundColor: params.value === "Paid" ? "#81C784" : "#FFB74D",
+            padding: "5px 10px",
+            borderRadius: "8px",
+          }}
+        >
+          {params.value}
+        </span>
       ),
     },
     {

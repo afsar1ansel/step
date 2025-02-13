@@ -16,8 +16,9 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Select,
   useDisclosure,
+  Checkbox,
+  Stack,
 } from "@chakra-ui/react";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -27,7 +28,7 @@ const TeacherMaster = () => {
     {
       id: "01",
       name: "Dr. Smith",
-      subject: "Anatomy",
+      subjects: ["Anatomy"], // Updated to handle multiple subjects
       description: "10+ years of experience",
       profilePic: "image",
     },
@@ -47,8 +48,9 @@ const TeacherMaster = () => {
       minWidth: 180,
     },
     {
-      headerName: "Subject",
-      field: "subject",
+      headerName: "Subjects",
+      field: "subjects",
+      valueFormatter: (params) => params.value.join(", "), // Display subjects as a comma-separated string
     },
     {
       headerName: "Description",
@@ -101,14 +103,14 @@ const TeacherMaster = () => {
 
   const [currentTeacher, setCurrentTeacher] = useState<any>(null);
   const [teacherName, setTeacherName] = useState("");
-  const [teacherSubject, setTeacherSubject] = useState("");
+  const [teacherSubjects, setTeacherSubjects] = useState<string[]>([]); // Updated to handle multiple subjects
   const [teacherDescription, setTeacherDescription] = useState("");
   const [teacherProfilePic, setTeacherProfilePic] = useState("");
 
   const handleEdit = (data: any) => {
     setCurrentTeacher(data);
     setTeacherName(data.name);
-    setTeacherSubject(data.subject);
+    setTeacherSubjects(data.subjects || []); // Initialize with selected subjects
     setTeacherDescription(data.description);
     setTeacherProfilePic(data.profilePic);
     onEditModalOpen(); // Open Edit Modal
@@ -122,10 +124,14 @@ const TeacherMaster = () => {
     const newTeacher = {
       id: String(rowData.length + 1),
       name: teacherName,
-      subject: teacherSubject,
+      subjects: teacherSubjects, // Updated to handle multiple subjects
       description: teacherDescription,
       profilePic: teacherProfilePic,
     };
+
+    // Log the details to the console
+    console.log("New Teacher Details:", newTeacher);
+
     setRowData((prev) => [...prev, newTeacher]);
     resetForm();
     onAddModalClose();
@@ -135,10 +141,14 @@ const TeacherMaster = () => {
     const updatedTeacher = {
       id: currentTeacher.id,
       name: teacherName,
-      subject: teacherSubject,
+      subjects: teacherSubjects, // Updated to handle multiple subjects
       description: teacherDescription,
       profilePic: teacherProfilePic,
     };
+
+    // Log the updated details to the console
+    console.log("Updated Teacher Details:", updatedTeacher);
+
     setRowData((prev) =>
       prev.map((teacher) =>
         teacher.id === currentTeacher.id ? updatedTeacher : teacher
@@ -150,10 +160,19 @@ const TeacherMaster = () => {
 
   const resetForm = () => {
     setTeacherName("");
-    setTeacherSubject("");
+    setTeacherSubjects([]);
     setTeacherDescription("");
     setTeacherProfilePic("");
     setCurrentTeacher(null);
+  };
+
+  const handleSubjectChange = (subject: string) => {
+    setTeacherSubjects(
+      (prev) =>
+        prev.includes(subject)
+          ? prev.filter((s) => s !== subject) // Remove if already selected
+          : [...prev, subject] // Add if not selected
+    );
   };
 
   return (
@@ -199,15 +218,22 @@ const TeacherMaster = () => {
                 value={teacherName}
                 onChange={(e) => setTeacherName(e.target.value)}
               />
-              <FormLabel>Subject</FormLabel>
-              <Select
-                placeholder="Select Subject"
-                value={teacherSubject}
-                onChange={(e) => setTeacherSubject(e.target.value)}
-              >
-                <option value="Anatomy">Anatomy</option>
-                <option value="Biochemistry">Biochemistry</option>
-              </Select>
+              <FormLabel>Subjects</FormLabel>
+              <Stack direction="column">
+                {["Anatomy", "Biochemistry", "Biology", "Chemistry"].map(
+                  (subject) => (
+                    <Checkbox
+                      key={subject}
+                      value={subject}
+                      isChecked={teacherSubjects.includes(subject)}
+                      onChange={() => handleSubjectChange(subject)}
+                      colorScheme="green"
+                    >
+                      {subject}
+                    </Checkbox>
+                  )
+                )}
+              </Stack>
               <FormLabel>Description</FormLabel>
               <Input
                 placeholder="Enter Description"
@@ -247,15 +273,22 @@ const TeacherMaster = () => {
                 value={teacherName}
                 onChange={(e) => setTeacherName(e.target.value)}
               />
-              <FormLabel>Subject</FormLabel>
-              <Select
-                placeholder="Select Subject"
-                value={teacherSubject}
-                onChange={(e) => setTeacherSubject(e.target.value)}
-              >
-                <option value="Anatomy">Anatomy</option>
-                <option value="Biochemistry">Biochemistry</option>
-              </Select>
+              <FormLabel>Subjects</FormLabel>
+              <Stack direction="column">
+                {["Anatomy", "Biochemistry", "Biology", "Chemistry"].map(
+                  (subject) => (
+                    <Checkbox
+                      key={subject}
+                      value={subject}
+                      isChecked={teacherSubjects.includes(subject)}
+                      onChange={() => handleSubjectChange(subject)}
+                      colorScheme="green"
+                    >
+                      {subject}
+                    </Checkbox>
+                  )
+                )}
+              </Stack>
               <FormLabel>Description</FormLabel>
               <Input
                 placeholder="Enter Description"
