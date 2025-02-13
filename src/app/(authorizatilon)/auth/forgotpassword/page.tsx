@@ -3,8 +3,7 @@ import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import style from "./page.module.css";
 import Image from "next/image";
-// import logo from "/public/Mesha_inc_logo-1.png";
-// import photo from "/public/Photo.png";
+
 
 import photo from "/public/Group19697.png";
 

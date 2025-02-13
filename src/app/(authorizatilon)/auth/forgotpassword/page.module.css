@@ -63,7 +63,7 @@ font-weight: 600;
 .forgot{
     /* border: solid 1px red; */
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     position: relative;
     top: -28px;
     right: -26vw;
