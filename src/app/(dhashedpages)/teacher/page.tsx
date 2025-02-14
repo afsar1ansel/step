@@ -19,7 +19,10 @@ import {
   useDisclosure,
   Checkbox,
   Stack,
+  Box,
+  Image,
 } from "@chakra-ui/react";
+import { useDropzone } from "react-dropzone";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -28,7 +31,7 @@ const TeacherMaster = () => {
     {
       id: "01",
       name: "Dr. Smith",
-      subjects: ["Anatomy"], // Updated to handle multiple subjects
+      subjects: ["Anatomy"],
       description: "10+ years of experience",
       profilePic: "image",
     },
@@ -50,7 +53,7 @@ const TeacherMaster = () => {
     {
       headerName: "Subjects",
       field: "subjects",
-      valueFormatter: (params) => params.value.join(", "), // Display subjects as a comma-separated string
+      valueFormatter: (params) => params.value.join(", "),
     },
     {
       headerName: "Description",
@@ -87,14 +90,12 @@ const TeacherMaster = () => {
     },
   ]);
 
-  // State for Add Teacher Modal
   const {
     isOpen: isAddModalOpen,
     onOpen: onAddModalOpen,
     onClose: onAddModalClose,
   } = useDisclosure();
 
-  // State for Edit Teacher Modal
   const {
     isOpen: isEditModalOpen,
     onOpen: onEditModalOpen,
@@ -103,17 +104,17 @@ const TeacherMaster = () => {
 
   const [currentTeacher, setCurrentTeacher] = useState<any>(null);
   const [teacherName, setTeacherName] = useState("");
-  const [teacherSubjects, setTeacherSubjects] = useState<string[]>([]); // Updated to handle multiple subjects
+  const [teacherSubjects, setTeacherSubjects] = useState<string[]>([]);
   const [teacherDescription, setTeacherDescription] = useState("");
   const [teacherProfilePic, setTeacherProfilePic] = useState("");
 
   const handleEdit = (data: any) => {
     setCurrentTeacher(data);
     setTeacherName(data.name);
-    setTeacherSubjects(data.subjects || []); // Initialize with selected subjects
+    setTeacherSubjects(data.subjects || []);
     setTeacherDescription(data.description);
     setTeacherProfilePic(data.profilePic);
-    onEditModalOpen(); // Open Edit Modal
+    onEditModalOpen();
   };
 
   const handleDelete = (data: any) => {
@@ -124,12 +125,11 @@ const TeacherMaster = () => {
     const newTeacher = {
       id: String(rowData.length + 1),
       name: teacherName,
-      subjects: teacherSubjects, // Updated to handle multiple subjects
+      subjects: teacherSubjects,
       description: teacherDescription,
       profilePic: teacherProfilePic,
     };
 
-    // Log the details to the console
     console.log("New Teacher Details:", newTeacher);
 
     setRowData((prev) => [...prev, newTeacher]);
@@ -141,12 +141,11 @@ const TeacherMaster = () => {
     const updatedTeacher = {
       id: currentTeacher.id,
       name: teacherName,
-      subjects: teacherSubjects, // Updated to handle multiple subjects
+      subjects: teacherSubjects,
       description: teacherDescription,
       profilePic: teacherProfilePic,
     };
 
-    // Log the updated details to the console
     console.log("Updated Teacher Details:", updatedTeacher);
 
     setRowData((prev) =>
@@ -167,13 +166,23 @@ const TeacherMaster = () => {
   };
 
   const handleSubjectChange = (subject: string) => {
-    setTeacherSubjects(
-      (prev) =>
-        prev.includes(subject)
-          ? prev.filter((s) => s !== subject) // Remove if already selected
-          : [...prev, subject] // Add if not selected
+    setTeacherSubjects((prev) =>
+      prev.includes(subject)
+        ? prev.filter((s) => s !== subject)
+        : [...prev, subject]
     );
   };
+
+  const onDrop = (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      setTeacherProfilePic(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
     <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
@@ -240,12 +249,31 @@ const TeacherMaster = () => {
                 value={teacherDescription}
                 onChange={(e) => setTeacherDescription(e.target.value)}
               />
-              <FormLabel>Profile Picture URL</FormLabel>
-              <Input
-                placeholder="Enter Profile Picture URL"
-                value={teacherProfilePic}
-                onChange={(e) => setTeacherProfilePic(e.target.value)}
-              />
+              <FormLabel>Profile Picture</FormLabel>
+              <Box
+                {...getRootProps()}
+                border="2px dashed"
+                borderColor="gray.300"
+                borderRadius="md"
+                p={4}
+                textAlign="center"
+                cursor="pointer"
+              >
+                <input {...getInputProps()} />
+                {teacherProfilePic ? (
+                  <Image
+                    src={teacherProfilePic}
+                    alt="Profile"
+                    boxSize="100px"
+                    borderRadius="full"
+                    mx="auto"
+                  />
+                ) : (
+                  <p>
+                    Drag & drop a profile picture here, or click to select one
+                  </p>
+                )}
+              </Box>
             </FormControl>
           </ModalBody>
           <ModalFooter>
@@ -295,12 +323,31 @@ const TeacherMaster = () => {
                 value={teacherDescription}
                 onChange={(e) => setTeacherDescription(e.target.value)}
               />
-              <FormLabel>Profile Picture URL</FormLabel>
-              <Input
-                placeholder="Enter Profile Picture URL"
-                value={teacherProfilePic}
-                onChange={(e) => setTeacherProfilePic(e.target.value)}
-              />
+              <FormLabel>Profile Picture</FormLabel>
+              <Box
+                {...getRootProps()}
+                border="2px dashed"
+                borderColor="gray.300"
+                borderRadius="md"
+                p={4}
+                textAlign="center"
+                cursor="pointer"
+              >
+                <input {...getInputProps()} />
+                {teacherProfilePic ? (
+                  <Image
+                    src={teacherProfilePic}
+                    alt="Profile"
+                    boxSize="100px"
+                    borderRadius="full"
+                    mx="auto"
+                  />
+                ) : (
+                  <p>
+                    Drag & drop a profile picture here, or click to select one
+                  </p>
+                )}
+              </Box>
             </FormControl>
           </ModalBody>
           <ModalFooter>
