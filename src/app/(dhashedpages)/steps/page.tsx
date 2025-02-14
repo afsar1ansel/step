@@ -59,6 +59,13 @@ const StepsTab = () => {
       headerName: "Subject Name",
       field: "subject",
       minWidth: 180,
+      cellRenderer: (params: any) => {
+        return (
+          <button onClick={() => handleShowDetails(params.data)}>
+            {params.data.subject}
+          </button>
+        );
+      },
     },
     {
       headerName: "No. of Steps",
@@ -67,20 +74,25 @@ const StepsTab = () => {
     {
       headerName: "Actions",
       cellRenderer: (params: any) => {
+        console.log(params.data)
         return (
           <div>
-            <button
+            {/* <button
               onClick={() => handleEdit(params.data)}
               style={{ marginRight: "10px" }}
             >
               Edit
-            </button>
+            </button> */}
             <button onClick={() => handleDelete(params.data)}>Delete</button>
           </div>
         );
       },
     },
   ]);
+
+  // function handleShowDetails(data: any) {
+  //  console.log(data)
+  // }
 
   // State for Add Step Modal
   const {
@@ -95,6 +107,107 @@ const StepsTab = () => {
     onOpen: onEditModalOpen,
     onClose: onEditModalClose,
   } = useDisclosure();
+
+  //state for show detail 
+  const [currentStepDetails, setCurrentStepDetails] = useState<any[]>([
+    {
+      stepNumber: 1,
+      preTestLink: "https://docs.google.com/spreadsheets/d/pre-test-link-1",
+      preTestSyllabus: "Introduction to Anatomy, Basic Terminology",
+      preTestInstructions: "Complete the test within 30 minutes.",
+      preTestExamDetails: "20 MCQs, 30 minutes duration",
+      postTestLink: "https://docs.google.com/spreadsheets/d/post-test-link-1",
+      postTestSyllabus: "Review of Anatomy Basics, Advanced Terminology",
+      postTestInstructions: "Complete the test within 45 minutes.",
+      postTestExamDetails: "30 MCQs, 45 minutes duration",
+      videoLink: "https://www.youtube.com/watch?v=anatomy-intro",
+      videoTitle: "Introduction to Anatomy",
+      videoDescription: "This video covers the basics of human anatomy.",
+      videoDuration: "15:30",
+      notes: [
+        {
+          title: "Anatomy Basics",
+          description: "Key terms and concepts for understanding anatomy.",
+        },
+        {
+          title: "Important Definitions",
+          description:
+            "Definitions of anatomical terms like proximal, distal, etc.",
+        },
+      ],
+    },
+    {
+      stepNumber: 2,
+      preTestLink: "https://docs.google.com/spreadsheets/d/pre-test-link-2",
+      preTestSyllabus: "Skeletal System, Bone Structure",
+      preTestInstructions: "Complete the test within 25 minutes.",
+      preTestExamDetails: "15 MCQs, 25 minutes duration",
+      postTestLink: "https://docs.google.com/spreadsheets/d/post-test-link-2",
+      postTestSyllabus: "Advanced Skeletal System, Joints and Ligaments",
+      postTestInstructions: "Complete the test within 40 minutes.",
+      postTestExamDetails: "25 MCQs, 40 minutes duration",
+      videoLink: "https://www.youtube.com/watch?v=skeletal-system",
+      videoTitle: "The Skeletal System",
+      videoDescription:
+        "This video explains the structure and function of the skeletal system.",
+      videoDuration: "20:45",
+      notes: [
+        {
+          title: "Bone Structure",
+          description: "Details about the composition and types of bones.",
+        },
+        {
+          title: "Joints and Ligaments",
+          description:
+            "Explanation of different types of joints and their functions.",
+        },
+      ],
+    },
+    {
+      stepNumber: 3,
+      preTestLink: "https://docs.google.com/spreadsheets/d/pre-test-link-3",
+      preTestSyllabus: "Muscular System, Muscle Types",
+      preTestInstructions: "Complete the test within 20 minutes.",
+      preTestExamDetails: "10 MCQs, 20 minutes duration",
+      postTestLink: "https://docs.google.com/spreadsheets/d/post-test-link-3",
+      postTestSyllabus: "Advanced Muscular System, Muscle Contraction",
+      postTestInstructions: "Complete the test within 35 minutes.",
+      postTestExamDetails: "20 MCQs, 35 minutes duration",
+      videoLink: "https://www.youtube.com/watch?v=muscular-system",
+      videoTitle: "The Muscular System",
+      videoDescription:
+        "This video covers the types of muscles and their functions.",
+      videoDuration: "18:10",
+      notes: [
+        {
+          title: "Muscle Types",
+          description: "Overview of skeletal, smooth, and cardiac muscles.",
+        },
+        {
+          title: "Muscle Contraction",
+          description: "Explanation of how muscles contract and relax.",
+        },
+      ],
+    },
+  ]);
+
+  const {
+    isOpen: isShowModalOpen,
+    onOpen: onShowModalOpen,
+    onClose: onShowModalClose,
+  } = useDisclosure();
+
+  const handleShowDetails = async (data: any) => {
+    // try {
+    //   // Fetch step details from the URL
+    //   const response = await fetch(`https://api.example.com/steps/${data.id}`);
+    //   const stepDetails = await response.json();
+    //   setCurrentStepDetails(stepDetails);
+      onShowModalOpen();
+    // } catch (error) {
+    //   console.error("Error fetching step details:", error);
+    // }
+  };
 
   const [currentStep, setCurrentStep] = useState<any>(null);
   const [stepNumber, setStepNumber] = useState("");
@@ -118,6 +231,7 @@ const StepsTab = () => {
   const [notesDescription, setNotesDescription] = useState("");
 
   const handleEdit = (data: any) => {
+    onShowModalClose();
     setCurrentStep(data);
     setStepNumber(data.steps);
     setSelectedSubject(data.subject);
@@ -569,6 +683,78 @@ const StepsTab = () => {
             </Button>
             <Button colorScheme="green" onClick={handleUpdateStep}>
               Update
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Show Step Details Modal */}
+      <Modal isOpen={isShowModalOpen} onClose={onShowModalClose} size="6xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Step Details</ModalHeader>
+          <ModalCloseButton />
+
+          <ModalBody>
+            {currentStepDetails.map((step, index) => (
+              <Box key={index} mb={6}>
+                <FormLabel>Step {index + 1}</FormLabel>
+                <Button onClick={() => handleEdit(step)}>edit</Button>
+                <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+                  <GridItem>
+                    <FormControl>
+                      <FormLabel>Pre Test MCQ Google Sheet Link</FormLabel>
+                      <Input value={step.preTestLink} isReadOnly />
+                    </FormControl>
+                  </GridItem>
+                  <GridItem>
+                    <FormControl>
+                      <FormLabel>Pre Test Details</FormLabel>
+                      <Textarea value={step.preTestSyllabus} isReadOnly />
+                      <Textarea value={step.preTestInstructions} isReadOnly />
+                      <Textarea value={step.preTestExamDetails} isReadOnly />
+                    </FormControl>
+                  </GridItem>
+                  <GridItem>
+                    <FormControl>
+                      <FormLabel>Post Test MCQ Google Sheet Link</FormLabel>
+                      <Input value={step.postTestLink} isReadOnly />
+                    </FormControl>
+                  </GridItem>
+                  <GridItem>
+                    <FormControl>
+                      <FormLabel>Post Test Details</FormLabel>
+                      <Textarea value={step.postTestSyllabus} isReadOnly />
+                      <Textarea value={step.postTestInstructions} isReadOnly />
+                      <Textarea value={step.postTestExamDetails} isReadOnly />
+                    </FormControl>
+                  </GridItem>
+                  <GridItem>
+                    <FormControl>
+                      <FormLabel>Video Details</FormLabel>
+                      <Input value={step.videoLink} isReadOnly />
+                      <Input value={step.videoTitle} isReadOnly />
+                      <Input value={step.videoDuration} isReadOnly />
+                    </FormControl>
+                  </GridItem>
+                  <GridItem>
+                    {/* <FormControl>
+                      <FormLabel>Notes</FormLabel>
+                      {step.notes.map((note: { title: string; description: string }, noteIndex) => (
+                        <Box mb={4}>
+                          <Input value={note.title} isReadOnly />
+                          <Textarea value={note.description} isReadOnly />
+                        </Box>
+                      ))}
+                    </FormControl> */}
+                  </GridItem>
+                </Grid>
+              </Box>
+            ))}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="gray" mr={3} onClick={onShowModalClose}>
+              Close
             </Button>
           </ModalFooter>
         </ModalContent>
