@@ -24,6 +24,8 @@ import {
   Stack,
 } from "@chakra-ui/react";
 
+import Select from "react-select";
+
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const CourseMaster = () => {
@@ -104,7 +106,7 @@ const CourseMaster = () => {
 
   const [currentCourse, setCurrentCourse] = useState<any>(null);
   const [courseName, setCourseName] = useState("");
-  const [assignedSubjects, setAssignedSubjects] = useState<string[]>([]);
+  const [teacherSubjects, setTeacherSubjects] = useState<string[]>([]);
   const [price, setPrice] = useState("");
   const [discountPrice, setDiscountPrice] = useState(""); // Added discount price state
   const [description, setDescription] = useState("");
@@ -112,7 +114,7 @@ const CourseMaster = () => {
   const handleEdit = (data: any) => {
     setCurrentCourse(data);
     setCourseName(data.name);
-    setAssignedSubjects(data.subjects);
+    setTeacherSubjects(data.subjects);
     setPrice(data.price);
     setDiscountPrice(data.discountPrice); // Set discount price
     setDescription(data.description);
@@ -127,7 +129,7 @@ const CourseMaster = () => {
     const newCourse = {
       id: String(rowData.length + 1),
       name: courseName,
-      subjects: assignedSubjects,
+      subjects: teacherSubjects,
       price: price,
       discountPrice: discountPrice, // Added discount price
       description: description,
@@ -141,7 +143,7 @@ const CourseMaster = () => {
     const updatedCourse = {
       id: currentCourse.id,
       name: courseName,
-      subjects: assignedSubjects,
+      subjects: teacherSubjects,
       price: price,
       discountPrice: discountPrice, // Added discount price
       description: description,
@@ -157,12 +159,23 @@ const CourseMaster = () => {
 
   const resetForm = () => {
     setCourseName("");
-    setAssignedSubjects([]);
+    setTeacherSubjects([]);
     setPrice("");
     setDiscountPrice(""); // Reset discount price
     setDescription("");
     setCurrentCourse(null);
   };
+
+  const subjectOptions = [
+    { label: "Books", value: "Books" },
+    { label: "Movies, Music & Games", value: "Movies, Music & Games" },
+    { label: "Electronics & Computers", value: "Electronics & Computers" },
+    { label: "Home, Garden & Tools", value: "Home, Garden & Tools" },
+    { label: "Health & Beauty", value: "Health & Beauty" },
+    { label: "Toys, Kids & Baby", value: "Toys, Kids & Baby" },
+    { label: "Clothing & Jewelry", value: "Clothing & Jewelry" },
+    { label: "Sports & Outdoors", value: "Sports & Outdoors" },
+  ];
 
   return (
     <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
@@ -208,25 +221,19 @@ const CourseMaster = () => {
                 onChange={(e) => setCourseName(e.target.value)}
               />
               <FormLabel>Assign Subject</FormLabel>
-              <RadioGroup
-                value={assignedSubjects[0] || ""} // Use the first item if array is not empty
-                onChange={(value) => setAssignedSubjects([value])} // Set as a single value in an array
-              >
-                <Stack direction="column">
-                  <Radio value="Anatomy" colorScheme="green">
-                    Anatomy
-                  </Radio>
-                  <Radio value="Biochemistry" colorScheme="green">
-                    Biochemistry
-                  </Radio>
-                  <Radio value="Physiology" colorScheme="green">
-                    Physiology
-                  </Radio>
-                  <Radio value="Pathology" colorScheme="green">
-                    Pathology
-                  </Radio>
-                </Stack>
-              </RadioGroup>
+              <Select
+                isMulti
+                options={subjectOptions}
+                value={subjectOptions.filter((option) =>
+                  teacherSubjects.includes(option.value)
+                )}
+                onChange={(selectedOptions) =>
+                  setTeacherSubjects(
+                    selectedOptions.map((option) => option.value)
+                  )
+                }
+              />
+              <br />
               <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>
                 <GridItem>
                   <FormLabel>Price</FormLabel>
@@ -279,25 +286,20 @@ const CourseMaster = () => {
                 onChange={(e) => setCourseName(e.target.value)}
               />
               <FormLabel>Assign Subject</FormLabel>
-              <RadioGroup
-                value={assignedSubjects[0] || ""} // Use the first item if array is not empty
-                onChange={(value) => setAssignedSubjects([value])} // Set as a single value in an array
-              >
-                <Stack direction="column">
-                  <Radio value="Anatomy" colorScheme="green">
-                    Anatomy
-                  </Radio>
-                  <Radio value="Biochemistry" colorScheme="green">
-                    Biochemistry
-                  </Radio>
-                  <Radio value="Physiology" colorScheme="green">
-                    Physiology
-                  </Radio>
-                  <Radio value="Pathology" colorScheme="green">
-                    Pathology
-                  </Radio>
-                </Stack>
-              </RadioGroup>
+              <Select
+                isMulti
+                options={subjectOptions}
+                value={subjectOptions.filter((option) =>
+                  teacherSubjects.includes(option.value)
+                )}
+                onChange={(selectedOptions) =>
+                  setTeacherSubjects(
+                    selectedOptions.map((option) => option.value)
+                  )
+                }
+              />
+
+              <br />
               <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>
                 <GridItem>
                   <FormLabel>Price</FormLabel>
