@@ -21,8 +21,11 @@ import {
   Stack,
   Box,
   Image,
+  // Select,
 } from "@chakra-ui/react";
 import { useDropzone } from "react-dropzone";
+
+import Select from "react-select";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -184,6 +187,19 @@ const TeacherMaster = () => {
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
+
+const subjectOptions = [
+  { label: "Books", value: "Books" },
+  { label: "Movies, Music & Games", value: "Movies, Music & Games" },
+  { label: "Electronics & Computers", value: "Electronics & Computers" },
+  { label: "Home, Garden & Tools", value: "Home, Garden & Tools" },
+  { label: "Health & Beauty", value: "Health & Beauty" },
+  { label: "Toys, Kids & Baby", value: "Toys, Kids & Baby" },
+  { label: "Clothing & Jewelry", value: "Clothing & Jewelry" },
+  { label: "Sports & Outdoors", value: "Sports & Outdoors" },
+];
+
+
   return (
     <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
       <div
@@ -228,27 +244,26 @@ const TeacherMaster = () => {
                 onChange={(e) => setTeacherName(e.target.value)}
               />
               <FormLabel>Subjects</FormLabel>
-              <Stack direction="column">
-                {["Anatomy", "Biochemistry", "Biology", "Chemistry"].map(
-                  (subject) => (
-                    <Checkbox
-                      key={subject}
-                      value={subject}
-                      isChecked={teacherSubjects.includes(subject)}
-                      onChange={() => handleSubjectChange(subject)}
-                      colorScheme="green"
-                    >
-                      {subject}
-                    </Checkbox>
-                  )
+              <Select
+                isMulti
+                options={subjectOptions}
+                value={subjectOptions.filter((option) =>
+                  teacherSubjects.includes(option.value)
                 )}
-              </Stack>
+                onChange={(selectedOptions) =>
+                  setTeacherSubjects(
+                    selectedOptions.map((option) => option.value)
+                  )
+                }
+              />
+              <br />
               <FormLabel>Description</FormLabel>
               <Input
                 placeholder="Enter Description"
                 value={teacherDescription}
                 onChange={(e) => setTeacherDescription(e.target.value)}
               />
+              <br />
               <FormLabel>Profile Picture</FormLabel>
               <Box
                 {...getRootProps()}
