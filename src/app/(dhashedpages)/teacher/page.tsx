@@ -80,12 +80,12 @@ const TeacherMaster = () => {
       cellRenderer: (params: any) => {
         return (
           <div>
-            <button
+            {/* <button
               onClick={() => handleEdit(params.data)}
               style={{ marginRight: "10px" }}
             >
               Edit
-            </button>
+            </button> */}
             <button onClick={() => handleDelete(params.data)}>Delete</button>
           </div>
         );
