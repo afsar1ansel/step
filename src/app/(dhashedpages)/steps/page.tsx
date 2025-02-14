@@ -697,9 +697,14 @@ const StepsTab = () => {
 
           <ModalBody>
             {currentStepDetails.map((step, index) => (
-              <Box key={index} mb={6}>
-                <FormLabel>Step {index + 1}</FormLabel>
-                <Button onClick={() => handleEdit(step)}>edit</Button>
+              <Box key={index} mb={6} mt={6}>
+                <Box height="1px" width="100%" bg="grey" mb={2} ></Box>
+                <Box display="flex" justifyContent={"space-between"}>
+                  <FormLabel fontSize={20} fontWeight={600}>
+                    *Step {index + 1}
+                  </FormLabel>
+                  <Button onClick={() => handleEdit(step)}>edit</Button>
+                </Box>
                 <Grid templateColumns="repeat(2, 1fr)" gap={6}>
                   <GridItem>
                     <FormControl>
@@ -738,15 +743,20 @@ const StepsTab = () => {
                     </FormControl>
                   </GridItem>
                   <GridItem>
-                    {/* <FormControl>
+                    <FormControl>
                       <FormLabel>Notes</FormLabel>
-                      {step.notes.map((note: { title: string; description: string }, noteIndex) => (
-                        <Box mb={4}>
-                          <Input value={note.title} isReadOnly />
-                          <Textarea value={note.description} isReadOnly />
-                        </Box>
-                      ))}
-                    </FormControl> */}
+                      {step.notes.map(
+                        (
+                          note: { title: string; description: string },
+                          noteIndex: number
+                        ) => (
+                          <Box mb={4}>
+                            <Input value={note.title} isReadOnly />
+                            <Textarea value={note.description} isReadOnly />
+                          </Box>
+                        )
+                      )}
+                    </FormControl>
                   </GridItem>
                 </Grid>
               </Box>
