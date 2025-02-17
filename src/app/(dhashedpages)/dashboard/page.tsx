@@ -40,6 +40,7 @@ export default function Home() {
         id: "01",
         name: "John Doe",
         email: "john@email.com",
+        registration: "12345",
         contact: "9876543210",
         registrationDate: "2025-02-10",
         mode: "Paid",
@@ -49,6 +50,7 @@ export default function Home() {
         id: "02",
         name: "Jane Smith",
         email: "jane@email.com",
+        registration: "67890",
         contact: "9876543211",
         registrationDate: "2025-02-09",
         mode: "Free",
@@ -58,8 +60,9 @@ export default function Home() {
   
     const [columnDefs, setColumnDefs] = useState<ColDef[]>([
       { headerName: "Sl. No", field: "id", maxWidth: 80 },
-      { headerName: "Student Name", field: "name", minWidth: 180 },
+      { headerName: "Student Name", field: "name", minWidth: 180 , filter: true},
       { headerName: "Email", field: "email", minWidth: 200 },
+      { headerName: "Registration No.", field: "registration", maxWidth: 100 },
       { headerName: "Contact No.", field: "contact", maxWidth: 120 },
       {
         headerName: "Registration Date",
@@ -189,9 +192,9 @@ export default function Home() {
       <div className={styles.statesContainer}>
         <div className={styles.stateBox}>
           <div className={styles.stateText}>
-            <p>TOTAL STUDENTS</p>
+            <p>TOTAL Downloads</p>
             <h2>3990</h2>
-            <p className={styles.measure}>↑ 3.5% Increase</p>
+            {/* <p className={styles.measure}>↑ 3.5% Increase</p> */}
           </div>
           <div className={styles.stateIcon}>
             <RiUser3Line />
@@ -200,9 +203,9 @@ export default function Home() {
 
         <div className={styles.stateBox}>
           <div className={styles.stateText}>
-            <p>COURSES</p>
+            <p>Subcriptions</p>
             <h2>110</h2>
-            <p className={styles.measure}>20 Unpaid , 90 paid</p>
+            {/* <p className={styles.measure}>20 Unpaid , 90 paid</p> */}
           </div>
           <div className={styles.stateIcon}>
             <TbDeviceAnalytics />
@@ -211,9 +214,9 @@ export default function Home() {
 
         <div className={styles.stateBox}>
           <div className={styles.stateText}>
-            <p>TESTS</p>
+            <p>Revenue</p>
             <h2>300</h2>
-            <p className={styles.measure}>240 under Course, 60 under misc</p>
+            {/* <p className={styles.measure}>240 under Course, 60 under misc</p> */}
           </div>
           <div className={styles.stateIcon}>
             <IoMdPaper />
@@ -222,9 +225,9 @@ export default function Home() {
 
         <div className={styles.stateBox}>
           <div className={styles.stateText}>
-            <p>RESOURCES</p>
+            <p>Total Active users</p>
             <h2>1460</h2>
-            <p className={styles.measure}>1000 under Course, 450 under misc</p>
+            {/* <p className={styles.measure}>1000 under Course, 450 under misc</p> */}
           </div>
           <div className={styles.stateIcon}>
             <VscFileSymlinkDirectory />
