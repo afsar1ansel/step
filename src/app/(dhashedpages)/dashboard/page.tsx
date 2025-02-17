@@ -227,7 +227,7 @@ export default function Home() {
 
         <div className={styles.stateBox}>
           <div className={styles.stateText}>
-            <p>Total Active users</p>
+            <p>Avg. daily login</p>
             <h2>1460</h2>
             {/* <p className={styles.measure}>1000 under Course, 450 under misc</p> */}
           </div>
