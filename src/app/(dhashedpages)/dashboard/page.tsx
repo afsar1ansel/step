@@ -62,16 +62,18 @@ export default function Home() {
       { headerName: "Sl. No", field: "id", maxWidth: 80 },
       { headerName: "Student Name", field: "name", minWidth: 180 , filter: true},
       { headerName: "Email", field: "email", minWidth: 200 },
-      { headerName: "Registration No.", field: "registration", maxWidth: 100 },
+      { headerName: "Registration No.", field: "registration", maxWidth: 150 },
       { headerName: "Contact No.", field: "contact", maxWidth: 120 },
       {
         headerName: "Registration Date",
         field: "registrationDate",
-        minWidth: 100,
+        // minWidth: 100,
+        maxWidth: 150,
       },
       {
-        headerName: "Subscription Status",
+        headerName: "Status",
         field: "subscription",
+        maxWidth: 130,
         cellRenderer: (params: any) => (
           <Switch
             isChecked={params.value === "Active"}
