@@ -218,7 +218,7 @@ export default function Home() {
           <div className={styles.stateText}>
             <p>Revenue</p>
             <h2>300</h2>
-            {/* <p className={styles.measure}>240 under Course, 60 under misc</p> */}
+            <p className={styles.measure}>₹ 2400 </p>
           </div>
           <div className={styles.stateIcon}>
             <IoMdPaper />
@@ -239,31 +239,31 @@ export default function Home() {
 
       <div className={styles.chartBox}>
         <div
-                style={{
-                  height: "60px",
-                  width: "100%",
-                  backgroundColor: "white",
-                  padding: "20px",
-                  borderRadius: "10px 10px 0px 0px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <p style={{ fontSize: "16px", fontWeight: "600" }}>Students Data</p>
-                {/* <Button onClick={onAddModalOpen} colorScheme="green">
+          style={{
+            height: "60px",
+            width: "100%",
+            backgroundColor: "white",
+            padding: "20px",
+            borderRadius: "10px 10px 0px 0px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <p style={{ fontSize: "16px", fontWeight: "600" }}>Students Data</p>
+          {/* <Button onClick={onAddModalOpen} colorScheme="green">
                   Add Student
                 </Button> */}
-              </div>
-              <div style={{ height: "100%", width: "100%" }}>
-                <AgGridReact
-                  rowData={rowData}
-                  columnDefs={columnDefs}
-                  pagination={true}
-                  paginationPageSize={10}
-                  paginationAutoPageSize={true}
-                />
-              </div>
+        </div>
+        <div style={{ height: "100%", width: "100%" }}>
+          <AgGridReact
+            rowData={rowData}
+            columnDefs={columnDefs}
+            pagination={true}
+            paginationPageSize={10}
+            paginationAutoPageSize={true}
+          />
+        </div>
       </div>
     </div>
   );
