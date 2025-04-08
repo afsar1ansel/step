@@ -6,7 +6,7 @@ import "./globals.css";
 import Image from "next/image";
 // import logo from "/public/Mesha_inc_logo-1.png";
 import profile from "/public/Group19697.png";
-
+import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { IoIosHome } from "react-icons/io";
 import { TbDeviceAnalytics } from "react-icons/tb";
 import { FaRegIdCard } from "react-icons/fa6";
@@ -45,11 +45,12 @@ import {
 type NavItem =
   | "dashboard"
   | "StudentData"
+  | "AdminUsers"
   | "steps"
   | "test"
   | "Resources"
-  | "alertLogs"
-  | "Reports"
+  // | "alertLogs"
+  // | "Reports"
   | "Masters"
   | "teacher"
   | "subject"
@@ -130,6 +131,12 @@ export default function RootLayout({
                     <FaRegIdCard />
                     <Link href="/StudentData">
                       <p className="linkname">Student Data</p>
+                    </Link>
+                  </li>
+                  <li className={active === "AdminUsers" ? "active" : ""}>
+                    <MdOutlineAdminPanelSettings />
+                    <Link href="/AdminUsers">
+                      <p className="linkname">Admin Users</p>
                     </Link>
                   </li>
                   <li className={active === "steps" ? "active" : ""}>

@@ -22,60 +22,28 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { TbReceiptYuan } from "react-icons/tb";
-import { sub } from "framer-motion/client";
+
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const SubjectMaster = () => {
+const AdminUsers = () => {
   const toast = useToast();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   useEffect(() => {
     fetchData();
-    fetchCourseData();
   }, []);
 
-
-  async function fetchCourseData() {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${baseUrl}/masters/courses/get-all-courses/${token}`,
-        {
-          method: "GET",
-        }
-      );
-      const data = await response.json();
-      console.log(data);
-      setallCourse(data);
-      setLoading(false);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch data",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  }
 
   async function fetchData() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${baseUrl}/masters/subjects/get-all-subjects/${token}`,
+        `${baseUrl}/admin-users/get-all-Admin-users/${token}`,
         {
           method: "GET",
         }
       );
-
-      // if (!response.ok) {
-      //   throw new Error("Network response was not ok");
-      // }
-
       const data = await response.json();
       setRowData(data);
       console.log(data);
@@ -105,31 +73,16 @@ const SubjectMaster = () => {
       cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Course Name",
-      field: "course_name",
+      headerName: "Name",
+      field: "username",
       // minWidth: 180,
     },
     {
-      headerName: "Subject Name",
-      field: "subject_name",
-      // minWidth: 180,
-    },
-    // {
-    //   headerName: "Course Code",
-    //   field: "course_id",
-    //   cellStyle: { textAlign: "center" },
-    //   // maxWidth: 120,
-    // },
-    {
-      headerName: "Course Created By",
-      field: "created_admin_user_id",
-      cellRenderer: (params: any) => {
-        // console.log(params);
-        return params.value == 1 ? "Admin" : "Sub Admin";
-      },
+      headerName: "Email",
+      field: "email",
     },
     {
-      field: "course_status",
+      field: "status",
       headerName: "Access",
       filter: false,
       maxWidth: 150,
@@ -155,34 +108,34 @@ const SubjectMaster = () => {
       headerName: "Creation date",
       field: "created_date",
     },
-   {
-        headerName: "Actions",
-        filter: false,
-        cellRenderer: (params: any) => {
-          return (
-            <HStack spacing={2}>
-              <Button
-                // leftIcon={<EditIcon />}
-                colorScheme="blue"
-                size="sm"
-                onClick={() => handleEdit(params.data)}
-                variant="outline"
-              >
-                Edit
-              </Button>
-              {/* <Button
-                // leftIcon={<DeleteIcon />}
-                colorScheme="red"
-                size="sm"
-                onClick={() => handleDelete(params.data)}
-                variant="outline"
-              >
-                Delete
-              </Button> */}
-            </HStack>
-          );
-        },
+    {
+      headerName: "Actions",
+      filter: false,
+      cellRenderer: (params: any) => {
+        return (
+          <HStack spacing={2}>
+            <Button
+              // leftIcon={<EditIcon />}
+              colorScheme="blue"
+              size="sm"
+              onClick={() => handleEdit(params.data)}
+              variant="outline"
+            >
+              Edit
+            </Button>
+            {/* <Button
+                 // leftIcon={<DeleteIcon />}
+                 colorScheme="red"
+                 size="sm"
+                 onClick={() => handleDelete(params.data)}
+                 variant="outline"
+               >
+                 Delete
+               </Button> */}
+          </HStack>
+        );
       },
+    },
   ]);
 
   //toggle function for switch button
@@ -192,14 +145,14 @@ const SubjectMaster = () => {
       const token = localStorage.getItem("token") ?? "";
       const status = data.course_status == 1 ? 0 : 1; // Toggle status between 0 and 1
       console.log(status);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/subjects/update-subject-status/${status}/${data.subject_id}/${token}`,
-        {
-          method: "GET",
-        }
-      );
-      const responseData = await response.json();
-      console.log(responseData);
+      // const response = await fetch(
+      //   `${process.env.NEXT_PUBLIC_BASE_URL}/masters/subjects/update-subject-status/${status}/${data.subject_id}/${token}`,
+      //   {
+      //     method: "GET",
+      //   }
+      // );
+      // const responseData = await response.json();
+      // console.log(responseData);
     } catch (error) {
       console.error("Error toggling course status:", error);
     }
@@ -219,20 +172,14 @@ const SubjectMaster = () => {
     onClose: onEditModalClose,
   } = useDisclosure();
 
-  const [currentSubject, setCurrentSubject] = useState<any>(null);
-  const [subjectName, setSubjectName] = useState("");
-  const [courseId, setCourseId] = useState("");
-  const [createdAdminUserId, setCreatedAdminUserId] = useState("");
-  const [subjectId , setsubjectId] = useState<any>([]);
-  // const [courseId, setCourseId] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [allCourse, setallCourse] = useState<any>([]);
+  const [name, setname] = useState("");
+  const [email, setemail] = useState("");
+  const [role, setrole] = useState("");
+  const [password, setpassword] = useState<any>([]);
+  // const [loading, setLoading] = useState(false);
+  // const [allCourse, setallCourse] = useState<any>([]);
 
   const handleEdit = (data: any) => {
-    // console.log(data)
-    setSubjectName(data.subject_name);
-    setCourseId(data.course_id);
-    setsubjectId(data.subject_id);
     onEditModalOpen(); // Open Edit Modal
   };
 
@@ -241,64 +188,63 @@ const SubjectMaster = () => {
   };
 
   const handleAddSubject = async () => {
-    console.log(subjectName, courseId , createdAdminUserId);
-    try{
+    // console.log(name, email, role , password);
+    try {
       const token = localStorage.getItem("token") ?? "";
       const form = new FormData();
-      form.append("subjectName", subjectName);
-      form.append("courseId", courseId);
+      form.append("username", name);
+      form.append("email", email);
+      form.append("password", password);
+      form.append("role", role);
       form.append("token", token);
       console.log(Object.fromEntries(form.entries()));
 
-       const response = await fetch(
-         `${process.env.NEXT_PUBLIC_BASE_URL}/masters/subjects/add`,
-         {
-           method: "POST",
-           body: form,
-         }
-       );
-       const responseData = await response.json();
-      //  console.log(responseData);
-       fetchData();
-
-        if (responseData.errFlag === 0) {
-          toast({
-            title: "Success",
-            description: "Subject added successfully",
-            status: "success",
-            duration: 3000,
-            isClosable: true,
-          });
-          fetchData();
-        } else {
-          toast({
-            title: "Error",
-            description: responseData.message,
-            status: "error",
-            duration: 3000,
-            isClosable: true,
-          });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/admin-users/add`,
+        {
+          method: "POST",
+          body: form,
         }
+      );
+      const responseData = await response.json();
+       console.log(responseData);
+      fetchData();
 
-    }
-    catch(error){
+      if (responseData.errFlag === 0) {
+        toast({
+          title: "Success",
+          description: "Subject added successfully",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        fetchData();
+      } else {
+        toast({
+          title: "Error",
+          description: responseData.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
       console.log(error);
-    }finally{
-
-    resetForm();
-    onAddModalClose();
+    } finally {
+      resetForm();
+      onAddModalClose();
     }
   };
 
   const handleUpdateSubject = async () => {
-    try{
-     const token = localStorage.getItem("token") ?? "";
-     const form = new FormData();
-     form.append("subjectName", subjectName);
-     form.append("subjectId", subjectId);
-      form.append("courseId", courseId);
-     form.append("token", token);
-    //  console.log(Object.fromEntries(form.entries()));
+    try {
+      const token = localStorage.getItem("token") ?? "";
+      const form = new FormData();
+      form.append("name", name);
+      form.append("password", password);
+      form.append("email", email);
+      form.append("token", token);
+      //  console.log(Object.fromEntries(form.entries()));
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/masters/subjects/update-subject`,
@@ -310,40 +256,44 @@ const SubjectMaster = () => {
       const responseData = await response.json();
       // console.log(responseData);
       // fetchData();
-       if (responseData.errFlag === 0) {
-         toast({
-           title: "Success",
-           description: "Subject updated successfully",
-           status: "success",
-           duration: 3000,
-           isClosable: true,
-         });
-         fetchData();
-       }
-       else {
-         toast({
-           title: "Error",
-           description: responseData.message,
-           status: "error",
-           duration: 3000,
-           isClosable: true,
-         });
-       }
-    }catch(error){
+      if (responseData.errFlag === 0) {
+        toast({
+          title: "Success",
+          description: "Subject updated successfully",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        fetchData();
+      } else {
+        toast({
+          title: "Error",
+          description: responseData.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
       console.log(error);
-    }finally{
-    resetForm();
-    onEditModalClose();
+    } finally {
+      resetForm();
+      onEditModalClose();
     }
   };
 
   const resetForm = () => {
-    setSubjectName("");
-    setCourseId("");
-    setCreatedAdminUserId("");
-
-    setCurrentSubject(null);
+    setname("");
+    setemail("");
+    setrole("");
+    setpassword("");
   };
+
+  const allRole = [
+    { id: 1, course_name: "Admin" },
+    { id: 2, course_name: "Teacher" },
+    // { id: 3, course_name: "Student" },
+  ];
 
   return (
     <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
@@ -359,9 +309,9 @@ const SubjectMaster = () => {
           alignItems: "center",
         }}
       >
-        <p style={{ fontSize: "16px", fontWeight: "600" }}>Subject Data</p>
+        <p style={{ fontSize: "16px", fontWeight: "600" }}>Admin Data</p>
         <Button onClick={onAddModalOpen} colorScheme="green">
-          Add Subject
+          Add New User
         </Button>
       </div>
       <div style={{ height: "100%", width: "100%" }}>
@@ -378,23 +328,37 @@ const SubjectMaster = () => {
       <Modal isOpen={isAddModalOpen} onClose={onAddModalClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add New Subject</ModalHeader>
+          <ModalHeader>Add New User</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
-              <FormLabel>Subject Name</FormLabel>
+              <FormLabel>Name</FormLabel>
               <Input
-                placeholder="Enter Subject Name"
-                value={subjectName}
-                onChange={(e) => setSubjectName(e.target.value)}
+                placeholder="Enter Name"
+                value={name}
+                onChange={(e) => setname(e.target.value)}
               />
 
-              <FormLabel>Course Id</FormLabel>
+              <FormLabel>Email</FormLabel>
+              <Input
+                placeholder="Enter Email"
+                value={email}
+                onChange={(e) => setemail(e.target.value)}
+              />
+
+              <FormLabel>password</FormLabel>
+              <Input
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setpassword(e.target.value)}
+              />
+
+              <FormLabel>Role</FormLabel>
               <Select
                 placeholder="Select option"
-                onChange={(e) => setCourseId(e.target.value)}
+                onChange={(e) => setrole(e.target.value)}
               >
-                {allCourse.map((course: any) => (
+                {allRole.map((course: any) => (
                   <option key={course.id} value={course.id}>
                     {course.course_name}
                   </option>
@@ -424,8 +388,8 @@ const SubjectMaster = () => {
               <FormLabel>Subject Name</FormLabel>
               <Input
                 placeholder="Enter Subject Name"
-                value={subjectName}
-                onChange={(e) => setSubjectName(e.target.value)}
+                value={name}
+                onChange={(e) => setname(e.target.value)}
               />
             </FormControl>
           </ModalBody>
@@ -443,4 +407,4 @@ const SubjectMaster = () => {
   );
 };
 
-export default SubjectMaster;
+export default AdminUsers;

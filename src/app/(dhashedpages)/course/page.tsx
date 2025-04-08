@@ -1,7 +1,7 @@
 "use client";
 
 import { AgGridReact } from "ag-grid-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import {
@@ -22,23 +22,48 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  Switch,
+  IconButton,
+  HStack,
+  useToast,
 } from "@chakra-ui/react";
+// import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 
 import Select from "react-select";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const CourseMaster = () => {
-  const [rowData, setRowData] = useState<any[]>([
-    {
-      id: "01",
-      name: "NEET PG Course",
-      subjects: ["Anatomy"], // Updated to handle single subject
-      price: "₹5,000",
-      discountPrice: "₹4,000", // Added discount price
-      description: "Full course access",
-    },
-  ]);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const [rowData, setRowData] = useState<any[]>([]);
+  const toast = useToast();
+  useEffect(() => {
+    fetcherData();
+  }, []);
+
+  //fetcher to get all course data
+
+  async function fetcherData() {
+    // const tok =
+    //   typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const tok = localStorage.getItem("token");
+    // console.log(tok);
+    try {
+      const response = await fetch(
+        `${baseUrl}/masters/courses/get-all-courses/${tok}`,
+        {
+          method: "GET",
+        }
+      );
+      const responseData = await response.json();
+      console.log(responseData);
+      setRowData(responseData);
+    } catch {
+      (error: Error) => {
+        console.error("Error fetching data:", error);
+      };
+    }
+  }
 
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     {
@@ -50,41 +75,75 @@ const CourseMaster = () => {
     },
     {
       headerName: "Course Name",
-      field: "name",
+      field: "course_name",
       minWidth: 180,
     },
+    // {
+    //   headerName: "Assigned Subjects",
+    //   field: "subjects",
+    //   cellRenderer: (params: any) => {
+    //     return params.value.join(", ");
+    //   },
+    // },
     {
-      headerName: "Assigned Subjects",
-      field: "subjects",
+      headerName: "Course Created By",
+      field: "created_admin_user_id",
       cellRenderer: (params: any) => {
-        return params.value.join(", ");
+        // console.log(params);
+        return params.value == 1 ? "Admin" : "Sub Admin";
       },
     },
     {
-      headerName: "Price",
-      field: "price",
+      field: "status",
+      headerName: "Access",
+      filter: false,
+      maxWidth: 150,
+      cellRenderer: (params: any) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <Switch
+            colorScheme="green"
+            onChange={(event) => handleToggle(params.data)}
+            defaultChecked={params.data.status}
+          />
+        </div>
+      ),
     },
     {
-      headerName: "Discount Price",
-      field: "discountPrice", // Added discount price column
-    },
-    {
-      headerName: "Description",
-      field: "description",
+      headerName: "Creation date",
+      field: "created_date",
     },
     {
       headerName: "Actions",
+      filter: false,
       cellRenderer: (params: any) => {
         return (
-          <div>
-            <button
+          <HStack spacing={2}>
+            <Button
+              // leftIcon={<EditIcon />}
+              colorScheme="blue"
+              size="sm"
               onClick={() => handleEdit(params.data)}
-              style={{ marginRight: "10px" }}
+              variant="outline"
             >
               Edit
-            </button>
-            <button onClick={() => handleDelete(params.data)}>Delete</button>
-          </div>
+            </Button>
+            <Button
+              // leftIcon={<DeleteIcon />}
+              colorScheme="red"
+              size="sm"
+              onClick={() => handleDelete(params.data)}
+              variant="outline"
+            >
+              Delete
+            </Button>
+          </HStack>
         );
       },
     },
@@ -109,15 +168,17 @@ const CourseMaster = () => {
   const [teacherSubjects, setTeacherSubjects] = useState<string[]>([]);
   const [price, setPrice] = useState("");
   const [discountPrice, setDiscountPrice] = useState(""); // Added discount price state
-  const [description, setDescription] = useState("");
+  const [editRowId, setEditRowId] = useState("");
+  const [createdAdminUserId, setcreatedAdminUserId] = useState("");
 
   const handleEdit = (data: any) => {
-    setCurrentCourse(data);
+    // setCurrentCourse(data);
+    setEditRowId(data.id);
     setCourseName(data.name);
-    setTeacherSubjects(data.subjects);
-    setPrice(data.price);
-    setDiscountPrice(data.discountPrice); // Set discount price
-    setDescription(data.description);
+    // setTeacherSubjects(data.subjects);
+    // setPrice(data.price);
+    // setDiscountPrice(data.discountPrice); // Set discount price
+    // setcreatedAdminUserId(data.createdAdminUserId);
     onEditModalOpen(); // Open Edit Modal
   };
 
@@ -125,34 +186,149 @@ const CourseMaster = () => {
     setRowData((prev) => prev.filter((course) => course.id !== data.id));
   };
 
-  const handleAddCourse = () => {
-    const newCourse = {
-      id: String(rowData.length + 1),
-      name: courseName,
-      subjects: teacherSubjects,
-      price: price,
-      discountPrice: discountPrice, // Added discount price
-      description: description,
-    };
-    setRowData((prev) => [...prev, newCourse]);
+  //toggle function for switch button
+  const handleToggle = async (data: any) => {
+
+    console.log(data.id);
+    try{
+      const token = localStorage.getItem("token") ?? "";
+const status = data.status ? 0 : 1; // Toggle status between 0 and 1
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/courses/change-course-status/${status}/${data.id}/${token}`,
+        {
+          method: "GET",
+        }
+      );
+      const responseData = await response.json();
+      console.log(responseData);
+
+    } catch (error) {
+      console.error("Error toggling course status:", error);
+    }
+
+  }
+
+  const handleAddCourse = async () => {
+    // const newCourse = {
+    //   id: String(rowData.length + 1),
+    //   name: courseName,
+    //   // subjects: teacherSubjects,
+    //   // price: price,
+    //   // discountPrice: discountPrice, // Added discount price
+    //   createdAdminUserId: createdAdminUserId,
+    // };
+    // setRowData((prev) => [...prev, newCourse]);
+    try{
+      const form = new FormData();
+      form.append("courseName", courseName);
+      form.append("createdAdminUserId", createdAdminUserId);
+      form.append("token", localStorage.getItem("token") ?? "");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/courses/add`,
+        {
+          method: "POST",
+          body: form,
+        }
+      );
+      const responseData = await response.json();
+      console.log(responseData);
+      fetcherData(); // Fetch updated data after adding a new course
+      // setRowData((prev) => [...prev, responseData]);
+        
+      if (responseData.errFlag == 0) {
+        toast({
+          title: "Course added successfully.",
+          description: responseData.message,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+          position: "top",
+        });
+      } else {
+        toast({
+          title: "Error adding course.",
+          description: responseData.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+          position: "top",
+        });
+      }
+
+
+    }
+    catch (error) {
+      console.error("Error adding course:", error);
+    }
+    finally {
+      // console.log("we are at finally block");
     resetForm();
     onAddModalClose();
+    }
   };
 
-  const handleUpdateCourse = () => {
-    const updatedCourse = {
-      id: currentCourse.id,
-      name: courseName,
-      subjects: teacherSubjects,
-      price: price,
-      discountPrice: discountPrice, // Added discount price
-      description: description,
-    };
-    setRowData((prev) =>
-      prev.map((course) =>
-        course.id === currentCourse.id ? updatedCourse : course
-      )
-    );
+  const handleUpdateCourse = async () => {
+    // const updatedCourse = {
+    //   id: currentCourse.id,
+    //   name: courseName,
+    //   // subjects: teacherSubjects,
+    //   price: price,
+    //   discountPrice: discountPrice, // Added discount price
+    //   createdAdminUserId: createdAdminUserId,
+    // };
+    // setRowData((prev) =>
+    //   prev.map((course) =>
+    //     course.id === currentCourse.id ? updatedCourse : course
+    //   )
+    // );
+
+       try {
+         const form = new FormData();
+         form.append("courseName", courseName);
+         form.append("courseId", editRowId);
+         form.append("token", localStorage.getItem("token") ?? "");
+
+         console.log(Object.fromEntries(form));
+
+         const response = await fetch(
+           `${process.env.NEXT_PUBLIC_BASE_URL}/masters/courses/update-course`,
+           {
+             method: "POST",
+             body: form,
+           }
+         );
+         const responseData = await response.json();
+         console.log(responseData);
+         fetcherData(); // Fetch updated data after adding a new course
+         // setRowData((prev) => [...prev, responseData]);
+
+         if (responseData.errFlag == 0) {
+           toast({
+             title: "Course updated successfully.",
+             description: responseData.message,
+             status: "success",
+             duration: 3000,
+             isClosable: true,
+             position: "top",
+           });
+         } else {
+           toast({
+             title: "Error updating course.",
+             description: responseData.message,
+             status: "error",
+             duration: 3000,
+             isClosable: true,
+             position: "top",
+           });
+         }
+       } catch (error) {
+         console.error("Error adding course:", error);
+       } finally {
+         // console.log("we are at finally block");
+         resetForm();
+         onAddModalClose();
+       }
     resetForm();
     onEditModalClose();
   };
@@ -162,23 +338,13 @@ const CourseMaster = () => {
     setTeacherSubjects([]);
     setPrice("");
     setDiscountPrice(""); // Reset discount price
-    setDescription("");
+    setcreatedAdminUserId("");
     setCurrentCourse(null);
   };
 
-  const subjectOptions = [
-    { label: "Books", value: "Books" },
-    { label: "Movies, Music & Games", value: "Movies, Music & Games" },
-    { label: "Electronics & Computers", value: "Electronics & Computers" },
-    { label: "Home, Garden & Tools", value: "Home, Garden & Tools" },
-    { label: "Health & Beauty", value: "Health & Beauty" },
-    { label: "Toys, Kids & Baby", value: "Toys, Kids & Baby" },
-    { label: "Clothing & Jewelry", value: "Clothing & Jewelry" },
-    { label: "Sports & Outdoors", value: "Sports & Outdoors" },
-  ];
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "80vw", height: "60vh" }}>
       <div
         style={{
           height: "60px",
@@ -202,7 +368,19 @@ const CourseMaster = () => {
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={10}
-          paginationAutoPageSize={true}
+          // paginationAutoPageSize={true}
+          defaultColDef={{
+            sortable: true,
+            filter: true,
+            floatingFilter: true,
+            resizable: true,
+            flex: 1,
+            filterParams: {
+              debounceMs: 0,
+              buttons: ["reset"],
+            },
+          }}
+          suppressCellFocus={true}
         />
       </div>
 
@@ -220,7 +398,7 @@ const CourseMaster = () => {
                 value={courseName}
                 onChange={(e) => setCourseName(e.target.value)}
               />
-              <FormLabel>Assign Subject</FormLabel>
+              {/* <FormLabel>Assign Subject</FormLabel>
               <Select
                 isMulti
                 options={subjectOptions}
@@ -232,9 +410,9 @@ const CourseMaster = () => {
                     selectedOptions.map((option) => option.value)
                   )
                 }
-              />
+              /> */}
               <br />
-              <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>
+              {/* <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>
                 <GridItem>
                   <FormLabel>Price</FormLabel>
                   <Input
@@ -251,12 +429,12 @@ const CourseMaster = () => {
                     onChange={(e) => setDiscountPrice(e.target.value)}
                   />
                 </GridItem>
-              </Grid>
-              <FormLabel>Description</FormLabel>
+              </Grid> */}
+              <FormLabel>createdAdminUserId</FormLabel>
               <Input
-                placeholder="Enter Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Enter created Admin User Id"
+                value={createdAdminUserId}
+                onChange={(e) => setcreatedAdminUserId(e.target.value)}
               />
             </FormControl>
           </ModalBody>
@@ -285,7 +463,7 @@ const CourseMaster = () => {
                 value={courseName}
                 onChange={(e) => setCourseName(e.target.value)}
               />
-              <FormLabel>Assign Subject</FormLabel>
+              {/* <FormLabel>Assign Subject</FormLabel>
               <Select
                 isMulti
                 options={subjectOptions}
@@ -297,10 +475,10 @@ const CourseMaster = () => {
                     selectedOptions.map((option) => option.value)
                   )
                 }
-              />
+              /> */}
 
               <br />
-              <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>
+              {/* <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>
                 <GridItem>
                   <FormLabel>Price</FormLabel>
                   <Input
@@ -317,13 +495,13 @@ const CourseMaster = () => {
                     onChange={(e) => setDiscountPrice(e.target.value)}
                   />
                 </GridItem>
-              </Grid>
-              <FormLabel>Description</FormLabel>
+              </Grid> */}
+              {/* <FormLabel>created Admin User Id</FormLabel>
               <Input
-                placeholder="Enter Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
+                placeholder="Enter created Admin User Id"
+                value={createdAdminUserId}
+                onChange={(e) => setcreatedAdminUserId(e.target.value)}
+              /> */}
             </FormControl>
           </ModalBody>
           <ModalFooter>

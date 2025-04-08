@@ -1,4 +1,4 @@
-
+import { ChakraProvider, CSSReset } from "@chakra-ui/react";
 
 export const metadata = {
   title: "Login",
@@ -13,7 +13,10 @@ export default function AuthLayout({
   return (
     <html lang="en">
       <body>
-        <div className="auth-content">{children}</div>
+        <ChakraProvider>
+          <CSSReset />
+          <div className="auth-content">{children}</div>
+        </ChakraProvider>
       </body>
     </html>
   );
