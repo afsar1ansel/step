@@ -86,6 +86,34 @@ export default function RootLayout({
     }
   }, [pathname]);
 
+  const handleLogout = () => {
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+    // if (!token) {
+      console.warn("No token found, redirecting to login...");
+      localStorage.removeItem("token");
+      localStorage.removeItem("permits");
+      localStorage.removeItem("user");
+      window.location.href = "/auth/login";
+      // return;
+    // }
+
+    // fetch(`${baseURL}/app-users/logout/${token}`, {
+    //   method: "GET",
+    // })
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     // console.log(data);
+    //     localStorage.removeItem("token");
+    //     localStorage.removeItem("permits");
+    //     window.location.href = "/auth/login";
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error fetching data:", error);
+    //   });
+  };
+
   return (
     <html lang="en">
       <body>
@@ -322,7 +350,7 @@ export default function RootLayout({
                       backgroundColor: "white",
                       border: "1px solid red",
                     }}
-                    onClick={onClose}
+                    onClick={handleLogout}
                   >
                     Logout
                   </Button>
