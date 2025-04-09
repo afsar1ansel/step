@@ -79,6 +79,14 @@ export default function RootLayout({
 
 
   useEffect(() => {
+
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    if (!token) {
+      console.warn("No token found, redirecting to login...");
+      window.location.href = "/auth/login";
+    }
+
     if (["teacher", "subject", "course"].includes(basePath)) {
       setActive("Masters");
     } else {
