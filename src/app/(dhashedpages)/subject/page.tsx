@@ -129,7 +129,7 @@ const SubjectMaster = () => {
       },
     },
     {
-      field: "course_status",
+      field: "subject_status",
       headerName: "Access",
       filter: false,
       maxWidth: 150,
@@ -155,22 +155,22 @@ const SubjectMaster = () => {
       headerName: "Creation date",
       field: "created_date",
     },
-   {
-        headerName: "Actions",
-        filter: false,
-        cellRenderer: (params: any) => {
-          return (
-            <HStack spacing={2}>
-              <Button
-                // leftIcon={<EditIcon />}
-                colorScheme="blue"
-                size="sm"
-                onClick={() => handleEdit(params.data)}
-                variant="outline"
-              >
-                Edit
-              </Button>
-              {/* <Button
+    {
+      headerName: "Actions",
+      filter: false,
+      cellRenderer: (params: any) => {
+        return (
+          <HStack spacing={2}>
+            <Button
+              // leftIcon={<EditIcon />}
+              colorScheme="blue"
+              size="sm"
+              onClick={() => handleEdit(params.data)}
+              variant="outline"
+            >
+              Edit
+            </Button>
+            {/* <Button
                 // leftIcon={<DeleteIcon />}
                 colorScheme="red"
                 size="sm"
@@ -179,10 +179,10 @@ const SubjectMaster = () => {
               >
                 Delete
               </Button> */}
-            </HStack>
-          );
-        },
+          </HStack>
+        );
       },
+    },
   ]);
 
   //toggle function for switch button

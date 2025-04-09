@@ -6,6 +6,7 @@ import "./globals.css";
 import Image from "next/image";
 // import logo from "/public/Mesha_inc_logo-1.png";
 import profile from "/public/Group19697.png";
+import { FaUserDoctor } from "react-icons/fa6";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { IoIosHome } from "react-icons/io";
 import { TbDeviceAnalytics } from "react-icons/tb";
@@ -46,6 +47,7 @@ type NavItem =
   | "dashboard"
   | "StudentData"
   | "AdminUsers"
+  | "Doctors"
   | "steps"
   | "test"
   | "Resources"
@@ -67,7 +69,7 @@ export default function RootLayout({
   const pathname = usePathname();
   const cleanedPathname = pathname.replace(/^\/+/, ""); // Remove leading slashes
   const basePath = cleanedPathname.split("/")[0]; // Extract the base path
-  console.log(basePath); // Check the base path
+  // console.log(basePath); // Check the base path
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -137,6 +139,12 @@ export default function RootLayout({
                     <MdOutlineAdminPanelSettings />
                     <Link href="/AdminUsers">
                       <p className="linkname">Admin Users</p>
+                    </Link>
+                  </li>
+                  <li className={active === "Doctors" ? "active" : ""}>
+                    <FaUserDoctor />
+                    <Link href="/Doctors">
+                      <p className="linkname">Doctors</p>
                     </Link>
                   </li>
                   <li className={active === "steps" ? "active" : ""}>

@@ -22,6 +22,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
+import { Spinner, Center, CircularProgress } from "@chakra-ui/react";
 
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -140,22 +141,23 @@ const AdminUsers = () => {
 
   //toggle function for switch button
   const handleToggle = async (data: any) => {
-    console.log(data);
+     setLoading(true);
     try {
       const token = localStorage.getItem("token") ?? "";
-      const status = data.course_status == 1 ? 0 : 1; // Toggle status between 0 and 1
+      const status = data.status == 1 ? 0 : 1;
       console.log(status);
-      // const response = await fetch(
-      //   `${process.env.NEXT_PUBLIC_BASE_URL}/masters/subjects/update-subject-status/${status}/${data.subject_id}/${token}`,
-      //   {
-      //     method: "GET",
-      //   }
-      // );
-      // const responseData = await response.json();
-      // console.log(responseData);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/admin-users/change-user-status/${status}/${data.id}/${token}`,
+        {
+          method: "GET",
+        }
+      );
+      const responseData = await response.json();
+      console.log(responseData);
     } catch (error) {
       console.error("Error toggling course status:", error);
     }
+    setLoading(false);
   };
 
   // State for Add Subject Modal
@@ -175,11 +177,18 @@ const AdminUsers = () => {
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
   const [role, setrole] = useState("");
+  const [userId, setuserId] = useState("");
   const [password, setpassword] = useState<any>([]);
-  // const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   // const [allCourse, setallCourse] = useState<any>([]);
 
   const handleEdit = (data: any) => {
+    console.log(data);
+    setname(data.username);
+    setemail(data.email);
+    setrole(data.role);
+    setpassword(data.password);
+    setuserId(data.id);
     onEditModalOpen(); // Open Edit Modal
   };
 
@@ -189,6 +198,7 @@ const AdminUsers = () => {
 
   const handleAddSubject = async () => {
     // console.log(name, email, role , password);
+    setLoading(true);
     try {
       const token = localStorage.getItem("token") ?? "";
       const form = new FormData();
@@ -219,6 +229,8 @@ const AdminUsers = () => {
           isClosable: true,
         });
         fetchData();
+         resetForm();
+         onAddModalClose();
       } else {
         toast({
           title: "Error",
@@ -230,32 +242,33 @@ const AdminUsers = () => {
       }
     } catch (error) {
       console.log(error);
-    } finally {
-      resetForm();
-      onAddModalClose();
     }
+
+    setLoading(false);
   };
 
   const handleUpdateSubject = async () => {
     try {
       const token = localStorage.getItem("token") ?? "";
       const form = new FormData();
-      form.append("name", name);
-      form.append("password", password);
+      form.append("username", name);
       form.append("email", email);
+      form.append("password", password);
+      form.append("role", role);
+      form.append("adminUserId", userId);
       form.append("token", token);
-      //  console.log(Object.fromEntries(form.entries()));
+       console.log(Object.fromEntries(form.entries()));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/subjects/update-subject`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/admin-users/update-admin-user`,
         {
           method: "POST",
           body: form,
         }
       );
       const responseData = await response.json();
-      // console.log(responseData);
-      // fetchData();
+      console.log(responseData);
+      fetchData();
       if (responseData.errFlag === 0) {
         toast({
           title: "Success",
@@ -265,6 +278,8 @@ const AdminUsers = () => {
           isClosable: true,
         });
         fetchData();
+         resetForm();
+         onEditModalClose();
       } else {
         toast({
           title: "Error",
@@ -273,13 +288,12 @@ const AdminUsers = () => {
           duration: 3000,
           isClosable: true,
         });
+         resetForm();
       }
     } catch (error) {
       console.log(error);
-    } finally {
-      resetForm();
-      onEditModalClose();
-    }
+    } 
+   
   };
 
   const resetForm = () => {
@@ -290,8 +304,8 @@ const AdminUsers = () => {
   };
 
   const allRole = [
-    { id: 1, course_name: "Admin" },
-    { id: 2, course_name: "Teacher" },
+    { id: 0, course_name: "Admin" },
+    { id: 1, course_name: "Teacher" },
     // { id: 3, course_name: "Student" },
   ];
 
@@ -385,12 +399,38 @@ const AdminUsers = () => {
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
-              <FormLabel>Subject Name</FormLabel>
+              <FormLabel>Name</FormLabel>
               <Input
                 placeholder="Enter Subject Name"
                 value={name}
                 onChange={(e) => setname(e.target.value)}
               />
+
+              <FormLabel>Email</FormLabel>
+              <Input
+                placeholder="Enter Email"
+                value={email}
+                onChange={(e) => setemail(e.target.value)}
+              />
+
+              <FormLabel>password</FormLabel>
+              <Input
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setpassword(e.target.value)}
+              />
+
+              <FormLabel>Role</FormLabel>
+              <Select
+                placeholder="Select option"
+                onChange={(e) => setrole(e.target.value)}
+              >
+                {allRole.map((course: any) => (
+                  <option key={course.id} value={course.id}>
+                    {course.course_name}
+                  </option>
+                ))}
+              </Select>
             </FormControl>
           </ModalBody>
           <ModalFooter>
@@ -403,6 +443,24 @@ const AdminUsers = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {loading && (
+        <Center
+          position="absolute"
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          zIndex={10}
+        >
+          <Spinner
+            size="xl"
+            color="blue.500"
+            thickness="4px"
+            emptyColor="gray.200"
+            speed="0.65s"
+          />
+        </Center>
+      )}
     </div>
   );
 };
