@@ -296,7 +296,7 @@ const StepsTab = () => {
         }
       );
       const data1 = await response.json();
-      console.log(data1);
+      // console.log(data1);
     }
     catch(error){
       console.log(error)
