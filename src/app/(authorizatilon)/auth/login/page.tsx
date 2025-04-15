@@ -29,7 +29,8 @@ export default function Login() {
     const form = new FormData();
     form.append("email", email);
     form.append("password", password);
-    // console.log(Object.fromEntries(form));
+    console.log(Object.fromEntries(form));
+    console.log(baseURL);
     try {
       const response = await fetch(`${baseURL}/admin-users/validate-user`, {
         method: "POST",
