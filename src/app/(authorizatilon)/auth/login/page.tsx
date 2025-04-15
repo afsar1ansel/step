@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 
 export default function Login() {
   const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
+  console.log(baseURL);
   const toast = useToast();
   const router = useRouter();
   const [email, setEmail] = useState("");
