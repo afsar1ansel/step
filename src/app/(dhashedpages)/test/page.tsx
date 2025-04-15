@@ -23,6 +23,8 @@ import {
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const TestsTab = () => {
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const [rowData, setRowData] = useState<any[]>([
     {
       id: "01",
