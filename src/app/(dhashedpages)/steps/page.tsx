@@ -68,6 +68,10 @@ const StepsTab = () => {
       ),
     },
     {
+      headerName: "Step Title",
+      field: "course_step_title",
+    },
+    {
       headerName: "Access Time",
       field: "course_overview_access_time_text",
     },
@@ -87,10 +91,7 @@ const StepsTab = () => {
       wrapText: true,
       cellStyle: { whiteSpace: "normal", lineHeight: "1.5" },
     },
-    {
-      headerName: "Course Title",
-      field: "course_step_title",
-    },
+
     {
       headerName: "Created Date",
       field: "created_date",
@@ -99,37 +100,37 @@ const StepsTab = () => {
       headerName: "No. of Test",
       field: "no_of_test_text",
     },
-      {
-          field: "status",
-          headerName: "Status",
-          cellStyle: { textAlign: "center" },
-          filter: false,
-          maxWidth: 150,
-          cellRenderer: (params: any) => (
-            // console.log(params.value),
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "80%",
-              }}
-            >
-              <Switch
-                colorScheme="green"
-                onChange={(event) => handleToggle(params.data)}
-                defaultChecked={params.value == 1 ? true : false}
-              />
-            </div>
-          ),
-        },
+    {
+      field: "status",
+      headerName: "Status",
+      cellStyle: { textAlign: "center" },
+      filter: false,
+      maxWidth: 75,
+      cellRenderer: (params: any) => (
+        // console.log(params.value),
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "80%",
+          }}
+        >
+          <Switch
+            colorScheme="green"
+            onChange={(event) => handleToggle(params.data)}
+            defaultChecked={params.value == 1 ? true : false}
+          />
+        </div>
+      ),
+    },
     {
       headerName: "Actions",
       filter: false,
       cellRenderer: (params: any) => {
         // console.log(params.data)
         return (
-          <div>
+          <div style={{ display: "flex", justifyContent: "center", flexDirection: "column", gap: "10px", padding: "5px" }}>
             <Button
               colorScheme="blue"
               size="sm"
@@ -140,11 +141,14 @@ const StepsTab = () => {
               Edit
             </Button>
             {/* <button onClick={() => handleDelete(params.data)}>Delete</button> */}
-            <Button onClick={() => handleShowDetails(params.data)}
+            <Button
+              onClick={() => handleShowDetails(params.data)}
               colorScheme="green"
               size="sm"
               variant={"outline"}
-              >Show</Button>
+            >
+              Show
+            </Button>
           </div>
         );
       },
@@ -382,6 +386,7 @@ const StepsTab = () => {
   // };
 
   function openAddModal() {
+    resetForm();
     fetchTeachers();
     fetchSubjects();
     fetchCourse();
@@ -574,6 +579,10 @@ const StepsTab = () => {
     setcourseOverViewHoursText("");
     setcourseOverviewDownloadableText("");
     setcourseOverviewAccessTimeText("");
+    setStepTitle("");
+    setStepDecription("");
+    setSelectedCourse("");
+    setnoOfTestText("");
   };
 
   const handleAddNoteGroup = () => {
@@ -834,7 +843,7 @@ const StepsTab = () => {
                 <FormControl>
                   <FormLabel>Select Course</FormLabel>
                   <Select
-                    placeholder="Select Subject"
+                    placeholder="Select Course"
                     value={selectedCourse}
                     onChange={(e) => setSelectedCourse(e.target.value)}
                   >
@@ -1179,7 +1188,7 @@ const StepsTab = () => {
                 <FormControl>
                   <FormLabel>Select Course</FormLabel>
                   <Select
-                    placeholder="Select Subject"
+                    placeholder="Select Course"
                     value={selectedCourse}
                     onChange={(e) => setSelectedCourse(e.target.value)}
                   >
