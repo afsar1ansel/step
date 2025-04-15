@@ -200,8 +200,30 @@ const StudentsTab = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={10}
-          paginationAutoPageSize={true}
+          paginationPageSize={5}
+          paginationPageSizeSelector={[5, 10, 15]}
+          // paginationAutoPageSize={true}
+          defaultColDef={{
+            sortable: true,
+            filter: true,
+            floatingFilter: true,
+            resizable: true,
+            flex: 1,
+            filterParams: {
+              debounceMs: 0,
+              buttons: ["reset"],
+            },
+          }}
+          getRowHeight={function (params) {
+            const description = params.data?.banner_description || "";
+            const words = description.split(" ").length;
+            const baseHeight = 50;
+            const heightPerWord = 6;
+            const minHeight = 50;
+            const calculatedHeight = baseHeight + words * heightPerWord;
+            return Math.max(minHeight, calculatedHeight);
+          }}
+          suppressCellFocus={true}
         />
       </div>
 

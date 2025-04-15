@@ -57,7 +57,7 @@ export default function Login() {
         status: "success",
         duration: 3000,
         isClosable: true,
-        position: "top",
+        position: "bottom",
       });
 
       // TODO: Redirect to dashboard or set auth state

@@ -134,7 +134,7 @@ const CourseMaster = () => {
             >
               Edit
             </Button>
-            <Button
+            {/* <Button
               // leftIcon={<DeleteIcon />}
               colorScheme="red"
               size="sm"
@@ -142,7 +142,7 @@ const CourseMaster = () => {
               variant="outline"
             >
               Delete
-            </Button>
+            </Button> */}
           </HStack>
         );
       },

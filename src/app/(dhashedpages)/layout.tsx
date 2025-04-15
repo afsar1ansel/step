@@ -286,12 +286,12 @@ export default function RootLayout({
                       <p className="linkname">Test</p>
                     </Link>
                   </li>
-                  <li className={active === "Resources" ? "active" : ""}>
+                  {/* <li className={active === "Resources" ? "active" : ""}>
                     <AiOutlineDatabase />
                     <Link href="/Resources">
                       <p className="linkname">Resources</p>
                     </Link>
-                  </li>
+                  </li> */}
                   {/* <li className={active === "Reports" ? "active" : ""}>
                     <IoMdPaper />
                     <Link href="/Reports">

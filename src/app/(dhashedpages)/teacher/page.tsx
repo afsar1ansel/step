@@ -201,7 +201,7 @@ const subjectOptions = [
 
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "80vw", height: "60vh" }}>
       <div
         style={{
           height: "60px",
@@ -226,6 +226,18 @@ const subjectOptions = [
           pagination={true}
           paginationPageSize={10}
           paginationAutoPageSize={true}
+          defaultColDef={{
+            sortable: true,
+            filter: true,
+            floatingFilter: true,
+            resizable: true,
+            flex: 1,
+            filterParams: {
+              debounceMs: 0,
+              buttons: ["reset"],
+            },
+          }}
+          suppressCellFocus={true}
         />
       </div>
 

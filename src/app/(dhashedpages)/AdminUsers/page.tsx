@@ -183,7 +183,7 @@ const AdminUsers = () => {
   // const [allCourse, setallCourse] = useState<any>([]);
 
   const handleEdit = (data: any) => {
-    console.log(data);
+    // console.log(data);
     setname(data.username);
     setemail(data.email);
     setrole(data.role);
@@ -254,7 +254,7 @@ const AdminUsers = () => {
       form.append("username", name);
       form.append("email", email);
       form.append("password", password);
-      form.append("role", role);
+      form.append("roleId", role);
       form.append("adminUserId", userId);
       form.append("token", token);
        console.log(Object.fromEntries(form.entries()));
@@ -310,7 +310,7 @@ const AdminUsers = () => {
   ];
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "80vw", height: "60vh", }}>
       <div
         style={{
           height: "60px",
@@ -333,8 +333,30 @@ const AdminUsers = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={10}
-          paginationAutoPageSize={true}
+          paginationPageSize={5}
+          paginationPageSizeSelector={[5, 10, 15]}
+          // paginationAutoPageSize={true}
+          defaultColDef={{
+            sortable: true,
+            filter: true,
+            floatingFilter: true,
+            resizable: true,
+            flex: 1,
+            filterParams: {
+              debounceMs: 0,
+              buttons: ["reset"],
+            },
+          }}
+          getRowHeight={function (params) {
+            const description = params.data?.banner_description || "";
+            const words = description.split(" ").length;
+            const baseHeight = 50;
+            const heightPerWord = 6;
+            const minHeight = 50;
+            const calculatedHeight = baseHeight + words * heightPerWord;
+            return Math.max(minHeight, calculatedHeight);
+          }}
+          suppressCellFocus={true}
         />
       </div>
 
