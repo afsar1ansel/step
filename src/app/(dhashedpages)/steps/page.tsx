@@ -130,7 +130,15 @@ const StepsTab = () => {
       cellRenderer: (params: any) => {
         // console.log(params.data)
         return (
-          <div style={{ display: "flex", justifyContent: "center", flexDirection: "column", gap: "10px", padding: "5px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "column",
+              gap: "10px",
+              padding: "5px",
+            }}
+          >
             <Button
               colorScheme="blue"
               size="sm"
@@ -161,10 +169,10 @@ const StepsTab = () => {
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
     try {
       const response = await fetch(
-        `${baseUrl}/masters/get-course-step-detail/${step}/${token}`
+        `${baseUrl}/masters/get-all-course-step-details/${step}/${token}`
       );
       const data = await response.json();
-      setRowData([data]);
+      setRowData(data);
       console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -285,13 +293,12 @@ const StepsTab = () => {
     onClose: onImageModalClose,
   } = useDisclosure();
 
-
   async function handleToggle(data: any) {
     console.log(data.status, data.id);
-  //  const token = localStorage.getItem("token") ?? "";
-   const status = data.status == 1 ? 0 : 1;
+    //  const token = localStorage.getItem("token") ?? "";
+    const status = data.status == 1 ? 0 : 1;
     console.log(status);
-    try{
+    try {
       const token = localStorage.getItem("token");
       const response = await fetch(
         `${baseUrl}/masters/update-course-step-status/${data.id}/${status}/${token}`,
@@ -301,9 +308,8 @@ const StepsTab = () => {
       );
       const data1 = await response.json();
       // console.log(data1);
-    }
-    catch(error){
-      console.log(error)
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -359,9 +365,9 @@ const StepsTab = () => {
 
   const handleEdit = (data: any) => {
     // console.log(data)
-     fetchTeachers();
-     fetchSubjects();
-     fetchCourse();
+    fetchTeachers();
+    fetchSubjects();
+    fetchCourse();
     onShowModalClose();
     setSelectedCourse(data.course_id);
     setSelectedSubject(data.subject_id);
@@ -375,8 +381,6 @@ const StepsTab = () => {
     setSelectedTeacher(data.doctor_id);
     setSelectedImage(data.banner_image_name);
     setCurrentStep(data.id);
-    
-
 
     onEditModalOpen(); // Open Edit Modal
   };
@@ -548,7 +552,6 @@ const StepsTab = () => {
       setIsSubmitting(false);
     }
 
-
     resetForm();
     onEditModalClose();
   };
@@ -601,8 +604,8 @@ const StepsTab = () => {
   };
 
   useEffect(() => {
-    fetchData();
     fetchCource();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -622,7 +625,14 @@ const StepsTab = () => {
         }
       );
       const responseData = await response.json();
-      // console.log(responseData);
+      console.log(responseData);
+
+      if (responseData.message == "Invalid token") {
+        localStorage.removeItem("token");
+        window.location.href = "/auth/login";
+        return;
+      }
+
       setCourse(responseData);
     } catch {
       (error: Error) => {
@@ -725,11 +735,12 @@ const StepsTab = () => {
           placeholder="Select option"
           onChange={(e) => setStep(e.target.value)}
         >
-          {course.map((item: any, index: number) => (
-            <option key={item.id} value={item.id}>
-              {item.course_name}
-            </option>
-          ))}
+          {course &&
+            course.map((item: any, index: number) => (
+              <option key={item.id} value={item.id}>
+                {item.course_name}
+              </option>
+            ))}
         </Select>
       </Box>
       <div
@@ -1278,8 +1289,6 @@ const StepsTab = () => {
               </GridItem>
             </Grid>
 
-  
-
             <FormControl>
               <FormLabel mt={4}>Doctor Image</FormLabel>
               <Box
@@ -1326,10 +1335,17 @@ const StepsTab = () => {
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="gray" mr={3} onClick={onEditModalClose} isDisabled={isSubmitting}>
+            <Button
+              colorScheme="gray"
+              mr={3}
+              onClick={onEditModalClose}
+              isDisabled={isSubmitting}
+            >
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleUpdateStep}
+            <Button
+              colorScheme="green"
+              onClick={handleUpdateStep}
               isLoading={isSubmitting}
               loadingText="Updating..."
             >
@@ -1394,7 +1410,7 @@ const StepsTab = () => {
                     </FormControl>
                   </GridItem>
                   <GridItem>
-                    <FormControl>
+                    {/* <FormControl>
                       <FormLabel>Notes</FormLabel>
                       {step.notes.map(
                         (
@@ -1407,7 +1423,7 @@ const StepsTab = () => {
                           </Box>
                         )
                       )}
-                    </FormControl>
+                    </FormControl> */}
                   </GridItem>
                 </Grid>
               </Box>
