@@ -48,10 +48,14 @@ const StepsTab = () => {
   const [rowData, setRowData] = useState<any[]>();
 
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
+    // {
+    //   headerName: "Step No.",
+    //   field: "step_no",
+    //   maxWidth: 80,
+    // },
     {
-      headerName: "Step No.",
-      field: "step_no",
-      maxWidth: 80,
+      headerName: "Step Title",
+      field: "course_step_title",
     },
     {
       headerName: "Image",
@@ -66,10 +70,6 @@ const StepsTab = () => {
           View Image
         </Button>
       ),
-    },
-    {
-      headerName: "Step Title",
-      field: "course_step_title",
     },
     {
       headerName: "Access Time",
@@ -171,7 +171,11 @@ const StepsTab = () => {
       const response = await fetch(
         `${baseUrl}/masters/get-all-course-step-details/${step}/${token}`
       );
+
       const data = await response.json();
+      if (data.errFlag === 1) {
+        toast({ title: data.message, status: "error", duration: 3000, isClosable: true });
+      }
       setRowData(data);
       console.log(data);
     } catch (error) {
@@ -420,7 +424,7 @@ const StepsTab = () => {
 
     const form = new FormData();
     form.append("courseStepTitle", stepTitle);
-    form.append("stepNo", stepNumber);
+    // form.append("stepNo", stepNumber);
     form.append("courseId", selectedCourse);
     form.append("subjectId", selectedSubject);
     form.append("doctorId", selectedTeacher);
@@ -479,6 +483,7 @@ const StepsTab = () => {
       });
     } finally {
       setIsSubmitting(false);
+        onAddModalClose();
     }
   };
 
@@ -804,7 +809,7 @@ const StepsTab = () => {
                   />
                 </FormControl>
               </GridItem>
-              <GridItem>
+              {/* <GridItem>
                 <FormControl>
                   <FormLabel>Step Number</FormLabel>
                   <Input
@@ -813,7 +818,7 @@ const StepsTab = () => {
                     onChange={(e) => setStepNumber(e.target.value)}
                   />
                 </FormControl>
-              </GridItem>
+              </GridItem> */}
               <GridItem>
                 <FormControl>
                   <FormLabel>Select Subject</FormLabel>
@@ -1149,7 +1154,7 @@ const StepsTab = () => {
                   />
                 </FormControl>
               </GridItem>
-              <GridItem>
+              {/* <GridItem>
                 <FormControl>
                   <FormLabel>Step Number</FormLabel>
                   <Input
@@ -1158,7 +1163,7 @@ const StepsTab = () => {
                     onChange={(e) => setStepNumber(e.target.value)}
                   />
                 </FormControl>
-              </GridItem>
+              </GridItem> */}
               <GridItem>
                 <FormControl>
                   <FormLabel>Select Subject</FormLabel>
