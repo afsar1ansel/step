@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 
 export default function Login() {
   const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
+  // console.log(baseURL);
   const toast = useToast();
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -30,6 +31,7 @@ export default function Login() {
     form.append("email", email);
     form.append("password", password);
     // console.log(Object.fromEntries(form));
+    // console.log(baseURL);
     try {
       const response = await fetch(`${baseURL}/admin-users/validate-user`, {
         method: "POST",

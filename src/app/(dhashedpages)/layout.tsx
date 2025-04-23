@@ -12,8 +12,8 @@ import { IoIosHome } from "react-icons/io";
 import { TbDeviceAnalytics } from "react-icons/tb";
 import { FaRegIdCard } from "react-icons/fa6";
 import { AiOutlineDatabase } from "react-icons/ai";
-import { IoMdPaper } from "react-icons/io";
-
+import { RiUserSettingsFill } from "react-icons/ri";
+import { FaUsers } from "react-icons/fa6";
 import { FaPowerOff } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import { FaUserEdit } from "react-icons/fa";
@@ -52,7 +52,7 @@ type NavItem =
   | "test"
   | "Resources"
   // | "alertLogs"
-  // | "Reports"
+  | "AppUser"
   | "Masters"
   | "teacher"
   | "subject"
@@ -292,14 +292,14 @@ export default function RootLayout({
                       <p className="linkname">Resources</p>
                     </Link>
                   </li> */}
-                  {/* <li className={active === "Reports" ? "active" : ""}>
-                    <IoMdPaper />
-                    <Link href="/Reports">
-                      <p className="linkname">Reports</p>
+                  <li className={active === "AppUser" ? "active" : ""}>
+                    <FaUsers />
+                    <Link href="/AppUser">
+                      <p className="linkname">App User</p>
                     </Link>
-                  </li> */}
+                  </li>
                   <li className={active === "Settings" ? "active" : ""}>
-                    <IoMdPaper />
+                    <RiUserSettingsFill />
                     <Link href="/Settings">
                       <p className="linkname">Settings</p>
                     </Link>

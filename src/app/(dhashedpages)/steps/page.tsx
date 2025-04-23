@@ -68,6 +68,10 @@ const StepsTab = () => {
       ),
     },
     {
+      headerName: "Step Title",
+      field: "course_step_title",
+    },
+    {
       headerName: "Access Time",
       field: "course_overview_access_time_text",
     },
@@ -87,10 +91,7 @@ const StepsTab = () => {
       wrapText: true,
       cellStyle: { whiteSpace: "normal", lineHeight: "1.5" },
     },
-    {
-      headerName: "Course Title",
-      field: "course_step_title",
-    },
+
     {
       headerName: "Created Date",
       field: "created_date",
@@ -99,37 +100,45 @@ const StepsTab = () => {
       headerName: "No. of Test",
       field: "no_of_test_text",
     },
-      {
-          field: "status",
-          headerName: "Status",
-          cellStyle: { textAlign: "center" },
-          filter: false,
-          maxWidth: 150,
-          cellRenderer: (params: any) => (
-            // console.log(params.value),
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "80%",
-              }}
-            >
-              <Switch
-                colorScheme="green"
-                onChange={(event) => handleToggle(params.data)}
-                defaultChecked={params.value == 1 ? true : false}
-              />
-            </div>
-          ),
-        },
+    {
+      field: "status",
+      headerName: "Status",
+      cellStyle: { textAlign: "center" },
+      filter: false,
+      maxWidth: 75,
+      cellRenderer: (params: any) => (
+        // console.log(params.value),
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "80%",
+          }}
+        >
+          <Switch
+            colorScheme="green"
+            onChange={(event) => handleToggle(params.data)}
+            defaultChecked={params.value == 1 ? true : false}
+          />
+        </div>
+      ),
+    },
     {
       headerName: "Actions",
       filter: false,
       cellRenderer: (params: any) => {
         // console.log(params.data)
         return (
-          <div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "column",
+              gap: "10px",
+              padding: "5px",
+            }}
+          >
             <Button
               colorScheme="blue"
               size="sm"
@@ -140,11 +149,14 @@ const StepsTab = () => {
               Edit
             </Button>
             {/* <button onClick={() => handleDelete(params.data)}>Delete</button> */}
-            <Button onClick={() => handleShowDetails(params.data)}
+            <Button
+              onClick={() => handleShowDetails(params.data)}
               colorScheme="green"
               size="sm"
               variant={"outline"}
-              >Show</Button>
+            >
+              Show
+            </Button>
           </div>
         );
       },
@@ -157,11 +169,11 @@ const StepsTab = () => {
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
     try {
       const response = await fetch(
-        `${baseUrl}/masters/get-course-step-detail/${step}/${token}`
+        `${baseUrl}/masters/get-all-course-step-details/${step}/${token}`
       );
       const data = await response.json();
-      setRowData([data]);
-      // console.log(data);
+      setRowData(data);
+      console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -281,13 +293,12 @@ const StepsTab = () => {
     onClose: onImageModalClose,
   } = useDisclosure();
 
-
   async function handleToggle(data: any) {
     console.log(data.status, data.id);
-  //  const token = localStorage.getItem("token") ?? "";
-   const status = data.status == 1 ? 0 : 1;
+    //  const token = localStorage.getItem("token") ?? "";
+    const status = data.status == 1 ? 0 : 1;
     console.log(status);
-    try{
+    try {
       const token = localStorage.getItem("token");
       const response = await fetch(
         `${baseUrl}/masters/update-course-step-status/${data.id}/${status}/${token}`,
@@ -296,10 +307,9 @@ const StepsTab = () => {
         }
       );
       const data1 = await response.json();
-      console.log(data1);
-    }
-    catch(error){
-      console.log(error)
+      // console.log(data1);
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -355,9 +365,9 @@ const StepsTab = () => {
 
   const handleEdit = (data: any) => {
     // console.log(data)
-     fetchTeachers();
-     fetchSubjects();
-     fetchCourse();
+    fetchTeachers();
+    fetchSubjects();
+    fetchCourse();
     onShowModalClose();
     setSelectedCourse(data.course_id);
     setSelectedSubject(data.subject_id);
@@ -371,8 +381,6 @@ const StepsTab = () => {
     setSelectedTeacher(data.doctor_id);
     setSelectedImage(data.banner_image_name);
     setCurrentStep(data.id);
-    
-
 
     onEditModalOpen(); // Open Edit Modal
   };
@@ -382,6 +390,7 @@ const StepsTab = () => {
   // };
 
   function openAddModal() {
+    resetForm();
     fetchTeachers();
     fetchSubjects();
     fetchCourse();
@@ -543,7 +552,6 @@ const StepsTab = () => {
       setIsSubmitting(false);
     }
 
-
     resetForm();
     onEditModalClose();
   };
@@ -574,6 +582,10 @@ const StepsTab = () => {
     setcourseOverViewHoursText("");
     setcourseOverviewDownloadableText("");
     setcourseOverviewAccessTimeText("");
+    setStepTitle("");
+    setStepDecription("");
+    setSelectedCourse("");
+    setnoOfTestText("");
   };
 
   const handleAddNoteGroup = () => {
@@ -592,8 +604,8 @@ const StepsTab = () => {
   };
 
   useEffect(() => {
-    fetchData();
     fetchCource();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -613,7 +625,14 @@ const StepsTab = () => {
         }
       );
       const responseData = await response.json();
-      // console.log(responseData);
+      console.log(responseData);
+
+      if (responseData.message == "Invalid token") {
+        localStorage.removeItem("token");
+        window.location.href = "/auth/login";
+        return;
+      }
+
       setCourse(responseData);
     } catch {
       (error: Error) => {
@@ -716,11 +735,12 @@ const StepsTab = () => {
           placeholder="Select option"
           onChange={(e) => setStep(e.target.value)}
         >
-          {course.map((item: any, index: number) => (
-            <option key={item.id} value={item.id}>
-              {item.course_name}
-            </option>
-          ))}
+          {course &&
+            course.map((item: any, index: number) => (
+              <option key={item.id} value={item.id}>
+                {item.course_name}
+              </option>
+            ))}
         </Select>
       </Box>
       <div
@@ -834,7 +854,7 @@ const StepsTab = () => {
                 <FormControl>
                   <FormLabel>Select Course</FormLabel>
                   <Select
-                    placeholder="Select Subject"
+                    placeholder="Select Course"
                     value={selectedCourse}
                     onChange={(e) => setSelectedCourse(e.target.value)}
                   >
@@ -1179,7 +1199,7 @@ const StepsTab = () => {
                 <FormControl>
                   <FormLabel>Select Course</FormLabel>
                   <Select
-                    placeholder="Select Subject"
+                    placeholder="Select Course"
                     value={selectedCourse}
                     onChange={(e) => setSelectedCourse(e.target.value)}
                   >
@@ -1269,8 +1289,6 @@ const StepsTab = () => {
               </GridItem>
             </Grid>
 
-  
-
             <FormControl>
               <FormLabel mt={4}>Doctor Image</FormLabel>
               <Box
@@ -1317,10 +1335,17 @@ const StepsTab = () => {
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="gray" mr={3} onClick={onEditModalClose} isDisabled={isSubmitting}>
+            <Button
+              colorScheme="gray"
+              mr={3}
+              onClick={onEditModalClose}
+              isDisabled={isSubmitting}
+            >
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleUpdateStep}
+            <Button
+              colorScheme="green"
+              onClick={handleUpdateStep}
               isLoading={isSubmitting}
               loadingText="Updating..."
             >
@@ -1385,7 +1410,7 @@ const StepsTab = () => {
                     </FormControl>
                   </GridItem>
                   <GridItem>
-                    <FormControl>
+                    {/* <FormControl>
                       <FormLabel>Notes</FormLabel>
                       {step.notes.map(
                         (
@@ -1398,7 +1423,7 @@ const StepsTab = () => {
                           </Box>
                         )
                       )}
-                    </FormControl>
+                    </FormControl> */}
                   </GridItem>
                 </Grid>
               </Box>
