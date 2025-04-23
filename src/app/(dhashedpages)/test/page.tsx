@@ -327,11 +327,15 @@ const TestsTab = () => {
                 onChange={(e) => setSelectedStep(e.target.value)}
                 isDisabled={!selectedCourse}
               >
-                {steps.map((step) => (
-                  <option key={step.id} value={step.id}>
-                    {step.course_step_title}
-                  </option>
-                ))}
+                {steps.length > 0 ? (
+                  steps.map((step) => (
+                    <option key={step.id} value={step.id}>
+                      {step.course_step_title}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No data available</option>
+                )}
               </Select>
             </FormControl>
             <FormControl mb={4}>
