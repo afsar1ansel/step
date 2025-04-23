@@ -21,6 +21,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
+import { data } from "framer-motion/client";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -39,6 +40,7 @@ const TestsTab = () => {
   const [preCourseTestDuration, setPreCourseTestDuration] = useState<
     number | ""
   >("");
+  const [stepNo, setStepNo] = useState<number | "">(""); // New state for stepNo
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentTestId, setCurrentTestId] = useState<number | null>(null);
 
@@ -65,6 +67,11 @@ const TestsTab = () => {
       headerName: "Total Time (Minutes)",
       field: "pre_course_test_duration_minutes",
       maxWidth: 150,
+    },
+    {
+      headerName: "Step No", // New column for stepNo
+      field: "step_no",
+      maxWidth: 100,
     },
     {
       headerName: "Status",
@@ -143,9 +150,16 @@ const TestsTab = () => {
       !selectedCourse ||
       !selectedStep ||
       !preCourseTestTitle ||
-      !preCourseTestDuration
+      !preCourseTestDuration ||
+      !stepNo
     ) {
-      alert("Please fill in all fields.");
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all fields.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
       return;
     }
 
@@ -157,6 +171,7 @@ const TestsTab = () => {
       "preCourseTestDurationMinutes",
       String(preCourseTestDuration)
     );
+    formData.append("stepNo", String(stepNo)); // Include stepNo in the form data
 
     if (isEditMode) {
       formData.append("preCourseTestId", String(currentTestId));
@@ -164,33 +179,77 @@ const TestsTab = () => {
         method: "POST",
         body: formData,
       })
-        .then((response) => {
-          if (response.ok) {
-            alert("Test updated successfully!");
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.errFlag === 0) {
+            toast({
+              title: "Success",
+              description: data.message,
+              status: "success",
+              duration: 3000,
+              isClosable: true,
+            });
             fetchTests(); // Refresh the table
             resetForm();
             onModalClose();
           } else {
-            alert("Failed to update test.");
+            toast({
+              title: "Error",
+              description: data.message,
+              status: "error",
+              duration: 3000,
+              isClosable: true,
+            });
           }
         })
-        .catch((error) => console.error("Error updating test:", error));
+        .catch((error) => {
+          console.error("Error updating test:", error);
+          toast({
+            title: "Error",
+            description: "An error occurred while updating the test.",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        });
     } else {
       fetch(`${baseUrl}/masters/pre-course-test/add`, {
         method: "POST",
         body: formData,
       })
-        .then((response) => {
-          if (response.ok) {
-            alert("Test added successfully!");
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.errFlag === 0) {
+            toast({
+              title: "Success",
+              description: data.message,
+              status: "success",
+              duration: 3000,
+              isClosable: true,
+            });
             fetchTests(); // Refresh the table
             resetForm();
             onModalClose();
           } else {
-            alert("Failed to add test.");
+            toast({
+              title: "Error",
+              description: data.message,
+              status: "error",
+              duration: 3000,
+              isClosable: true,
+            });
           }
         })
-        .catch((error) => console.error("Error adding test:", error));
+        .catch((error) => {
+          console.error("Error adding test:", error);
+          toast({
+            title: "Error",
+            description: "An error occurred while adding the test.",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        });
     }
   };
 
@@ -242,6 +301,7 @@ const TestsTab = () => {
     setSelectedStep(data.course_step_details_master_id);
     setPreCourseTestTitle(data.pre_course_test_title);
     setPreCourseTestDuration(data.pre_course_test_duration_minutes);
+    setStepNo(data.stepNo); // Set stepNo for editing
     onModalOpen();
   };
 
@@ -255,6 +315,7 @@ const TestsTab = () => {
     setSelectedStep("");
     setPreCourseTestTitle("");
     setPreCourseTestDuration("");
+    setStepNo(""); // Reset stepNo
     setIsEditMode(false);
     setCurrentTestId(null);
     setSteps([]);
@@ -355,6 +416,15 @@ const TestsTab = () => {
                 onChange={(e) =>
                   setPreCourseTestDuration(Number(e.target.value))
                 }
+              />
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>Step No</FormLabel>
+              <Input
+                type="number"
+                placeholder="Enter Step No"
+                value={stepNo}
+                onChange={(e) => setStepNo(Number(e.target.value))}
               />
             </FormControl>
           </ModalBody>
