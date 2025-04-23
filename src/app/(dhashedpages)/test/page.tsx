@@ -105,6 +105,7 @@ const TestsTab = () => {
       maxWidth: 150,
     },
   ]);
+  console.log("work")
 
   // Fetch tests data
   useEffect(() => {
