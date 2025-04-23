@@ -173,6 +173,7 @@ const TestsTab = () => {
   };
 
   const handleEdit = (data: any) => {
+    console.log("Edit clicked for:", data);
     setIsEditMode(true);
     setCurrentTestId(data.id);
     setSelectedCourse(data.course_id); // Assuming course_id is available in the data
