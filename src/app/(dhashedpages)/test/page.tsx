@@ -17,7 +17,9 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
+  Switch,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -26,6 +28,7 @@ const TestsTab = () => {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const toast = useToast();
 
   const [rowData, setRowData] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
@@ -64,6 +67,29 @@ const TestsTab = () => {
       maxWidth: 150,
     },
     {
+      headerName: "Status",
+      field: "status",
+      cellStyle: { textAlign: "center" },
+      filter: false,
+      maxWidth: 150,
+      cellRenderer: (params: any) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "80%",
+          }}
+        >
+          <Switch
+            colorScheme="green"
+            onChange={() => handleToggle(params.data)}
+            defaultChecked={params.value === 1}
+          />
+        </div>
+      ),
+    },
+    {
       headerName: "Actions",
       cellRenderer: (params: any) => (
         <div>
@@ -92,8 +118,6 @@ const TestsTab = () => {
 
   // Fetch courses
   useEffect(() => {
-    // console.log(token);
-
     if (token) {
       fetch(`${baseUrl}/masters/courses/get-all-courses/${token}`)
         .then((response) => response.json())
@@ -141,15 +165,14 @@ const TestsTab = () => {
         body: formData,
       })
         .then((response) => {
-          console.log(response);
-          // if (response.errFlag == 0) {
-          //   alert("Test updated successfully!");
-          //   fetchTests(); // Refresh the table
-          //   resetForm();
-          //   onModalClose();
-          // } else {
-          //   alert("Failed to update test.");
-          // }
+          if (response.ok) {
+            alert("Test updated successfully!");
+            fetchTests(); // Refresh the table
+            resetForm();
+            onModalClose();
+          } else {
+            alert("Failed to update test.");
+          }
         })
         .catch((error) => console.error("Error updating test:", error));
     } else {
@@ -158,22 +181,61 @@ const TestsTab = () => {
         body: formData,
       })
         .then((response) => {
-          console.log(response);
-          // if (response.ok) {
-          //   alert("Test added successfully!");
-          //   fetchTests(); // Refresh the table
-          //   resetForm();
-          //   onModalClose();
-          // } else {
-          //   alert("Failed to add test.");
-          // }
+          if (response.ok) {
+            alert("Test added successfully!");
+            fetchTests(); // Refresh the table
+            resetForm();
+            onModalClose();
+          } else {
+            alert("Failed to add test.");
+          }
         })
         .catch((error) => console.error("Error adding test:", error));
     }
   };
 
+  const handleToggle = async (data: any) => {
+    const newStatus = data.status === 1 ? 0 : 1;
+    try {
+      const response = await fetch(
+        `${baseUrl}/masters/pre-course-test/change-status/${newStatus}/${data.id}/${token}`,
+        { method: "GET" }
+      );
+      if (response.ok) {
+        setRowData((prev) =>
+          prev.map((row) =>
+            row.id === data.id ? { ...row, status: newStatus } : row
+          )
+        );
+        toast({
+          title: "Success",
+          description: "Status updated successfully.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to update status.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update status.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
   const handleEdit = (data: any) => {
-    console.log("Edit clicked for:", data);
     setIsEditMode(true);
     setCurrentTestId(data.id);
     setSelectedCourse(data.course_id); // Assuming course_id is available in the data
