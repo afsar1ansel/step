@@ -49,7 +49,7 @@ type NavItem =
   | "AdminUsers"
   | "Doctors"
   | "steps"
-  | "test"
+  // | "test"
   | "Resources"
   // | "alertLogs"
   | "AppUser"
@@ -60,7 +60,7 @@ type NavItem =
   | "Support"
   | "Settings"
   | "Logout"
-  | "precourse-test"
+  | "test"
   | "precourse-qa"
   | "postcourse-test"
   | "postcourse-qa";
@@ -95,7 +95,7 @@ export default function RootLayout({
       setActive("Masters");
     } else if (
       [
-        "precourse-test",
+        "test",
         "precourse-qa",
         "postcourse-test",
         "postcourse-qa",
@@ -299,126 +299,126 @@ export default function RootLayout({
                       <p className="linkname">Test</p>
                     </Link>
                   </li> */}
-                    <li
+                  <li
                     style={{ padding: 0, margin: 0 }}
                     className={
                       [
-                      "precourse-test",
-                      "precourse-qa",
-                      "postcourse-test",
-                      "postcourse-qa",
+                        "test",
+                        "precourse-qa",
+                        "postcourse-test",
+                        "postcourse-qa",
                       ].includes(basePath)
-                      ? "active"
-                      : ""
+                        ? "active"
+                        : ""
                     }
-                    >
+                  >
                     <Accordion allowToggle>
                       <AccordionItem border="none">
-                      <AccordionButton
-                        style={{
-                        display: "flex",
-                        alignItems: "center",
-                        width: "100%",
-                        padding: "0.5rem 20px",
-                        }}
-                      >
-                        <FaUserEdit />
-                        <p
-                        style={{
-                          flex: 1,
-                          textAlign: "left",
-                          marginLeft: "0.5rem",
-                        }}
+                        <AccordionButton
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            width: "100%",
+                            padding: "0.5rem 20px",
+                          }}
                         >
-                        Test
-                        </p>
-                        <AccordionIcon />
-                      </AccordionButton>
-                      <AccordionPanel
-                        pb={0}
-                        pl={1}
-                        margin={0}
-                        padding={0}
-                        style={{ marginTop: "-0.5rem" }} // Adjust the gap here
-                      >
-                        <ul style={{ listStyle: "none", padding: 0 }}>
-                        <li>
-                          <Link href="/precourse-test">
+                          <FaUserEdit />
                           <p
-                            className={
-                            basePath === "precourse-test"
-                              ? "active-sub-option"
-                              : ""
-                            }
                             style={{
-                            margin: 0,
-                            marginLeft: "1rem",
-                            padding: "0",
+                              flex: 1,
+                              textAlign: "left",
+                              marginLeft: "0.5rem",
                             }}
                           >
-                            Precourse Test
+                            Test
                           </p>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link href="/precourse-qa">
-                          <p
-                            className={
-                            basePath === "precourse-qa"
-                              ? "active-sub-option"
-                              : ""
-                            }
-                            style={{
-                            margin: 0,
-                            marginLeft: "1rem",
-                            padding: "0",
-                            }}
-                          >
-                            Precourse Q/A
-                          </p>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link href="/postcourse-test">
-                          <p
-                            className={
-                            basePath === "postcourse-test"
-                              ? "active-sub-option"
-                              : ""
-                            }
-                            style={{
-                            margin: 0,
-                            marginLeft: "1rem",
-                            padding: "0",
-                            }}
-                          >
-                            Postcourse Test
-                          </p>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link href="/postcourse-qa">
-                          <p
-                            className={
-                            basePath === "postcourse-qa"
-                              ? "active-sub-option"
-                              : ""
-                            }
-                            style={{
-                            margin: 0,
-                            marginLeft: "1rem",
-                            padding: "0",
-                            }}
-                          >
-                            Postcourse Q/A
-                          </p>
-                          </Link>
-                        </li>
-                        </ul>
-                      </AccordionPanel>
+                          <AccordionIcon />
+                        </AccordionButton>
+                        <AccordionPanel
+                          pb={0}
+                          pl={1}
+                          margin={0}
+                          padding={0}
+                          style={{ marginTop: "-20px" }}
+                        >
+                          <ul style={{ listStyle: "none", padding: 0 }}>
+                            <li>
+                              <Link href="/test">
+                                <p
+                                  className={
+                                    basePath === "test"
+                                      ? "active-sub-option"
+                                      : ""
+                                  }
+                                  style={{
+                                    margin: 0,
+                                    marginLeft: "1rem",
+                                    padding: "0",
+                                  }}
+                                >
+                                  Precourse Test
+                                </p>
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/precourse-qa">
+                                <p
+                                  className={
+                                    basePath === "precourse-qa"
+                                      ? "active-sub-option"
+                                      : ""
+                                  }
+                                  style={{
+                                    margin: 0,
+                                    marginLeft: "1rem",
+                                    padding: "0",
+                                  }}
+                                >
+                                  Precourse Q/A
+                                </p>
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/postcourse-test">
+                                <p
+                                  className={
+                                    basePath === "postcourse-test"
+                                      ? "active-sub-option"
+                                      : ""
+                                  }
+                                  style={{
+                                    margin: 0,
+                                    marginLeft: "1rem",
+                                    padding: "0",
+                                  }}
+                                >
+                                  Postcourse Test
+                                </p>
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/postcourse-qa">
+                                <p
+                                  className={
+                                    basePath === "postcourse-qa"
+                                      ? "active-sub-option"
+                                      : ""
+                                  }
+                                  style={{
+                                    margin: 0,
+                                    marginLeft: "1rem",
+                                    padding: "0",
+                                  }}
+                                >
+                                  Postcourse Q/A
+                                </p>
+                              </Link>
+                            </li>
+                          </ul>
+                        </AccordionPanel>
                       </AccordionItem>
                     </Accordion>
-                    </li>
+                  </li>
                   {/* <li className={active === "Resources" ? "active" : ""}>
                     <AiOutlineDatabase />
                     <Link href="/Resources">
