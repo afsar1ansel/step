@@ -92,7 +92,7 @@ const TestsTab = () => {
 
   // Fetch courses
   useEffect(() => {
-    console.log(token);
+    // console.log(token);
 
     if (token) {
       fetch(`${baseUrl}/masters/courses/get-all-courses/${token}`)
