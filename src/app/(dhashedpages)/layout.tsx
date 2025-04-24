@@ -11,7 +11,7 @@ import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { IoIosHome } from "react-icons/io";
 import { TbDeviceAnalytics } from "react-icons/tb";
 import { FaRegIdCard } from "react-icons/fa6";
-import { AiOutlineDatabase } from "react-icons/ai";
+import { PiVideoConferenceFill } from "react-icons/pi";
 import { RiUserSettingsFill } from "react-icons/ri";
 import { FaUsers } from "react-icons/fa6";
 import { FaPowerOff } from "react-icons/fa6";
@@ -51,7 +51,7 @@ type NavItem =
   | "steps"
   // | "test"
   | "Resources"
-  // | "alertLogs"
+  | "videos"
   | "AppUser"
   | "Masters"
   | "teacher"
@@ -419,12 +419,12 @@ export default function RootLayout({
                       </AccordionItem>
                     </Accordion>
                   </li>
-                  {/* <li className={active === "Resources" ? "active" : ""}>
-                    <AiOutlineDatabase />
-                    <Link href="/Resources">
-                      <p className="linkname">Resources</p>
+                  <li className={active === "videos" ? "active" : ""}>
+                    <PiVideoConferenceFill />
+                    <Link href="/videos">
+                      <p className="linkname">videos</p>
                     </Link>
-                  </li> */}
+                  </li>
                   <li className={active === "AppUser" ? "active" : ""}>
                     <FaUsers />
                     <Link href="/AppUser">
