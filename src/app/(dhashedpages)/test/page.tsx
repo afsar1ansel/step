@@ -118,7 +118,9 @@ const TestsTab = () => {
     if (token) {
       fetch(`${baseUrl}/masters/pre-course-test/get-all/${token}`)
         .then((response) => response.json())
-        .then((data) => setRowData(data))
+        .then((data) =>{
+           console.log("Fetched test data:", data);
+          setRowData(data)})
         .catch((error) => console.error("Error fetching test data:", error));
     }
   }, [token, baseUrl]);

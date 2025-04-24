@@ -23,14 +23,14 @@ import {
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const precourseqa = () => {
+const postcourseqa = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const [rowData, setRowData] = useState<any[]>([]);
   const [testId, setTestId] = useState("1");
   const [testOptions, settestOptions] = useState<any[]>([]);
-  const [preCourseTestQuestionsMasterId, setPreCourseTestQuestionsMasterId] =
+  const [postCourseTestQuestionsMasterId, setpostCourseTestQuestionsMasterId] =
     useState("");
-    const [questionNo, setQuestionNo] = useState("");
+    const [questionNo, setquestionNo] = useState("");
     const [editQuestion, setEditQuestion] = useState("");
   const toast = useToast();
   useEffect(() => {
@@ -46,7 +46,7 @@ const precourseqa = () => {
     const token = localStorage.getItem("token") ?? "";
     try {
       const response = await fetch(
-        `${baseUrl}/masters/pre-course-test/questions/view/${testId}/${token}`,
+        `${baseUrl}/masters/post-course-test/questions/view/${testId}/${token}`,
         {
           method: "GET",
         }
@@ -68,13 +68,13 @@ const precourseqa = () => {
     const tok = localStorage.getItem("token");
     try {
       const response = await fetch(
-        `${baseUrl}/masters/pre-course-test/get-all/${tok}`,
+        `${baseUrl}/masters/post-course-test-detail/get-all/${tok}`,
         {
           method: "GET",
         }
       );
       const responseData = await response.json();
-      console.log(responseData);
+      // console.log(responseData);
       settestOptions(responseData);
     } catch {
       (error: Error) => {
@@ -191,8 +191,8 @@ const precourseqa = () => {
   const [testCourseId, settestCourseId] = useState("");
 
   const handleEdit = (data: any) => {
-   setPreCourseTestQuestionsMasterId(data.question_id);
-    setQuestionNo(data.question_no);
+   setpostCourseTestQuestionsMasterId(data.question_id);
+    setquestionNo(data.question_no);
     setEditQuestion(data.question);
     // console.log(data)
     onEditModalOpen(); 
@@ -204,10 +204,10 @@ const precourseqa = () => {
       form.append("token", localStorage.getItem("token") ?? "");
       form.append("sheetId", sheetId);
       form.append("sheetName", SheetName);
-      form.append("preCourseTestId", testId);
+      form.append("postCourseTestId", testId);
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/pre-course-test/fetch-questions`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/post-course-test/fetch-questions`,
         {
           method: "POST",
           body: form,
@@ -248,15 +248,15 @@ const precourseqa = () => {
     try {
       const form = new FormData();
       form.append("token", localStorage.getItem("token") ?? "");
-      form.append("preCourseTestQuestionsMasterId", preCourseTestQuestionsMasterId);
-      form.append("preCourseTestId", testId);
+      form.append("postCourseTestQuestionsMasterId", postCourseTestQuestionsMasterId);
+      form.append("postCourseTestId", testId);
       form.append("questionNo", questionNo);
       form.append("question", editQuestion);
 
       console.log(Object.fromEntries(form));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/pre-course-test/questions/update`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/post-course-test/questions/update`,
         {
           method: "POST",
           body: form,
@@ -325,7 +325,7 @@ const precourseqa = () => {
             {testOptions &&
               testOptions.map((item: any, index: number) => (
                 <option key={item.id} value={item.id}>
-                  {item.pre_course_test_title}
+                  {item.post_course_test_title}
                 </option>
               ))}
           </Select>
@@ -424,4 +424,4 @@ const precourseqa = () => {
   );
 };
 
-export default precourseqa;
+export default postcourseqa;
