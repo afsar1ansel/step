@@ -161,291 +161,295 @@ export default function RootLayout({
               {/* Sidebar Navigation */}
               <nav className="sidebar">
                 <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    padding: "20px",
-                    marginBottom: "20px",
-                    borderBottom: "1px solid #ccc",
-                  }}
+                  // style={{
+                  //   display: "flex",
+                  //   justifyContent: "center",
+                  //   padding: "20px",
+                  //   marginBottom: "20px",
+                  //   borderBottom: "1px solid #ccc",
+                  // }}
+                  className="sidebar-logo-container"
                 >
                   <Image src={profile} alt="Logo" width={200} height={200} />
                 </div>
-                <ul>
-                  <li className={active === "dashboard" ? "active" : ""}>
-                    <IoIosHome />
-                    <Link className="link" href="/dashboard">
-                      <p className="linkname">Dashboard</p>
-                    </Link>
-                  </li>
-                  <li className={active === "StudentData" ? "active" : ""}>
-                    <FaRegIdCard />
-                    <Link href="/StudentData">
-                      <p className="linkname">Student Data</p>
-                    </Link>
-                  </li>
-                  <li className={active === "AdminUsers" ? "active" : ""}>
-                    <MdOutlineAdminPanelSettings />
-                    <Link href="/AdminUsers">
-                      <p className="linkname">Admin Users</p>
-                    </Link>
-                  </li>
-                  <li className={active === "Doctors" ? "active" : ""}>
-                    <FaUserDoctor />
-                    <Link href="/Doctors">
-                      <p className="linkname">Doctors</p>
-                    </Link>
-                  </li>
-                  <li className={active === "steps" ? "active" : ""}>
-                    <TbDeviceAnalytics />
-                    <Link href="/steps">
-                      <p className="linkname">Steps</p>
-                    </Link>
-                  </li>
-                  <li
-                    style={{ padding: 0, margin: 0 }}
-                    className={
-                      ["teacher", "subject", "course"].includes(basePath)
-                        ? "active"
-                        : ""
-                    }
-                  >
-                    <Accordion allowToggle>
-                      <AccordionItem border="none">
-                        <AccordionButton
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            width: "100%",
-                            padding: "0.5rem 20px",
-                          }}
-                        >
-                          <TbDeviceAnalytics />
-                          <p
+                {/* Scrollable navigation items container */}
+                <div className="sidebar-nav-container">
+                  <ul>
+                    <li className={active === "dashboard" ? "active" : ""}>
+                      <IoIosHome />
+                      <Link className="link" href="/dashboard">
+                        <p className="linkname">Dashboard</p>
+                      </Link>
+                    </li>
+                    <li className={active === "StudentData" ? "active" : ""}>
+                      <FaRegIdCard />
+                      <Link href="/StudentData">
+                        <p className="linkname">Student Data</p>
+                      </Link>
+                    </li>
+                    <li className={active === "AdminUsers" ? "active" : ""}>
+                      <MdOutlineAdminPanelSettings />
+                      <Link href="/AdminUsers">
+                        <p className="linkname">Admin Users</p>
+                      </Link>
+                    </li>
+                    <li className={active === "Doctors" ? "active" : ""}>
+                      <FaUserDoctor />
+                      <Link href="/Doctors">
+                        <p className="linkname">Doctors</p>
+                      </Link>
+                    </li>
+                    <li className={active === "steps" ? "active" : ""}>
+                      <TbDeviceAnalytics />
+                      <Link href="/steps">
+                        <p className="linkname">Steps</p>
+                      </Link>
+                    </li>
+                    <li
+                      style={{ padding: 0, margin: 0 }}
+                      className={
+                        ["teacher", "subject", "course"].includes(basePath)
+                          ? "active"
+                          : ""
+                      }
+                    >
+                      <Accordion allowToggle>
+                        <AccordionItem border="none">
+                          <AccordionButton
                             style={{
-                              flex: 1,
-                              textAlign: "left",
-                              marginLeft: "0.5rem",
+                              display: "flex",
+                              alignItems: "center",
+                              width: "100%",
+                              padding: "0.5rem 20px",
                             }}
                           >
-                            Masters
-                          </p>
-                          <AccordionIcon />
-                        </AccordionButton>
-                        <AccordionPanel pb={0} pl={1} margin={0} padding={0}>
-                          <ul style={{ listStyle: "none", padding: 0 }}>
-                            <li>
-                              <Link href="/teacher">
-                                <p
-                                  className={
-                                    basePath === "teacher"
-                                      ? "active-sub-option"
-                                      : ""
-                                  }
-                                  style={{
-                                    margin: 0,
-                                    marginLeft: "1rem",
-                                    padding: "0",
-                                  }}
-                                >
-                                  Teacher Master
-                                </p>
-                              </Link>
-                            </li>
-                            <li>
-                              <Link href="/subject">
-                                <p
-                                  className={
-                                    basePath === "subject"
-                                      ? "active-sub-option"
-                                      : ""
-                                  }
-                                  style={{
-                                    margin: 0,
-                                    marginLeft: "1rem",
-                                    padding: "0",
-                                  }}
-                                >
-                                  Subject Master
-                                </p>
-                              </Link>
-                            </li>
-                            <li>
-                              <Link href="/course">
-                                <p
-                                  className={
-                                    basePath === "course"
-                                      ? "active-sub-option"
-                                      : ""
-                                  }
-                                  style={{
-                                    margin: 0,
-                                    marginLeft: "1rem",
-                                    padding: "0",
-                                  }}
-                                >
-                                  Course Master
-                                </p>
-                              </Link>
-                            </li>
-                          </ul>
-                        </AccordionPanel>
-                      </AccordionItem>
-                    </Accordion>
-                  </li>
-                  {/* <li className={active === "test" ? "active" : ""}>
+                            <TbDeviceAnalytics />
+                            <p
+                              style={{
+                                flex: 1,
+                                textAlign: "left",
+                                marginLeft: "0.5rem",
+                              }}
+                            >
+                              Masters
+                            </p>
+                            <AccordionIcon />
+                          </AccordionButton>
+                          <AccordionPanel pb={0} pl={1} margin={0} padding={0}>
+                            <ul style={{ listStyle: "none", padding: 0 }}>
+                              <li>
+                                <Link href="/teacher">
+                                  <p
+                                    className={
+                                      basePath === "teacher"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Teacher Master
+                                  </p>
+                                </Link>
+                              </li>
+                              <li>
+                                <Link href="/subject">
+                                  <p
+                                    className={
+                                      basePath === "subject"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Subject Master
+                                  </p>
+                                </Link>
+                              </li>
+                              <li>
+                                <Link href="/course">
+                                  <p
+                                    className={
+                                      basePath === "course"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Course Master
+                                  </p>
+                                </Link>
+                              </li>
+                            </ul>
+                          </AccordionPanel>
+                        </AccordionItem>
+                      </Accordion>
+                    </li>
+                    {/* <li className={active === "test" ? "active" : ""}>
                     <FaUserEdit />
                     <Link href="/test">
                       <p className="linkname">Test</p>
                     </Link>
                   </li> */}
-                  <li
-                    style={{ padding: 0, margin: 0 }}
-                    className={
-                      [
-                        "test",
-                        "precourse-qa",
-                        "postcourse-test",
-                        "postcourse-qa",
-                      ].includes(basePath)
-                        ? "active"
-                        : ""
-                    }
-                  >
-                    <Accordion allowToggle>
-                      <AccordionItem border="none">
-                        <AccordionButton
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            width: "100%",
-                            padding: "0.5rem 20px",
-                          }}
-                        >
-                          <FaUserEdit />
-                          <p
+                    <li
+                      style={{ padding: 0, margin: 0 }}
+                      className={
+                        [
+                          "test",
+                          "precourse-qa",
+                          "postcourse-test",
+                          "postcourse-qa",
+                        ].includes(basePath)
+                          ? "active"
+                          : ""
+                      }
+                    >
+                      <Accordion allowToggle>
+                        <AccordionItem border="none">
+                          <AccordionButton
                             style={{
-                              flex: 1,
-                              textAlign: "left",
-                              marginLeft: "0.5rem",
+                              display: "flex",
+                              alignItems: "center",
+                              width: "100%",
+                              padding: "0.5rem 20px",
                             }}
                           >
-                            Test
-                          </p>
-                          <AccordionIcon />
-                        </AccordionButton>
-                        <AccordionPanel
-                          pb={0}
-                          pl={1}
-                          margin={0}
-                          padding={0}
-                          style={{ marginTop: "-20px" }}
-                        >
-                          <ul style={{ listStyle: "none", padding: 0 }}>
-                            <li>
-                              <Link href="/test">
-                                <p
-                                  className={
-                                    basePath === "test"
-                                      ? "active-sub-option"
-                                      : ""
-                                  }
-                                  style={{
-                                    margin: 0,
-                                    marginLeft: "1rem",
-                                    padding: "0",
-                                  }}
-                                >
-                                  Precourse Test
-                                </p>
-                              </Link>
-                            </li>
-                            <li>
-                              <Link href="/precourse-qa">
-                                <p
-                                  className={
-                                    basePath === "precourse-qa"
-                                      ? "active-sub-option"
-                                      : ""
-                                  }
-                                  style={{
-                                    margin: 0,
-                                    marginLeft: "1rem",
-                                    padding: "0",
-                                  }}
-                                >
-                                  Precourse Q/A
-                                </p>
-                              </Link>
-                            </li>
-                            <li>
-                              <Link href="/postcourse-test">
-                                <p
-                                  className={
-                                    basePath === "postcourse-test"
-                                      ? "active-sub-option"
-                                      : ""
-                                  }
-                                  style={{
-                                    margin: 0,
-                                    marginLeft: "1rem",
-                                    padding: "0",
-                                  }}
-                                >
-                                  Postcourse Test
-                                </p>
-                              </Link>
-                            </li>
-                            <li>
-                              <Link href="/postcourse-qa">
-                                <p
-                                  className={
-                                    basePath === "postcourse-qa"
-                                      ? "active-sub-option"
-                                      : ""
-                                  }
-                                  style={{
-                                    margin: 0,
-                                    marginLeft: "1rem",
-                                    padding: "0",
-                                  }}
-                                >
-                                  Postcourse Q/A
-                                </p>
-                              </Link>
-                            </li>
-                          </ul>
-                        </AccordionPanel>
-                      </AccordionItem>
-                    </Accordion>
-                  </li>
-                  <li className={active === "videos" ? "active" : ""}>
-                    <PiVideoConferenceFill />
-                    <Link href="/videos">
-                      <p className="linkname">videos</p>
-                    </Link>
-                  </li>
-                  <li className={active === "AppUser" ? "active" : ""}>
-                    <FaUsers />
-                    <Link href="/AppUser">
-                      <p className="linkname">App User</p>
-                    </Link>
-                  </li>
-                  <li className={active === "Settings" ? "active" : ""}>
-                    <RiUserSettingsFill />
-                    <Link href="/Settings">
-                      <p className="linkname">Settings</p>
-                    </Link>
-                  </li>
-                  <li
-                    className={active === "Logout" ? "active" : ""}
-                    onClick={onOpen}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <FaPowerOff />
-                    <p className="linkname">Logout</p>
-                  </li>
-                </ul>
+                            <FaUserEdit />
+                            <p
+                              style={{
+                                flex: 1,
+                                textAlign: "left",
+                                marginLeft: "0.5rem",
+                              }}
+                            >
+                              Test
+                            </p>
+                            <AccordionIcon />
+                          </AccordionButton>
+                          <AccordionPanel
+                            pb={0}
+                            pl={1}
+                            margin={0}
+                            padding={0}
+                            style={{ marginTop: "-2px" }}
+                          >
+                            <ul style={{ listStyle: "none", padding: 0 }}>
+                              <li>
+                                <Link href="/test">
+                                  <p
+                                    className={
+                                      basePath === "test"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Precourse Test
+                                  </p>
+                                </Link>
+                              </li>
+                              <li>
+                                <Link href="/precourse-qa">
+                                  <p
+                                    className={
+                                      basePath === "precourse-qa"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Precourse Q/A
+                                  </p>
+                                </Link>
+                              </li>
+                              <li>
+                                <Link href="/postcourse-test">
+                                  <p
+                                    className={
+                                      basePath === "postcourse-test"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Postcourse Test
+                                  </p>
+                                </Link>
+                              </li>
+                              <li>
+                                <Link href="/postcourse-qa">
+                                  <p
+                                    className={
+                                      basePath === "postcourse-qa"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Postcourse Q/A
+                                  </p>
+                                </Link>
+                              </li>
+                            </ul>
+                          </AccordionPanel>
+                        </AccordionItem>
+                      </Accordion>
+                    </li>
+                    <li className={active === "videos" ? "active" : ""}>
+                      <PiVideoConferenceFill />
+                      <Link href="/videos">
+                        <p className="linkname">videos</p>
+                      </Link>
+                    </li>
+                    <li className={active === "AppUser" ? "active" : ""}>
+                      <FaUsers />
+                      <Link href="/AppUser">
+                        <p className="linkname">App User</p>
+                      </Link>
+                    </li>
+                    <li className={active === "Settings" ? "active" : ""}>
+                      <RiUserSettingsFill />
+                      <Link href="/Settings">
+                        <p className="linkname">Settings</p>
+                      </Link>
+                    </li>
+                    <li
+                      className={active === "Logout" ? "active" : ""}
+                      onClick={onOpen}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <FaPowerOff />
+                      <p className="linkname">Logout</p>
+                    </li>
+                  </ul>
+                </div>
               </nav>
               <main className="content">{children}</main>
             </div>

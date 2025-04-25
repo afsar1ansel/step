@@ -99,13 +99,16 @@ const TestsTab = () => {
       headerName: "Actions",
       cellRenderer: (params: any) => (
         <div>
-          <button
+          <Button
+            // leftIcon={<EditIcon />}
+            colorScheme="blue"
+            size="sm"
             onClick={() => handleEdit(params.data)}
-            style={{ marginRight: "10px" }}
+            variant="outline"
           >
             Edit
-          </button>
-          <button onClick={() => handleDelete(params.data)}>Delete</button>
+          </Button>
+          {/* <button onClick={() => handleDelete(params.data)}>Delete</button> */}
         </div>
       ),
       maxWidth: 150,
@@ -334,7 +337,7 @@ const TestsTab = () => {
       <div
         style={{
           height: "60px",
-          width: "100%",
+          width: "80vw",
           backgroundColor: "white",
           padding: "20px",
           borderRadius: "10px 10px 0px 0px",
@@ -348,13 +351,24 @@ const TestsTab = () => {
           Add Test
         </Button>
       </div>
-      <div style={{ height: "100%", width: "100%" }}>
+      <div style={{ height: "100%", width: "80vw" }}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={10}
           paginationAutoPageSize={true}
+          defaultColDef={{
+            sortable: true,
+            filter: true,
+            floatingFilter: true,
+            resizable: true,
+            flex: 1,
+            filterParams: {
+              debounceMs: 0,
+              buttons: ["reset"],
+            },
+          }}
         />
       </div>
 

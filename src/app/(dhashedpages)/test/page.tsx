@@ -52,26 +52,36 @@ const TestsTab = () => {
 
   const [columnDefs] = useState<ColDef[]>([
     {
-      headerName: "Date & Time",
-      field: "dateTime",
-      valueGetter: (params) =>
-        `${params.data.created_date} ${params.data.created_time}`,
-      minWidth: 200,
-    },
-    {
       headerName: "Title",
       field: "pre_course_test_title",
       minWidth: 250,
     },
     {
+      headerName: "Date & Time",
+      field: "created_date",
+      minWidth: 200,
+      cellRenderer: (params: { value: any }) => {
+        const date = new Date(params.value);
+        const options: Intl.DateTimeFormatOptions = {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        };
+        return date.toLocaleDateString("en-IN", options);
+      },
+    },
+
+    {
       headerName: "Total Time (Minutes)",
       field: "pre_course_test_duration_minutes",
       maxWidth: 150,
+      filter: false,
     },
     {
       headerName: "Step No", // New column for stepNo
       field: "step_no",
       maxWidth: 100,
+      filter: false,
     },
     {
       headerName: "Status",
@@ -98,15 +108,19 @@ const TestsTab = () => {
     },
     {
       headerName: "Actions",
+      filter: false,
       cellRenderer: (params: any) => (
         <div>
-          <button
+          <Button
+            // leftIcon={<EditIcon />}
+            colorScheme="blue"
+            size="sm"
             onClick={() => handleEdit(params.data)}
-            style={{ marginRight: "10px" }}
+            variant="outline"
           >
             Edit
-          </button>
-          <button onClick={() => handleDelete(params.data)}>Delete</button>
+          </Button>
+          {/* <button onClick={() => handleDelete(params.data)}>Delete</button> */}
         </div>
       ),
       maxWidth: 150,
@@ -118,9 +132,10 @@ const TestsTab = () => {
     if (token) {
       fetch(`${baseUrl}/masters/pre-course-test/get-all/${token}`)
         .then((response) => response.json())
-        .then((data) =>{
-           console.log("Fetched test data:", data);
-          setRowData(data)})
+        .then((data) => {
+          console.log("Fetched test data:", data);
+          setRowData(data);
+        })
         .catch((error) => console.error("Error fetching test data:", error));
     }
   }, [token, baseUrl]);
@@ -333,11 +348,11 @@ const TestsTab = () => {
   };
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px", }}>
       <div
         style={{
           height: "60px",
-          width: "100%",
+          width: "80vw",
           backgroundColor: "white",
           padding: "20px",
           borderRadius: "10px 10px 0px 0px",
@@ -351,13 +366,24 @@ const TestsTab = () => {
           Add Test
         </Button>
       </div>
-      <div style={{ height: "100%", width: "100%" }}>
+      <div style={{ height: "100%", width: "80vw" }}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={10}
           paginationAutoPageSize={true}
+          defaultColDef={{
+            sortable: true,
+            filter: true,
+            floatingFilter: true,
+            resizable: true,
+            flex: 1,
+            filterParams: {
+              debounceMs: 0,
+              buttons: ["reset"],
+            },
+          }}
         />
       </div>
 

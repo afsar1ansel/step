@@ -72,19 +72,20 @@ body {
   height: 100%;
 }
 
+/* Sidebar styles - Modified */
 .sidebar {
   background-color: white;
   border-right: 2px solid rgba(242, 243, 244, 0.5);
   color: white;
   width: 15vw;
   min-width: 180px;
-  /* padding: 20px; */
+  height: 100vh; /* Full viewport height */
   position: fixed;
-  top: 50px;
-  bottom: 0;
-  left: 0;
   top: 0;
-  /* border: solid 2px green; */
+  left: 0;
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  overflow: hidden; /* Hide overflow from parent */
 }
 
 .sidebar ul {
@@ -145,4 +146,56 @@ body {
   border-left: solid 3px #32b5ba;
   color: rgb(2, 51, 54) !important;
   font-weight: 500;
+}
+
+/* Logo container - Stays fixed at top */
+.sidebar-logo-container {
+  padding: 20px;
+  border-bottom: 1px solid #ccc;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+/* Navigation container - Will scroll */
+.sidebar-nav-container {
+  flex: 1; /* Take remaining space */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding-bottom: 20px; /* Space at bottom */
+}
+
+/* Custom scrollbar styling */
+.sidebar-nav-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-nav-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.sidebar-nav-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.sidebar-nav-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Adjust existing sidebar ul styles */
+.sidebar ul {
+  list-style-type: none;
+  margin-top: 0; /* Removed the top margin */
+  padding-top: 10px; /* Added some padding instead */
+}
+
+/* Accordion panel scrolling */
+.accordion-panel ul {
+  max-height: 300px; /* Limit height for nested accordion items */
+  overflow-y: auto;
+}
+
+/* Adjust content margin */
+.content {
+  margin-left: 15vw; /* Match sidebar width */
+  padding: 40px 0 0 40px;
+  width: calc(100% - 15vw);
 }

@@ -20,8 +20,6 @@ import {
   Switch,
   useToast,
 } from "@chakra-ui/react";
-import { time } from "console";
-import { a } from "framer-motion/client";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -41,7 +39,7 @@ const StudentsTab = () => {
     {
       headerName: "Step No",
       field: "step_no",
-      filter: true,
+      filter: false,
       cellStyle: { textAlign: "center" },
     },
     {
@@ -67,14 +65,14 @@ const StudentsTab = () => {
     {
       headerName: "Video Description",
       field: "video_description",
-      filter: true,
+      filter: false,
       // floatingFilter: true,
       cellStyle: { textAlign: "left" },
     },
     {
       headerName: "Video Duration (in mins)",
       field: "video_duration_in_mins",
-      filter: true,
+      filter: false,
       cellStyle: { textAlign: "center" },
       cellRenderer: (params: { value: any }) => {
         return (
@@ -102,6 +100,7 @@ const StudentsTab = () => {
     {
       headerName: "status",
       field: "status",
+      filter: false,
       cellStyle: {
         display: "flex",
         alignItems: "center",
@@ -140,6 +139,7 @@ const StudentsTab = () => {
     {
       headerName: "Action",
       field: "action",
+      filter: false,
       cellStyle: {
         display: "flex",
         alignItems: "center",
@@ -205,8 +205,8 @@ const StudentsTab = () => {
     onOpen: onVideoModalOpen,
     onClose: onVideoModalClose,
   } = useDisclosure();
-  const [currentVideoLink, setCurrentVideoLink] = useState("");
 
+  const [currentVideoLink, setCurrentVideoLink] = useState("");
   const [videoDescription, setvideoDescription] = useState<any>(null);
   const [vedioTitle, setvedioTitle] = useState("");
   const [videoDurationinMin, setvideoDurationinMin] = useState("");
