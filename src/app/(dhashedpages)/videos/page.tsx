@@ -1,5 +1,3 @@
-// "StudentsTab" Component
-
 "use client";
 
 import { AgGridReact } from "ag-grid-react";
@@ -20,24 +18,158 @@ import {
   ModalOverlay,
   useDisclosure,
   Switch,
+  useToast,
 } from "@chakra-ui/react";
 import { time } from "console";
+import { a } from "framer-motion/client";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const StudentsTab = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const [rowData, setRowData] = useState<any[]>([]);
+  const toast = useToast();
 
-  const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
+  const [columnDefs, setColumnDefs] = useState<ColDef[]>([
+    {
+      headerName: "Video Title",
+      field: "video_title",
+      filter: true,
+      floatingFilter: true,
+      cellStyle: { textAlign: "left" },
+    },
+    {
+      headerName: "Step No",
+      field: "step_no",
+      filter: true,
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Video Link",
+      field: "video_link",
+      filter: false,
+      cellStyle: { textAlign: "center" },
+      cellRenderer: (params: { value: any }) => {
+        return (
+          <Button
+            colorScheme="blue"
+            size="sm"
+            onClick={() => {
+              setCurrentVideoLink(params.value);
+              onVideoModalOpen();
+            }}
+          >
+            Play Video
+          </Button>
+        );
+      },
+    },
+    {
+      headerName: "Video Description",
+      field: "video_description",
+      filter: true,
+      // floatingFilter: true,
+      cellStyle: { textAlign: "left" },
+    },
+    {
+      headerName: "Video Duration (in mins)",
+      field: "video_duration_in_mins",
+      filter: true,
+      cellStyle: { textAlign: "center" },
+      cellRenderer: (params: { value: any }) => {
+        return (
+          <div>
+            <span>{params.value} Min</span>
+          </div>
+        );
+      },
+    },
+    {
+      headerName: "Created Date",
+      field: "created_date",
+      filter: true,
+      cellStyle: { textAlign: "center" },
+      cellRenderer: (params: { value: any }) => {
+        const date = new Date(params.value);
+        const options: Intl.DateTimeFormatOptions = {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        };
+        return date.toLocaleDateString("en-IN", options);
+      },
+    },
+    {
+      headerName: "status",
+      field: "status",
+      cellStyle: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      },
+      cellRenderer: (params: { value: any; data: any; api: any }) => {
+        const toggleSubscription = async (newValue: number) => {
+          try {
+            const videoLearningId = params.data.id;
+            const token = localStorage.getItem("token") || "";
+
+            const response = await fetch(
+              `${baseUrl}/video-learning/change-status/${newValue}/${videoLearningId}/${token}`
+            );
+            const data = await response.json();
+            console.log(data);
+
+            params.data.status = newValue;
+            params.api.applyTransaction({ update: [params.data] });
+          } catch (error) {
+            console.error("Error updating status:", error);
+          }
+        };
+
+        return (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <Switch
+              isChecked={params.value == 1}
+              colorScheme="green"
+              onChange={() => toggleSubscription(params.value == 1 ? 0 : 1)}
+            />
+          </div>
+        );
+      },
+    },
+    {
+      headerName: "Action",
+      field: "action",
+      cellStyle: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      },
+      cellRenderer: (params: { value: any; data: any }) => {
+        return (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <Button
+            
+              colorScheme="blue"
+              size="sm"
+              onClick={() => handleEdit(params.data)}
+              variant="outline"
+            >
+              Edit
+            </Button>
+          </div>
+        );
+      },
+    },
+  ]);
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  // fetching data 
+  // fetching data
   async function fetchData() {
-    try{
+    try {
       const token = localStorage.getItem("token");
       const response = await fetch(
         `${baseUrl}/video-learning/get-all/${token}`,
@@ -46,10 +178,9 @@ const StudentsTab = () => {
         }
       );
       const data = await response.json();
-      // setRowData(data);
+      setRowData(data);
       console.log(data);
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
@@ -68,16 +199,32 @@ const StudentsTab = () => {
     onClose: onEditModalClose,
   } = useDisclosure();
 
-  const [currentStudent, setCurrentStudent] = useState<any>(null);
-  const [studentName, setStudentName] = useState("");
-  const [studentEmail, setStudentEmail] = useState("");
-  const [studentContact, setStudentContact] = useState("");
+  // State for Add Student Form
+  const {
+    isOpen: isVideoModalOpen,
+    onOpen: onVideoModalOpen,
+    onClose: onVideoModalClose,
+  } = useDisclosure();
+  const [currentVideoLink, setCurrentVideoLink] = useState("");
+
+  const [videoDescription, setvideoDescription] = useState<any>(null);
+  const [vedioTitle, setvedioTitle] = useState("");
+  const [videoDurationinMin, setvideoDurationinMin] = useState("");
+  const [videoLink, setvideoLink] = useState("");
+  const [stepNo, setStepNo] = useState("");
+  const [courseStepDetailsMasterId, setCourseStepDetailsMasterId] =
+    useState("");
+  const [videoLearningId, setVideoLearningId] = useState("");
 
   const handleEdit = (data: any) => {
-    setCurrentStudent(data);
-    setStudentName(data.name);
-    setStudentEmail(data.email);
-    setStudentContact(data.contact);
+    setVideoLearningId(data.id);
+    setvedioTitle(data.video_title);
+    setvideoDurationinMin(data.video_duration_in_mins);
+    setvideoLink(data.video_link);
+    setvideoDescription(data.video_description);
+    setStepNo(data.step_no);
+    setCourseStepDetailsMasterId(data.course_step_details_master_id);
+
     onEditModalOpen();
   };
 
@@ -85,39 +232,110 @@ const StudentsTab = () => {
     setRowData((prev) => prev.filter((student) => student.id !== data.id));
   };
 
-  const toggleSubscription = (data: any) => {
-    setRowData((prev) =>
-      prev.map((student) =>
-        student.id === data.id
-          ? {
-              ...student,
-              subscription:
-                student.subscription === "Active" ? "Inactive" : "Active",
-            }
-          : student
-      )
-    );
-  };
-
   const handleAddStudent = () => {
-    const newStudent = {
-      id: String(rowData.length + 1),
-      name: studentName,
-      email: studentEmail,
-      contact: studentContact,
-      registrationDate: new Date().toISOString().split("T")[0],
-      subscription: "Inactive",
-    };
-    setRowData((prev) => [...prev, newStudent]);
+    const token = localStorage.getItem("token") ?? "";
+    const form = new FormData();
+    form.append("token", token);
+    form.append("videoTitle", vedioTitle);
+    form.append("videoDescription", videoDescription);
+    form.append("videoDurationInMins", videoDurationinMin);
+    form.append("videoLink", videoLink);
+    form.append("courseStepDetailsMasterId", courseStepDetailsMasterId);
+    form.append("stepNo", stepNo);
+    // console.log(Object.fromEntries(form.entries()));
+
+    try {
+      fetch(`${baseUrl}/video-learning/add`, {
+        method: "POST",
+        body: form,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // console.log(data);
+          fetchData();
+          if (data.errFlag == 0) {
+            toast({
+              title: "Success",
+              description: "Video Added Successfully",
+              status: "success",
+              duration: 3000,
+              isClosable: true,
+            });
+          } else {
+            toast({
+              title: "Error",
+              description: "Video Not Added",
+              status: "error",
+              duration: 3000,
+              isClosable: true,
+            });
+          }
+        });
+    } catch (error) {
+      console.error("Error adding video:", error);
+    }
+
     resetForm();
     onAddModalClose();
   };
 
+  const handleEditStudent = () => {
+    const token = localStorage.getItem("token") ?? "";
+    const form = new FormData();
+    form.append("token", token);
+    form.append("videoTitle", vedioTitle);
+    form.append("videoDescription", videoDescription);
+    form.append("videoDuration", videoDurationinMin);
+    form.append("videoLink", videoLink);
+    form.append("courseStepDetailsMasterId", courseStepDetailsMasterId);
+    form.append("stepNo", stepNo);
+    form.append("videoLearningId", videoLearningId);
+
+    console.log(Object.fromEntries(form.entries()));
+
+    try {
+      fetch(`${baseUrl}/video-learning/update`, {
+        method: "POST",
+        body: form,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // console.log(data);
+          fetchData();
+          if (data.errFlag == 0) {
+            toast({
+              title: "Success",
+              description: "Video Updated Successfully",
+              status: "success",
+              duration: 3000,
+              isClosable: true,
+            });
+          } else {
+            toast({
+              title: "Error",
+              description: "Video Not Updated",
+              status: "error",
+              duration: 3000,
+              isClosable: true,
+            });
+          }
+        });
+    } catch (error) {
+      console.error("Error updating video:", error);
+    }
+
+    resetForm();
+    onEditModalClose();
+  };
+
   const resetForm = () => {
-    setStudentName("");
-    setStudentEmail("");
-    setStudentContact("");
-    setCurrentStudent(null);
+    setvedioTitle("");
+    setvideoDurationinMin("");
+    setvideoLink("");
+    setStepNo("");
+    setCourseStepDetailsMasterId("");
+    setVideoLearningId("");
+    setvideoDescription(null);
   };
 
   return (
@@ -175,31 +393,63 @@ const StudentsTab = () => {
       <Modal isOpen={isAddModalOpen} onClose={onAddModalClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add New Student</ModalHeader>
+          <ModalHeader>Add New Video</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
-              <FormLabel>Student Name</FormLabel>
+              <FormLabel>Video Title</FormLabel>
               <Input
-                placeholder="Enter Student Name"
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
+                placeholder="Enter Video Title"
+                value={vedioTitle}
+                onChange={(e) => setvedioTitle(e.target.value)}
               />
             </FormControl>
             <FormControl mt={4}>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>video Duration in Minutes</FormLabel>
               <Input
-                placeholder="Enter Email"
-                value={studentEmail}
-                onChange={(e) => setStudentEmail(e.target.value)}
+                placeholder="Enter Video Duration in Minutes"
+                value={videoDurationinMin}
+                onChange={(e) => setvideoDurationinMin(e.target.value)}
               />
             </FormControl>
             <FormControl mt={4}>
-              <FormLabel>Contact No.</FormLabel>
+              <FormLabel>Video Link</FormLabel>
               <Input
-                placeholder="Enter Contact No."
-                value={studentContact}
-                onChange={(e) => setStudentContact(e.target.value)}
+                placeholder="Enter Video Link"
+                value={videoLink}
+                onChange={(e) => setvideoLink(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Video Description</FormLabel>
+              <textarea
+                placeholder="Enter Video Description"
+                value={videoDescription}
+                onChange={(e) => setvideoDescription(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "100px",
+                  padding: "8px",
+                  borderRadius: "4px",
+                  border: "1px solid #e2e8f0",
+                  resize: "none",
+                }}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Step no</FormLabel>
+              <Input
+                placeholder="Enter Step No"
+                value={stepNo}
+                onChange={(e) => setStepNo(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Course Step Details Master Id</FormLabel>
+              <Input
+                placeholder="Enter Course Step Details Master Id"
+                value={courseStepDetailsMasterId}
+                onChange={(e) => setCourseStepDetailsMasterId(e.target.value)}
               />
             </FormControl>
           </ModalBody>
@@ -222,27 +472,59 @@ const StudentsTab = () => {
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
-              <FormLabel>Student Name</FormLabel>
+              <FormLabel>Video Title</FormLabel>
               <Input
-                placeholder="Enter Student Name"
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
+                placeholder="Enter Video Title"
+                value={vedioTitle}
+                onChange={(e) => setvedioTitle(e.target.value)}
               />
             </FormControl>
             <FormControl mt={4}>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>video Duration in Minutes</FormLabel>
               <Input
-                placeholder="Enter Email"
-                value={studentEmail}
-                onChange={(e) => setStudentEmail(e.target.value)}
+                placeholder="Enter Video Duration in Minutes"
+                value={videoDurationinMin}
+                onChange={(e) => setvideoDurationinMin(e.target.value)}
               />
             </FormControl>
             <FormControl mt={4}>
-              <FormLabel>Contact No.</FormLabel>
+              <FormLabel>Video Link</FormLabel>
               <Input
-                placeholder="Enter Contact No."
-                value={studentContact}
-                onChange={(e) => setStudentContact(e.target.value)}
+                placeholder="Enter Video Link"
+                value={videoLink}
+                onChange={(e) => setvideoLink(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Video Description</FormLabel>
+              <textarea
+                placeholder="Enter Video Description"
+                value={videoDescription}
+                onChange={(e) => setvideoDescription(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: "100px",
+                  padding: "8px",
+                  borderRadius: "4px",
+                  border: "1px solid #e2e8f0",
+                  resize: "none",
+                }}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Step no</FormLabel>
+              <Input
+                placeholder="Enter Step No"
+                value={stepNo}
+                onChange={(e) => setStepNo(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Course Step Details Master Id</FormLabel>
+              <Input
+                placeholder="Enter Course Step Details Master Id"
+                value={courseStepDetailsMasterId}
+                onChange={(e) => setCourseStepDetailsMasterId(e.target.value)}
               />
             </FormControl>
           </ModalBody>
@@ -250,10 +532,48 @@ const StudentsTab = () => {
             <Button colorScheme="gray" mr={3} onClick={onEditModalClose}>
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleAddStudent}>
+            <Button colorScheme="green" onClick={handleEditStudent}>
               Update
             </Button>
           </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Video Player Modal */}
+      <Modal isOpen={isVideoModalOpen} onClose={onVideoModalClose} size="xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Video Player</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <div
+              style={{
+                width: "100%",
+                height: "0",
+                paddingBottom: "56.25%",
+                position: "relative",
+              }}
+            >
+              <iframe
+                src={currentVideoLink}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  border: "none",
+                }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </ModalBody>
+          {/* <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onVideoModalClose}>
+              Close
+            </Button>
+          </ModalFooter> */}
         </ModalContent>
       </Modal>
     </div>
