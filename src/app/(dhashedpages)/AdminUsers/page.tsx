@@ -406,7 +406,7 @@ const AdminUsers = () => {
             <Button colorScheme="gray" mr={3} onClick={onAddModalClose}>
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleAddSubject}>
+            <Button colorScheme="green" onClick={handleAddSubject} isLoading={loading}>
               Add
             </Button>
           </ModalFooter>
@@ -459,7 +459,7 @@ const AdminUsers = () => {
             <Button colorScheme="gray" mr={3} onClick={onEditModalClose}>
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleUpdateSubject}>
+            <Button colorScheme="green" onClick={handleUpdateSubject} isLoading={loading}>
               Update
             </Button>
           </ModalFooter>

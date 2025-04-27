@@ -735,7 +735,7 @@ const StepsTab = () => {
       }}
     >
       <Box p={4} mb={2}>
-        <Heading mb={4}>Welcome to Steps</Heading>
+        {/* <Heading mb={4}>Welcome to Steps</Heading> */}
         <Select
           placeholder="Select option"
           onChange={(e) => setStep(e.target.value)}
