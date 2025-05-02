@@ -50,7 +50,7 @@ type NavItem =
   | "Doctors"
   | "steps"
   // | "test"
-  | "Resources"
+  | "BannerMaster"
   | "videos"
   | "AppUser"
   | "Masters"
@@ -422,6 +422,12 @@ export default function RootLayout({
                         </AccordionItem>
                       </Accordion>
                     </li>
+                    <li className={active === "BannerMaster" ? "active" : ""}>
+                    <FaUserEdit />
+                    <Link href="/BannerMaster">
+                      <p className="linkname">Banner Master</p>
+                    </Link>
+                  </li>
                     <li className={active === "videos" ? "active" : ""}>
                       <PiVideoConferenceFill />
                       <Link href="/videos">

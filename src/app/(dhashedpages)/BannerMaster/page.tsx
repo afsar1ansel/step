@@ -14,7 +14,7 @@ import photo from "/public/BG.png";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const DataLogs = () => {
+const BannerMaster = () => {
   return (
     <div
       style={{
@@ -99,4 +99,4 @@ const DataLogs = () => {
   );
 };
 
-export default DataLogs;
+export default BannerMaster;
