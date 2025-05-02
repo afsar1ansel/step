@@ -1,187 +1,445 @@
 "use client";
 
 import { AgGridReact } from "ag-grid-react";
-import React, { useEffect, useMemo, useState } from "react";
-import { HiDownload } from "react-icons/hi";
-import { CiEdit } from "react-icons/ci";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import React, { useEffect, useState } from "react";
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
-import styles from "./page.module.css";
-import { FaSearch } from "react-icons/fa";
-import Image from "next/image";
-import photo from "/public/BG.png";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Switch,
+  useDisclosure,
+  useToast,
+  Image,
+  Text,
+} from "@chakra-ui/react";
+import { useDropzone } from "react-dropzone";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-/*************  ✨ Windsurf Command 🌟  *************/
 const BannerMaster = () => {
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const toast = useToast();
+
   const [rowData, setRowData] = useState<any[]>([]);
-  const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
-  const [defaultColDef, setDefaultColDef] = useState<ColDef>({
-    flex: 1,
-    minWidth: 100,
-    sortable: true,
-    resizable: true,
-    filter: true,
-  });
+  const [bannerTitle, setBannerTitle] = useState("");
+  const [bannerImage, setBannerImage] = useState<File | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [currentBannerId, setCurrentBannerId] = useState<number | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false); // State for image modal
+  const [selectedImage, setSelectedImage] = useState<string | null>(null); // State for selected image
 
+  const {
+    isOpen: isModalOpen,
+    onOpen: onModalOpen,
+    onClose: onModalClose,
+  } = useDisclosure();
+
+  const [columnDefs] = useState<ColDef[]>([
+    { headerName: "ID", field: "id", maxWidth: 80 },
+    { headerName: "Title", field: "banner_title", minWidth: 200 },
+    {
+      headerName: "Image",
+      field: "banner_image_name",
+      cellRenderer: (params: any) => (
+        <Button
+          variant="link"
+          colorScheme="blue"
+          onClick={() => handleViewImage(params.value)}
+        >
+          View Banner
+        </Button>
+      ),
+      minWidth: 150,
+    },
+    {
+      headerName: "Date & Time",
+      valueGetter: (params) =>
+        `${params.data.created_date} ${params.data.created_time}`,
+      minWidth: 200,
+    },
+    {
+      headerName: "Status",
+      field: "status",
+      cellRenderer: (params: any) => (
+        <Switch
+          isChecked={params.value === 1}
+          onChange={() => handleToggleStatus(params.data)}
+          colorScheme="green"
+        />
+      ),
+      maxWidth: 150,
+    },
+    {
+      headerName: "Actions",
+      cellRenderer: (params: any) => (
+        <div>
+          <Button
+            size="sm"
+            colorScheme="blue"
+            variant={"outline"}
+            onClick={() => handleEdit(params.data)}
+            style={{ marginRight: "10px" }}
+          >
+            Edit
+          </Button>
+        </div>
+      ),
+      maxWidth: 150,
+    },
+  ]);
+
+  // Fetch banners data
   useEffect(() => {
-    const columnDefs: ColDef[] = [
-      {
-        headerName: "Date",
-        field: "date",
-        width: 150,
-      },
-      {
-        headerName: "Category",
-        field: "category",
-        width: 150,
-      },
-      {
-        headerName: "Name",
-        field: "name",
-        width: 100,
-      },
-      {
-        headerName: "Heading",
-        field: "heading",
-        width: 150,
-      },
-      {
-        headerName: "Description",
-        field: "description",
-        width: 150,
-      },
-      {
-        headerName: "Actions",
-        field: "actions",
-        width: 120,
-        cellRenderer: (params) => {
-          return (
-            <div>
-              <HiDownload
-                className={styles.actionIcon}
-                onClick={() => handleDownload(params.data)}
-              />
-              <CiEdit
-                className={styles.actionIcon}
-                onClick={() => handleEdit(params.data)}
-              />
-              <RiDeleteBin6Line
-                className={styles.actionIcon}
-                onClick={() => handleDelete(params.data)}
-              />
-            </div>
-          );
-        },
-      },
-    ];
+    fetchBanners();
+  }, [token, baseUrl]);
 
-    setColumnDefs(columnDefs);
-    setDefaultColDef({
-      ...defaultColDef,
-      headerComponentParams: {
-        menuIcon: "fa fa-cog",
-      },
-    });
-  }, []);
+  const fetchBanners = () => {
+    if (token) {
+      fetch(`${baseUrl}/masters/ad-banners/get-all/${token}`)
+        .then((response) => response.json())
+        .then((data) => setRowData(data))
+        .catch((error) => console.error("Error fetching banners:", error));
+    }
+  };
 
-  const handleDownload = (data: any) => {
-    console.log(data);
+  const handleAddBanner = () => {
+    resetForm();
+    setIsEditMode(false);
+    onModalOpen();
   };
 
   const handleEdit = (data: any) => {
-    console.log(data);
+    setIsEditMode(true);
+    setCurrentBannerId(data.id);
+    setBannerTitle(data.banner_title);
+    setPreviewImage(
+      `${baseUrl}/masters/ad-banners/display/${token}/${data.banner_image_name}`
+    );
+    onModalOpen();
   };
 
-  const handleDelete = (data: any) => {
-    console.log(data);
+  const handleAddOrUpdateBanner = () => {
+    if (!bannerTitle || (!bannerImage && !isEditMode)) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all fields and upload an image.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("token", token || "");
+    formData.append("bannerTitle", bannerTitle);
+    if (bannerImage) formData.append("bannerImage", bannerImage);
+
+    if (isEditMode) {
+      formData.append("bannerId", String(currentBannerId));
+      fetch(`${baseUrl}/masters/ad-banners/update`, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.errFlag === 0) {
+            toast({
+              title: "Success",
+              description: data.message,
+              status: "success",
+              duration: 3000,
+              isClosable: true,
+            });
+            fetchBanners();
+            resetForm();
+            onModalClose();
+          } else {
+            toast({
+              title: "Error",
+              description: data.message,
+              status: "error",
+              duration: 3000,
+              isClosable: true,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error updating banner:", error);
+          toast({
+            title: "Error",
+            description: "An error occurred while updating the banner.",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        });
+    } else {
+      fetch(`${baseUrl}/masters/ad-banners/add`, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.errFlag === 0) {
+            toast({
+              title: "Success",
+              description: data.message,
+              status: "success",
+              duration: 3000,
+              isClosable: true,
+            });
+            fetchBanners();
+            resetForm();
+            onModalClose();
+          } else {
+            toast({
+              title: "Error",
+              description: data.message,
+              status: "error",
+              duration: 3000,
+              isClosable: true,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error adding banner:", error);
+          toast({
+            title: "Error",
+            description: "An error occurred while adding the banner.",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        });
+    }
   };
+
+  const handleToggleStatus = (data: any) => {
+    const newStatus = data.status === 1 ? 0 : 1;
+    fetch(
+      `${baseUrl}/masters/ad-banners/change-status/${newStatus}/${data.id}/${token}`,
+      { method: "GET" }
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.errFlag === 0) {
+          toast({
+            title: "Success",
+            description: "Status updated successfully.",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+          fetchBanners();
+        } else {
+          toast({
+            title: "Error",
+            description: result.message,
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating status:", error);
+        toast({
+          title: "Error",
+          description: "An error occurred while updating the status.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      });
+  };
+
+  const resetForm = () => {
+    setBannerTitle("");
+    setBannerImage(null);
+    setPreviewImage(null);
+    setIsEditMode(false);
+    setCurrentBannerId(null);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setBannerImage(file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
+  };
+
+  const handleViewImage = (imageName: string) => {
+    setSelectedImage(
+      `${baseUrl}/masters/ad-banners/display/${token}/${imageName}`
+    );
+    setIsImageModalOpen(true);
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null);
+    setIsImageModalOpen(false);
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: (acceptedFiles) => {
+      const file = acceptedFiles[0];
+      if (file) {
+        setBannerImage(file);
+        setPreviewImage(URL.createObjectURL(file));
+      }
+    },
+    accept: { "image/*": [] },
+  });
 
   return (
-    <div
-      style={{
-        width: "80vw",
-        height: "60vh",
-        maxWidth: "1250px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        margin: "0 auto",
-      }}
-    >
-      <div className={styles.hello}>
-        <h2>All Recources</h2>
-        <p>
-          Access, monitor, and manage uploaded data logs with detailed
-          processing history for better transparency and control.
-        </p>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          <FaSearch className={styles.searchIcon} />
-          <input
-            type="text"
-            placeholder="Search..."
-            className={styles.searchinput}
-          />
-        </div>
-      </div>
+    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
       <div
         style={{
-          height: "100%",
-          width: "80vw",
-          marginTop: "40px",
+          height: "60px",
+          width: "100%",
+          backgroundColor: "white",
+          padding: "20px",
+          borderRadius: "10px 10px 0px 0px",
           display: "flex",
-          justifyContent: "center",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        <div
-          style={{
-            height: "100%",
-            width: "100%",
-            border: "solid 1px black",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <div className={styles.card}>
-            <div className={styles.cardImage}>
-              <Image src={photo} alt="Logo" width={100} height={75} />
-            </div>
-            <div className={styles.cardText}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-around",
-                  gap: "40px",
-                  borderBottom: "solid 1px black",
-                  alignItems: "center",
-                  width: "400px",
-                }}
-              >
-                <p>5 jan 2024</p>
-                <p>catogory</p>
-                <p>name</p>
-              </div>
-
-              <h2 style={{fontSize: "20px", fontWeight: "600", marginTop: "10px"}}>Heading</h2>
-              <p>Lorem ipsum dolor seius officia ipsa reprehenderit minus, enim quis explicabo. Qui.</p>
-            </div>
-          </div>
-        </div>
+        <p style={{ fontSize: "16px", fontWeight: "600" }}>Banner Master</p>
+        <Button onClick={handleAddBanner} colorScheme="green">
+          Add Banner
+        </Button>
       </div>
+      <div style={{ height: "100%", width: "100%" }}>
+        <AgGridReact
+          rowData={rowData}
+          columnDefs={columnDefs}
+          pagination={true}
+          paginationPageSize={5}
+          defaultColDef={{
+            sortable: true,
+            filter: true,
+            floatingFilter: true,
+            resizable: true,
+            flex: 1,
+          }}
+        />
+      </div>
+
+      {/* Add/Edit Banner Modal */}
+      <Modal isOpen={isModalOpen} onClose={onModalClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            {isEditMode ? "Edit Banner" : "Add New Banner"}
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl mb={4}>
+              <FormLabel>Banner Title</FormLabel>
+              <Input
+                placeholder="Enter Banner Title"
+                value={bannerTitle}
+                onChange={(e) => setBannerTitle(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>Banner Image</FormLabel>
+              <Box
+                {...getRootProps()}
+                border="2px dashed"
+                borderColor={isDragActive ? "green.500" : "gray.300"}
+                borderRadius="md"
+                p={5}
+                textAlign="center"
+                cursor="pointer"
+                _hover={{ borderColor: "green.400" }}
+              >
+                <input {...getInputProps()} />
+                {isDragActive ? (
+                  <Text>Drop the image here...</Text>
+                ) : (
+                  <Text>Drag & drop an image here, or click to select</Text>
+                )}
+              </Box>
+              {previewImage && (
+                <Box mt={4} textAlign="start">
+                  <Image
+                    src={previewImage}
+                    alt="Preview"
+                    borderRadius="md"
+                    boxSize="200px"
+                    objectFit="cover"
+                    mx="auto"
+                  />
+                  <Button
+                    mt={4}
+                    size="sm"
+                    colorScheme="red"
+                    onClick={() => {
+                      setBannerImage(null);
+                      setPreviewImage(null);
+                    }}
+                  >
+                    Remove Image
+                  </Button>
+                </Box>
+              )}
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="gray" mr={3} onClick={onModalClose}>
+              Cancel
+            </Button>
+            <Button colorScheme="green" onClick={handleAddOrUpdateBanner}>
+              {isEditMode ? "Update" : "Add"}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Image Modal */}
+      <Modal isOpen={isImageModalOpen} onClose={closeImageModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>View Image</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {selectedImage && (
+              <Image
+                src={selectedImage}
+                alt="Banner"
+                borderRadius="md"
+                boxSize="100%"
+                objectFit="contain"
+              />
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="gray" onClick={closeImageModal}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };
-/*******  19995e3e-dedc-4c5a-980a-5b9cd1865f82  *******/
 
 export default BannerMaster;

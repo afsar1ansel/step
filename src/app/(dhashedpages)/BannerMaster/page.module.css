@@ -1,57 +1,19 @@
-.hello h2{
+.hello h3{
     /* border: solid 1px red; */
     color: rgba(25, 27, 28, 1);
-    font-size: 20px;
+    size: 16px;
     font-weight: 600;
-    /* margin-bottom: 10px; */
-    text-align: center;
+    margin-bottom: 10px;
 }
 
 .hello p{
     color: rgba(98, 108, 112, 1);
     size: 14px;
     font-weight: 400;
-    text-align: center;
 }
 
 .statesContainer{
     /* border: solid 1px yellow; */
     display: flex;
     gap: 14px;
-}
-
-.searchinput {
-    margin-top: 20px;
-  padding: 5px 2.2vw;
-  width: 400px;
-  height: 34px;
-  border-radius: 20px;
-  border: 1px solid black;
-  /* outline: none; */
-  /* background-color: rgba(242, 243, 244, 0.5); */
-
-}
-
-.searchIcon{
-  /* border: solid 1px red; */
-  position: relative;
-  left: 2vw;
-  top: 8px;
-  color: rgba(98, 108, 112, 1);
-  cursor: pointer
-}
-
-
-.card{
-    border: solid 1px gray;
-    height: 200px;
-    width: 50%;
-    padding: 20px;
-    display: flex;
-    gap: 50px;
-}
-
-.cardImage{
-    border-right: solid 1px black;
-    padding: 10px;
 }
