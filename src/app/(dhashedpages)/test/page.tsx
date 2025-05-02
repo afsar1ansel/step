@@ -41,6 +41,9 @@ const TestsTab = () => {
     number | ""
   >("");
   const [stepNo, setStepNo] = useState<number | "">(""); // New state for stepNo
+  const [syllabusTextLine1, setSyllabusTextLine1] = useState(""); // New state
+  const [syllabusTextLine2, setSyllabusTextLine2] = useState(""); // New state
+  const [syllabusTextLine3, setSyllabusTextLine3] = useState(""); // New state
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentTestId, setCurrentTestId] = useState<number | null>(null);
 
@@ -82,6 +85,21 @@ const TestsTab = () => {
       field: "step_no",
       maxWidth: 100,
       filter: false,
+    },
+    {
+      headerName: "Syllabus Line 1",
+      field: "syllabus_text_line_1", // New column
+      minWidth: 200,
+    },
+    {
+      headerName: "Syllabus Line 2",
+      field: "syllabus_text_line_2", // New column
+      minWidth: 200,
+    },
+    {
+      headerName: "Syllabus Line 3",
+      field: "syllabus_text_line_3", // New column
+      minWidth: 200,
     },
     {
       headerName: "Status",
@@ -168,7 +186,10 @@ const TestsTab = () => {
       !selectedStep ||
       !preCourseTestTitle ||
       !preCourseTestDuration ||
-      !stepNo
+      !stepNo ||
+      !syllabusTextLine1 ||
+      !syllabusTextLine2 ||
+      !syllabusTextLine3
     ) {
       toast({
         title: "Validation Error",
@@ -189,6 +210,9 @@ const TestsTab = () => {
       String(preCourseTestDuration)
     );
     formData.append("stepNo", String(stepNo)); // Include stepNo in the form data
+    formData.append("syllabusTextLine1", syllabusTextLine1); // Include syllabusTextLine1
+    formData.append("syllabusTextLine2", syllabusTextLine2); // Include syllabusTextLine2
+    formData.append("syllabusTextLine3", syllabusTextLine3); // Include syllabusTextLine3
 
     if (isEditMode) {
       formData.append("preCourseTestId", String(currentTestId));
@@ -236,6 +260,7 @@ const TestsTab = () => {
       })
         .then((response) => response.json())
         .then((data) => {
+          console.log(data);
           if (data.errFlag === 0) {
             toast({
               title: "Success",
@@ -312,13 +337,17 @@ const TestsTab = () => {
   };
 
   const handleEdit = (data: any) => {
+    console.log("Edit clicked for:", data);
     setIsEditMode(true);
     setCurrentTestId(data.id);
     setSelectedCourse(data.course_id); // Assuming course_id is available in the data
     setSelectedStep(data.course_step_details_master_id);
     setPreCourseTestTitle(data.pre_course_test_title);
     setPreCourseTestDuration(data.pre_course_test_duration_minutes);
-    setStepNo(data.stepNo); // Set stepNo for editing
+    setStepNo(data.step_no); // Set stepNo for editing
+    setSyllabusTextLine1(data.syllabus_text_line_1); // Set syllabusTextLine1
+    setSyllabusTextLine2(data.syllabus_text_line_2); // Set syllabusTextLine2
+    setSyllabusTextLine3(data.syllabus_text_line_3); // Set syllabusTextLine3
     onModalOpen();
   };
 
@@ -333,6 +362,9 @@ const TestsTab = () => {
     setPreCourseTestTitle("");
     setPreCourseTestDuration("");
     setStepNo(""); // Reset stepNo
+    setSyllabusTextLine1(""); // Reset syllabusTextLine1
+    setSyllabusTextLine2(""); // Reset syllabusTextLine2
+    setSyllabusTextLine3(""); // Reset syllabusTextLine3
     setIsEditMode(false);
     setCurrentTestId(null);
     setSteps([]);
@@ -348,7 +380,7 @@ const TestsTab = () => {
   };
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px", }}>
+    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
       <div
         style={{
           height: "60px",
@@ -453,6 +485,30 @@ const TestsTab = () => {
                 placeholder="Enter Step No"
                 value={stepNo}
                 onChange={(e) => setStepNo(Number(e.target.value))}
+              />
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>Syllabus Line 1</FormLabel>
+              <Input
+                placeholder="Enter Syllabus Line 1"
+                value={syllabusTextLine1}
+                onChange={(e) => setSyllabusTextLine1(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>Syllabus Line 2</FormLabel>
+              <Input
+                placeholder="Enter Syllabus Line 2"
+                value={syllabusTextLine2}
+                onChange={(e) => setSyllabusTextLine2(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>Syllabus Line 3</FormLabel>
+              <Input
+                placeholder="Enter Syllabus Line 3"
+                value={syllabusTextLine3}
+                onChange={(e) => setSyllabusTextLine3(e.target.value)}
               />
             </FormControl>
           </ModalBody>

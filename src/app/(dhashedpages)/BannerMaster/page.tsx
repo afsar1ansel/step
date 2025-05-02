@@ -14,7 +14,91 @@ import photo from "/public/BG.png";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
+/*************  ✨ Windsurf Command 🌟  *************/
 const BannerMaster = () => {
+  const [rowData, setRowData] = useState<any[]>([]);
+  const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
+  const [defaultColDef, setDefaultColDef] = useState<ColDef>({
+    flex: 1,
+    minWidth: 100,
+    sortable: true,
+    resizable: true,
+    filter: true,
+  });
+
+  useEffect(() => {
+    const columnDefs: ColDef[] = [
+      {
+        headerName: "Date",
+        field: "date",
+        width: 150,
+      },
+      {
+        headerName: "Category",
+        field: "category",
+        width: 150,
+      },
+      {
+        headerName: "Name",
+        field: "name",
+        width: 100,
+      },
+      {
+        headerName: "Heading",
+        field: "heading",
+        width: 150,
+      },
+      {
+        headerName: "Description",
+        field: "description",
+        width: 150,
+      },
+      {
+        headerName: "Actions",
+        field: "actions",
+        width: 120,
+        cellRenderer: (params) => {
+          return (
+            <div>
+              <HiDownload
+                className={styles.actionIcon}
+                onClick={() => handleDownload(params.data)}
+              />
+              <CiEdit
+                className={styles.actionIcon}
+                onClick={() => handleEdit(params.data)}
+              />
+              <RiDeleteBin6Line
+                className={styles.actionIcon}
+                onClick={() => handleDelete(params.data)}
+              />
+            </div>
+          );
+        },
+      },
+    ];
+
+    setColumnDefs(columnDefs);
+    setDefaultColDef({
+      ...defaultColDef,
+      headerComponentParams: {
+        menuIcon: "fa fa-cog",
+      },
+    });
+  }, []);
+
+  const handleDownload = (data: any) => {
+    console.log(data);
+  };
+
+  const handleEdit = (data: any) => {
+    console.log(data);
+  };
+
+  const handleDelete = (data: any) => {
+    console.log(data);
+  };
+
   return (
     <div
       style={{
@@ -98,5 +182,6 @@ const BannerMaster = () => {
     </div>
   );
 };
+/*******  19995e3e-dedc-4c5a-980a-5b9cd1865f82  *******/
 
 export default BannerMaster;
