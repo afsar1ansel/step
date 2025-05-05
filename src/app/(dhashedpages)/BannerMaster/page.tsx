@@ -49,11 +49,12 @@ const BannerMaster = () => {
   } = useDisclosure();
 
   const [columnDefs] = useState<ColDef[]>([
-    { headerName: "ID", field: "id", maxWidth: 80 },
+    { headerName: "ID", field: "id", maxWidth: 80 , filter: false },
     { headerName: "Title", field: "banner_title", minWidth: 200 },
     {
       headerName: "Image",
       field: "banner_image_name",
+      filter: false,
       cellRenderer: (params: any) => (
         <Button
           variant="link"
@@ -78,6 +79,7 @@ const BannerMaster = () => {
           {
             headerName: "Status",
             field: "status",
+            filter: false,
             cellRenderer: (params: any) => (
         <Switch
           isChecked={params.value === 1}
@@ -89,6 +91,7 @@ const BannerMaster = () => {
           },
           {
             headerName: "Actions",
+            filter: false,
             cellRenderer: (params: any) => (
         <div>
           <Button
