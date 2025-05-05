@@ -62,30 +62,34 @@ const BannerMaster = () => {
         >
           View Banner
         </Button>
-      ),
-      minWidth: 150,
-    },
-    {
-      headerName: "Date & Time",
-      valueGetter: (params) =>
-        `${params.data.created_date} ${params.data.created_time}`,
-      minWidth: 200,
-    },
-    {
-      headerName: "Status",
-      field: "status",
-      cellRenderer: (params: any) => (
+            ),
+            minWidth: 150,
+          },
+          {
+            headerName: "Date & Time",
+            valueGetter: (params) => {
+        const date = params.data.created_date.split(" ")[1]; // Extract the date part
+        const month = params.data.created_date.split(" ")[2]; // Extract the month part
+        const year = params.data.created_date.split(" ")[3]; // Extract the year part
+        return `${date} ${month} ${year} ${params.data.created_time}`;
+            },
+            minWidth: 200,
+          },
+          {
+            headerName: "Status",
+            field: "status",
+            cellRenderer: (params: any) => (
         <Switch
           isChecked={params.value === 1}
           onChange={() => handleToggleStatus(params.data)}
           colorScheme="green"
         />
-      ),
-      maxWidth: 150,
-    },
-    {
-      headerName: "Actions",
-      cellRenderer: (params: any) => (
+            ),
+            maxWidth: 150,
+          },
+          {
+            headerName: "Actions",
+            cellRenderer: (params: any) => (
         <div>
           <Button
             size="sm"
@@ -308,7 +312,7 @@ const BannerMaster = () => {
   });
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "80vw", height: "60vh", }}>
       <div
         style={{
           height: "60px",
