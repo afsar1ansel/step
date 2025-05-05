@@ -251,7 +251,7 @@ const StudentsTab = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          // console.log(data);
+          console.log(data);
           fetchData();
           if (data.errFlag == 0) {
             toast({
