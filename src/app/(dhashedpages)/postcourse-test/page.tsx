@@ -58,44 +58,44 @@ const TestsTab = () => {
       field: "dateTime",
       valueGetter: (params) =>
         `${params.data.created_date} ${params.data.created_time}`,
-      minWidth: 200,
+      // minWidth: 200,
     },
     {
       headerName: "Title",
       field: "post_course_test_title",
-      minWidth: 250,
+      // minWidth: 250,
     },
     {
       headerName: "Total Time (Minutes)",
       field: "post_course_test_duration_minutes",
-      maxWidth: 150,
+      // maxWidth: 150,
     },
     {
       headerName: "Step No", // New column for stepNo
       field: "step_no",
-      maxWidth: 100,
+      // maxWidth: 100,
     },
     {
       headerName: "Syllabus Line 1",
       field: "syllabus_text_line_1", // New column
-      minWidth: 200,
+      // minWidth: 200,
     },
     {
       headerName: "Syllabus Line 2",
       field: "syllabus_text_line_2", // New column
-      minWidth: 200,
+      // minWidth: 200,
     },
     {
       headerName: "Syllabus Line 3",
       field: "syllabus_text_line_3", // New column
-      minWidth: 200,
+      // minWidth: 200,
     },
     {
       headerName: "Status",
       field: "status",
       cellStyle: { textAlign: "center" },
       filter: false,
-      maxWidth: 150,
+      // maxWidth: 150,
       cellRenderer: (params: any) => (
         <div
           style={{

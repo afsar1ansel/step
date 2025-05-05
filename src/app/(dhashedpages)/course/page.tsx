@@ -174,6 +174,8 @@ const CourseMaster = () => {
   const handleEdit = (data: any) => {
     // setCurrentCourse(data);
     setEditRowId(data.id);
+    console.log(data.id);
+    console.log(data);
     setCourseName(data.name);
     // setTeacherSubjects(data.subjects);
     // setPrice(data.price);
@@ -209,20 +211,13 @@ const status = data.status ? 0 : 1; // Toggle status between 0 and 1
   }
 
   const handleAddCourse = async () => {
-    // const newCourse = {
-    //   id: String(rowData.length + 1),
-    //   name: courseName,
-    //   // subjects: teacherSubjects,
-    //   // price: price,
-    //   // discountPrice: discountPrice, // Added discount price
-    //   createdAdminUserId: createdAdminUserId,
-    // };
-    // setRowData((prev) => [...prev, newCourse]);
+    
     try{
       const form = new FormData();
       form.append("courseName", courseName);
-      form.append("createdAdminUserId", createdAdminUserId);
+      // form.append("createdAdminUserId", createdAdminUserId);
       form.append("token", localStorage.getItem("token") ?? "");
+        form.append("courseImage", "2025-05-03_14-02-12_node_logo.png");
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/masters/courses/add`,
@@ -269,24 +264,13 @@ const status = data.status ? 0 : 1; // Toggle status between 0 and 1
   };
 
   const handleUpdateCourse = async () => {
-    // const updatedCourse = {
-    //   id: currentCourse.id,
-    //   name: courseName,
-    //   // subjects: teacherSubjects,
-    //   price: price,
-    //   discountPrice: discountPrice, // Added discount price
-    //   createdAdminUserId: createdAdminUserId,
-    // };
-    // setRowData((prev) =>
-    //   prev.map((course) =>
-    //     course.id === currentCourse.id ? updatedCourse : course
-    //   )
-    // );
+   
 
        try {
          const form = new FormData();
          form.append("courseName", courseName);
          form.append("courseId", editRowId);
+          form.append("courseImage", "2025-05-03_14-02-12_node_logo.png");
          form.append("token", localStorage.getItem("token") ?? "");
 
          console.log(Object.fromEntries(form));
@@ -430,12 +414,12 @@ const status = data.status ? 0 : 1; // Toggle status between 0 and 1
                   />
                 </GridItem>
               </Grid> */}
-              <FormLabel>createdAdminUserId</FormLabel>
+              {/* <FormLabel>createdAdminUserId</FormLabel>
               <Input
                 placeholder="Enter created Admin User Id"
                 value={createdAdminUserId}
                 onChange={(e) => setcreatedAdminUserId(e.target.value)}
-              />
+              /> */}
             </FormControl>
           </ModalBody>
           <ModalFooter>
@@ -463,45 +447,7 @@ const status = data.status ? 0 : 1; // Toggle status between 0 and 1
                 value={courseName}
                 onChange={(e) => setCourseName(e.target.value)}
               />
-              {/* <FormLabel>Assign Subject</FormLabel>
-              <Select
-                isMulti
-                options={subjectOptions}
-                value={subjectOptions.filter((option) =>
-                  teacherSubjects.includes(option.value)
-                )}
-                onChange={(selectedOptions) =>
-                  setTeacherSubjects(
-                    selectedOptions.map((option) => option.value)
-                  )
-                }
-              /> */}
-
-              <br />
-              {/* <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>
-                <GridItem>
-                  <FormLabel>Price</FormLabel>
-                  <Input
-                    placeholder="Enter Price"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                  />
-                </GridItem>
-                <GridItem>
-                  <FormLabel>Discount Price</FormLabel>
-                  <Input
-                    placeholder="Enter Discount Price"
-                    value={discountPrice}
-                    onChange={(e) => setDiscountPrice(e.target.value)}
-                  />
-                </GridItem>
-              </Grid> */}
-              {/* <FormLabel>created Admin User Id</FormLabel>
-              <Input
-                placeholder="Enter created Admin User Id"
-                value={createdAdminUserId}
-                onChange={(e) => setcreatedAdminUserId(e.target.value)}
-              /> */}
+            
             </FormControl>
           </ModalBody>
           <ModalFooter>

@@ -57,12 +57,12 @@ const TestsTab = () => {
     {
       headerName: "Title",
       field: "pre_course_test_title",
-      minWidth: 250,
+      // minWidth: 250,
     },
     {
       headerName: "Date & Time",
       field: "created_date",
-      minWidth: 200,
+      // minWidth: 200,
       cellRenderer: (params: { value: any }) => {
         const date = new Date(params.value);
         const options: Intl.DateTimeFormatOptions = {
@@ -77,29 +77,28 @@ const TestsTab = () => {
     {
       headerName: "Total Time (Minutes)",
       field: "pre_course_test_duration_minutes",
-      maxWidth: 150,
+      // maxWidth: 150,
       filter: false,
     },
     {
       headerName: "Step No", // New column for stepNo
       field: "step_no",
-      maxWidth: 100,
+      // maxWidth: 100,
       filter: false,
     },
     {
       headerName: "Syllabus Line 1",
       field: "syllabus_text_line_1", // New column
-      minWidth: 200,
+      // minWidth: 200,
     },
     {
       headerName: "Syllabus Line 2",
       field: "syllabus_text_line_2", // New column
-      minWidth: 200,
+      // minWidth: 200,
     },
     {
       headerName: "Syllabus Line 3",
       field: "syllabus_text_line_3", // New column
-      minWidth: 200,
     },
     {
       headerName: "Status",

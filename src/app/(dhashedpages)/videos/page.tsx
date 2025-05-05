@@ -149,7 +149,6 @@ const StudentsTab = () => {
         return (
           <div style={{ display: "flex", justifyContent: "center" }}>
             <Button
-            
               colorScheme="blue"
               size="sm"
               onClick={() => handleEdit(params.data)}
@@ -233,6 +232,7 @@ const StudentsTab = () => {
   };
 
   const handleAddStudent = () => {
+    resetForm();
     const token = localStorage.getItem("token") ?? "";
     const form = new FormData();
     form.append("token", token);
@@ -338,6 +338,11 @@ const StudentsTab = () => {
     setvideoDescription(null);
   };
 
+  const onAddModalOpenWithReset = () => {
+    resetForm(); // Clear the form fields
+    onAddModalOpen(); // Open the modal
+  };
+
   return (
     <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
       <div
@@ -353,7 +358,7 @@ const StudentsTab = () => {
         }}
       >
         <p style={{ fontSize: "16px", fontWeight: "600" }}>Video Data</p>
-        <Button onClick={onAddModalOpen} colorScheme="green">
+        <Button onClick={onAddModalOpenWithReset} colorScheme="green">
           Add Video
         </Button>
       </div>
