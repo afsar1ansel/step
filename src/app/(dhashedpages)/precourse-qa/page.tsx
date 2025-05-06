@@ -32,6 +32,7 @@ const precourseqa = () => {
     useState("");
     const [questionNo, setQuestionNo] = useState("");
     const [editQuestion, setEditQuestion] = useState("");
+    const [ testIdAdd, setTestIdAdd] = useState("");
   const toast = useToast();
   useEffect(() => {
     fetchTest();
@@ -204,7 +205,9 @@ const precourseqa = () => {
       form.append("token", localStorage.getItem("token") ?? "");
       form.append("sheetId", sheetId);
       form.append("sheetName", SheetName);
-      form.append("preCourseTestId", testId);
+      form.append("preCourseTestId", testIdAdd);
+
+      console.log(Object.fromEntries(form));
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/masters/pre-course-test/fetch-questions`,
@@ -319,7 +322,7 @@ const precourseqa = () => {
         <p style={{ fontSize: "16px", fontWeight: "600" }}>Course Data</p>
         <div style={{ display: "flex", gap: "12px" }}>
           <Select
-            placeholder="Select option"
+            placeholder="Select Test"
             onChange={(e) => setTestId(e.target.value)}
           >
             {testOptions &&
@@ -375,12 +378,18 @@ const precourseqa = () => {
                 value={SheetName}
                 onChange={(e) => setSheetName(e.target.value)}
               />
-              <FormLabel>pre Test Course Id</FormLabel>
-              <Input
-                placeholder="Enter pre Test Course Id"
-                value={SheetName}
-                onChange={(e) => settestCourseId(e.target.value)}
-              />
+              <FormLabel>Select Test</FormLabel>
+              <Select
+                placeholder="Select Test"
+                onChange={(e) => setTestIdAdd(e.target.value)}
+              >
+                {testOptions &&
+                  testOptions.map((item: any, index: number) => (
+                    <option key={item.id} value={item.id}>
+                      {item.pre_course_test_title}
+                    </option>
+                  ))}
+              </Select>
             </FormControl>
           </ModalBody>
           <ModalFooter>

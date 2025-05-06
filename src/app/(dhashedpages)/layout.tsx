@@ -193,22 +193,22 @@ export default function RootLayout({
                         <p className="linkname">Admin Users</p>
                       </Link>
                     </li>
-                    <li className={active === "Doctors" ? "active" : ""}>
+                    {/* <li className={active === "Doctors" ? "active" : ""}>
                       <FaUserDoctor />
                       <Link href="/Doctors">
                         <p className="linkname">Doctors</p>
                       </Link>
-                    </li>
+                    </li> */}
                     <li className={active === "steps" ? "active" : ""}>
                       <TbDeviceAnalytics />
                       <Link href="/steps">
-                        <p className="linkname">Steps</p>
+                        <p className="linkname">Course Step Details</p>
                       </Link>
                     </li>
                     <li
                       style={{ padding: 0, margin: 0 }}
                       className={
-                        ["teacher", "subject", "course"].includes(basePath)
+                        ["Doctors", "subject", "course"].includes(basePath)
                           ? "active"
                           : ""
                       }
@@ -238,10 +238,10 @@ export default function RootLayout({
                           <AccordionPanel pb={0} pl={1} margin={0} padding={0}>
                             <ul style={{ listStyle: "none", padding: 0 }}>
                               <li>
-                                <Link href="/teacher">
+                                <Link href="/course">
                                   <p
                                     className={
-                                      basePath === "teacher"
+                                      basePath === "course"
                                         ? "active-sub-option"
                                         : ""
                                     }
@@ -251,10 +251,11 @@ export default function RootLayout({
                                       padding: "0",
                                     }}
                                   >
-                                    Teacher Master
+                                    Course Master
                                   </p>
                                 </Link>
                               </li>
+
                               <li>
                                 <Link href="/subject">
                                   <p
@@ -273,11 +274,12 @@ export default function RootLayout({
                                   </p>
                                 </Link>
                               </li>
+
                               <li>
-                                <Link href="/course">
+                                <Link href="/Doctors">
                                   <p
                                     className={
-                                      basePath === "course"
+                                      basePath === "Doctors"
                                         ? "active-sub-option"
                                         : ""
                                     }
@@ -287,7 +289,7 @@ export default function RootLayout({
                                       padding: "0",
                                     }}
                                   >
-                                    Course Master
+                                    Doctors Master
                                   </p>
                                 </Link>
                               </li>
@@ -423,11 +425,11 @@ export default function RootLayout({
                       </Accordion>
                     </li>
                     <li className={active === "BannerMaster" ? "active" : ""}>
-                    <FaUserEdit />
-                    <Link href="/BannerMaster">
-                      <p className="linkname">Banner Master</p>
-                    </Link>
-                  </li>
+                      <FaUserEdit />
+                      <Link href="/BannerMaster">
+                        <p className="linkname">Banner Master</p>
+                      </Link>
+                    </li>
                     <li className={active === "videos" ? "active" : ""}>
                       <PiVideoConferenceFill />
                       <Link href="/videos">

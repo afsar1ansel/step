@@ -56,10 +56,22 @@ const StepsTab = () => {
     {
       headerName: "Step Title",
       field: "course_step_title",
+      cellStyle: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "80%",
+      },
     },
     {
       headerName: "Image",
       field: "banner_image_name",
+      cellStyle: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "80%",
+      },
       // minWidth: 180,
       cellRenderer: (params: any) => (
         <Button
@@ -74,14 +86,32 @@ const StepsTab = () => {
     {
       headerName: "Access Time",
       field: "course_overview_access_time_text",
+      cellStyle: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "80%",
+      },
     },
     {
       headerName: "Downloadable Text",
       field: "course_overview_downloadable_text",
+      cellStyle: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "80%",
+      },
     },
     {
       headerName: "Course Overview Hours",
       field: "course_overview_hours_text",
+      cellStyle: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "80%",
+      },
     },
     {
       headerName: "Course Overview Description",
@@ -89,21 +119,40 @@ const StepsTab = () => {
       cellClass: "ag-cell-wrap-text",
       autoHeight: true,
       wrapText: true,
-      cellStyle: { whiteSpace: "normal", lineHeight: "1.5" },
+      cellStyle: {
+        whiteSpace: "normal",
+        lineHeight: "1.5",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "80%",
+      },
     },
 
     {
       headerName: "Created Date",
       field: "created_date",
+      cellStyle: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "80%",
+      },
     },
     {
       headerName: "No. of Test",
       field: "no_of_test_text",
+      cellStyle: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "80%",
+      },
     },
     {
       field: "status",
       headerName: "Status",
-      cellStyle: { textAlign: "center" },
+      // cellStyle: { textAlign: "center" },
       filter: false,
       maxWidth: 75,
       cellRenderer: (params: any) => (
@@ -134,9 +183,8 @@ const StepsTab = () => {
             style={{
               display: "flex",
               justifyContent: "center",
-              flexDirection: "column",
-              gap: "10px",
-              padding: "5px",
+              alignItems: "center",
+              height: "80%",
             }}
           >
             <Button
@@ -149,14 +197,14 @@ const StepsTab = () => {
               Edit
             </Button>
             {/* <button onClick={() => handleDelete(params.data)}>Delete</button> */}
-            <Button
+            {/* <Button
               onClick={() => handleShowDetails(params.data)}
               colorScheme="green"
               size="sm"
               variant={"outline"}
             >
               Show
-            </Button>
+            </Button> */}
           </div>
         );
       },
@@ -611,6 +659,7 @@ const StepsTab = () => {
   useEffect(() => {
     fetchCource();
     fetchData();
+    fetchSubjects(); 
   }, []);
 
   useEffect(() => {
@@ -698,7 +747,7 @@ const StepsTab = () => {
       );
       const data = await response.json();
       setSubject(data);
-      //  console.log(data);
+       console.log(data);
     } catch (error) {
       console.log(error);
     }
@@ -709,7 +758,7 @@ const StepsTab = () => {
     // console.log(tok);
     try {
       const response = await fetch(
-        `${baseUrl}/masters/courses/get-all-courses/${tok}`,
+        `${baseUrl}/masters/subjects/get-all-subjects/${tok}`,
         {
           method: "GET",
         }
@@ -734,20 +783,20 @@ const StepsTab = () => {
         alignItems: "center",
       }}
     >
-      <Box p={4} mb={2}>
-        {/* <Heading mb={4}>Welcome to Steps</Heading> */}
+      {/* <Box p={4} mb={2}>
+   
         <Select
-          placeholder="Select option"
+          placeholder="Select Subject"
           onChange={(e) => setStep(e.target.value)}
         >
-          {course &&
-            course.map((item: any, index: number) => (
-              <option key={item.id} value={item.id}>
-                {item.course_name}
+          {subject &&
+            subject.map((item: any, index: number) => (
+              <option key={item.id} value={item.course_id}>
+                {item.subject_name}
               </option>
             ))}
         </Select>
-      </Box>
+      </Box> */}
       <div
         style={{
           height: "60px",
@@ -760,10 +809,27 @@ const StepsTab = () => {
           alignItems: "center",
         }}
       >
-        <p style={{ fontSize: "16px", fontWeight: "600" }}>Steps Data</p>
-        <Button onClick={openAddModal} colorScheme="green">
-          Add Step
-        </Button>
+        <p style={{ fontSize: "16px", fontWeight: "600" }}>
+          Course Step Details
+        </p>
+        <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+          <Box>
+        <Select
+          placeholder="Select Subject"
+          onChange={(e) => setStep(e.target.value)}
+        >
+          {subject &&
+            subject.map((item: any, index: number) => (
+          <option key={item.id} value={item.course_id}>
+            {item.subject_name}
+          </option>
+            ))}
+        </Select>
+          </Box>
+          <Button onClick={openAddModal} colorScheme="green">
+        Add Step
+          </Button>
+        </div>
       </div>
       <div style={{ height: "100%", width: "100%", border: "1px solid #ccc" }}>
         <AgGridReact
@@ -839,7 +905,7 @@ const StepsTab = () => {
               </GridItem>
               <GridItem>
                 <FormControl>
-                  <FormLabel>Select Teacher</FormLabel>
+                  <FormLabel>Select Doctor</FormLabel>
                   <Select
                     placeholder="Select Doctor"
                     value={selectedTeacher}
@@ -895,7 +961,7 @@ const StepsTab = () => {
               </GridItem> */}
               <GridItem>
                 <FormControl>
-                  <FormLabel>course Overview Hours Text </FormLabel>
+                  <FormLabel>Course Overview</FormLabel>
                   <Input
                     placeholder="Enter Course Overview Hours"
                     value={courseOverviewHoursText}
@@ -905,9 +971,9 @@ const StepsTab = () => {
               </GridItem>
               <GridItem>
                 <FormControl>
-                  <FormLabel>course Overview Downloadable Text </FormLabel>
+                  <FormLabel>Course Overview Downloadable</FormLabel>
                   <Input
-                    placeholder="Enter Course Overview Downloadable Text"
+                    placeholder="Enter Course Overview Downloadable materials"
                     value={courseOverviewDownloadableText}
                     onChange={(e) =>
                       setcourseOverviewDownloadableText(e.target.value)
@@ -917,7 +983,7 @@ const StepsTab = () => {
               </GridItem>
               <GridItem>
                 <FormControl>
-                  <FormLabel>course acess Time </FormLabel>
+                  <FormLabel>Course Acess Time </FormLabel>
                   <Input
                     placeholder="Enter Course Overview Access Time"
                     value={courseOverviewAccessTimeText}
@@ -929,7 +995,7 @@ const StepsTab = () => {
               </GridItem>
               <GridItem>
                 <FormControl>
-                  <FormLabel>No. of tests </FormLabel>
+                  <FormLabel>No. of Tests </FormLabel>
                   <Input
                     placeholder="Enter No. of tests"
                     value={noOfTestText}
@@ -939,7 +1005,7 @@ const StepsTab = () => {
               </GridItem>
               <GridItem>
                 <FormControl>
-                  <FormLabel>course Step Description </FormLabel>
+                  <FormLabel>Course Step Description </FormLabel>
                   <Textarea
                     placeholder="Enter Step Description"
                     value={stepDecription}
@@ -1071,7 +1137,7 @@ const StepsTab = () => {
             </Box> */}
 
             <FormControl>
-              <FormLabel mt={4}>Doctor Image</FormLabel>
+              <FormLabel mt={4}>Banner Image</FormLabel>
               <Box
                 {...getRootProps()}
                 border="2px dashed"
@@ -1355,88 +1421,6 @@ const StepsTab = () => {
               loadingText="Updating..."
             >
               Update
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      {/* Show Step Details Modal */}
-      <Modal isOpen={isShowModalOpen} onClose={onShowModalClose} size="6xl">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Step Details</ModalHeader>
-          <ModalCloseButton />
-
-          <ModalBody>
-            {currentStepDetails.map((step, index) => (
-              <Box key={index} mb={6} mt={6}>
-                <Box height="1px" width="100%" bg="grey" mb={2}></Box>
-                <Box display="flex" justifyContent={"space-between"}>
-                  <FormLabel fontSize={20} fontWeight={600}>
-                    *Step {index + 1}
-                  </FormLabel>
-                  <Button onClick={() => handleEdit(step)}>edit</Button>
-                </Box>
-                <Grid templateColumns="repeat(2, 1fr)" gap={6}>
-                  <GridItem>
-                    <FormControl>
-                      <FormLabel>Pre Test MCQ Google Sheet Link</FormLabel>
-                      <Input value={step.preTestLink} isReadOnly />
-                    </FormControl>
-                  </GridItem>
-                  <GridItem>
-                    <FormControl>
-                      <FormLabel>Pre Test Details</FormLabel>
-                      <Textarea value={step.preTestSyllabus} isReadOnly />
-                      <Textarea value={step.preTestInstructions} isReadOnly />
-                      <Textarea value={step.preTestExamDetails} isReadOnly />
-                    </FormControl>
-                  </GridItem>
-                  <GridItem>
-                    <FormControl>
-                      <FormLabel>Post Test MCQ Google Sheet Link</FormLabel>
-                      <Input value={step.postTestLink} isReadOnly />
-                    </FormControl>
-                  </GridItem>
-                  <GridItem>
-                    <FormControl>
-                      <FormLabel>Post Test Details</FormLabel>
-                      <Textarea value={step.postTestSyllabus} isReadOnly />
-                      <Textarea value={step.postTestInstructions} isReadOnly />
-                      <Textarea value={step.postTestExamDetails} isReadOnly />
-                    </FormControl>
-                  </GridItem>
-                  <GridItem>
-                    <FormControl>
-                      <FormLabel>Video Details</FormLabel>
-                      <Input value={step.videoLink} isReadOnly />
-                      <Input value={step.videoTitle} isReadOnly />
-                      <Input value={step.videoDuration} isReadOnly />
-                    </FormControl>
-                  </GridItem>
-                  <GridItem>
-                    {/* <FormControl>
-                      <FormLabel>Notes</FormLabel>
-                      {step.notes.map(
-                        (
-                          note: { title: string; description: string },
-                          noteIndex: number
-                        ) => (
-                          <Box mb={4}>
-                            <Input value={note.title} isReadOnly />
-                            <Textarea value={note.description} isReadOnly />
-                          </Box>
-                        )
-                      )}
-                    </FormControl> */}
-                  </GridItem>
-                </Grid>
-              </Box>
-            ))}
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="gray" mr={3} onClick={onShowModalClose}>
-              Close
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -426,6 +426,14 @@ const StudentsTab = () => {
               />
             </FormControl>
             <FormControl mt={4}>
+              <FormLabel>Course Step Details Master Id</FormLabel>
+              <Input
+                placeholder="Enter Course Step Details Master Id"
+                value={courseStepDetailsMasterId}
+                onChange={(e) => setCourseStepDetailsMasterId(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
               <FormLabel>Video Description</FormLabel>
               <textarea
                 placeholder="Enter Video Description"
@@ -441,22 +449,14 @@ const StudentsTab = () => {
                 }}
               />
             </FormControl>
-            <FormControl mt={4}>
+            {/* <FormControl mt={4}>
               <FormLabel>Step no</FormLabel>
               <Input
                 placeholder="Enter Step No"
                 value={stepNo}
                 onChange={(e) => setStepNo(e.target.value)}
               />
-            </FormControl>
-            <FormControl mt={4}>
-              <FormLabel>Course Step Details Master Id</FormLabel>
-              <Input
-                placeholder="Enter Course Step Details Master Id"
-                value={courseStepDetailsMasterId}
-                onChange={(e) => setCourseStepDetailsMasterId(e.target.value)}
-              />
-            </FormControl>
+            </FormControl> */}
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="gray" mr={3} onClick={onAddModalClose}>
@@ -516,14 +516,14 @@ const StudentsTab = () => {
                 }}
               />
             </FormControl>
-            <FormControl mt={4}>
+            {/* <FormControl mt={4}>
               <FormLabel>Step no</FormLabel>
               <Input
                 placeholder="Enter Step No"
                 value={stepNo}
                 onChange={(e) => setStepNo(e.target.value)}
               />
-            </FormControl>
+            </FormControl> */}
             <FormControl mt={4}>
               <FormLabel>Course Step Details Master Id</FormLabel>
               <Input

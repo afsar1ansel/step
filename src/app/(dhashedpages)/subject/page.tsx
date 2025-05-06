@@ -130,7 +130,7 @@ const SubjectMaster = () => {
     },
     {
       field: "subject_status",
-      headerName: "Access",
+      headerName: "Status",
       filter: false,
       maxWidth: 150,
       cellRenderer: (params: any) => (
@@ -292,14 +292,13 @@ const SubjectMaster = () => {
 
   const handleUpdateSubject = async () => {
     try{
-     const token = localStorage.getItem("token") ?? "";
-     const form = new FormData();
-     form.append("subjectName", subjectName);
-     form.append("subjectId", subjectId);
+      const token = localStorage.getItem("token") ?? "";
+      const form = new FormData();
+      form.append("subjectName", subjectName);
+      form.append("subjectId", subjectId);
       form.append("courseId", courseId);
-     form.append("token", token);
-    //  console.log(Object.fromEntries(form.entries()));
-
+      form.append("token", token);
+      // console.log(Object.fromEntries(form.entries()));
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/masters/subjects/update-subject`,
         {
@@ -308,27 +307,26 @@ const SubjectMaster = () => {
         }
       );
       const responseData = await response.json();
-      // console.log(responseData);
-      // fetchData();
-       if (responseData.errFlag === 0) {
-         toast({
-           title: "Success",
-           description: "Subject updated successfully",
-           status: "success",
-           duration: 3000,
-           isClosable: true,
-         });
-         fetchData();
-       }
-       else {
-         toast({
-           title: "Error",
-           description: responseData.message,
-           status: "error",
-           duration: 3000,
-           isClosable: true,
-         });
-       }
+      console.log(responseData);
+      fetchData();
+      if (responseData.errFlag === 0) {
+        toast({
+          title: "Success",
+          description: "Subject updated successfully",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        fetchData();
+      } else {
+        toast({
+          title: "Error",
+          description: responseData.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     }catch(error){
       console.log(error);
     }finally{
@@ -359,7 +357,7 @@ const SubjectMaster = () => {
           alignItems: "center",
         }}
       >
-        <p style={{ fontSize: "16px", fontWeight: "600" }}>Subject Data</p>
+        <p style={{ fontSize: "16px", fontWeight: "600" }}>Subject</p>
         <Button onClick={onAddModalOpen} colorScheme="green">
           Add Subject
         </Button>
@@ -401,7 +399,7 @@ const SubjectMaster = () => {
                 onChange={(e) => setSubjectName(e.target.value)}
               />
 
-              <FormLabel>Course Id</FormLabel>
+              <FormLabel> Select Course</FormLabel>
               <Select
                 placeholder="Select option"
                 onChange={(e) => setCourseId(e.target.value)}
@@ -439,6 +437,17 @@ const SubjectMaster = () => {
                 value={subjectName}
                 onChange={(e) => setSubjectName(e.target.value)}
               />
+              <FormLabel>Select Course</FormLabel>
+              <Select
+                placeholder="Select option"
+                onChange={(e) => setCourseId(e.target.value)}
+              >
+                {allCourse.map((course: any) => (
+                  <option key={course.id} value={course.id}>
+                    {course.course_name}
+                  </option>
+                ))}
+              </Select>
             </FormControl>
           </ModalBody>
           <ModalFooter>

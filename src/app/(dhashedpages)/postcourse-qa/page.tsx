@@ -32,6 +32,7 @@ const postcourseqa = () => {
     useState("");
     const [questionNo, setquestionNo] = useState("");
     const [editQuestion, setEditQuestion] = useState("");
+     const [ testIdAdd, setTestIdAdd] = useState("");
   const toast = useToast();
   useEffect(() => {
     fetchTest();
@@ -319,7 +320,7 @@ const postcourseqa = () => {
         <p style={{ fontSize: "16px", fontWeight: "600" }}>Course Data</p>
         <div style={{ display: "flex", gap: "12px" }}>
           <Select
-            placeholder="Select option"
+            placeholder="Select test"
             onChange={(e) => setTestId(e.target.value)}
           >
             {testOptions &&
@@ -375,12 +376,18 @@ const postcourseqa = () => {
                 value={SheetName}
                 onChange={(e) => setSheetName(e.target.value)}
               />
-              <FormLabel>pre Test Course Id</FormLabel>
-              <Input
-                placeholder="Enter pre Test Course Id"
-                value={SheetName}
-                onChange={(e) => settestCourseId(e.target.value)}
-              />
+              <FormLabel>Select Test</FormLabel>
+              <Select
+                placeholder="Select test"
+                onChange={(e) => setTestIdAdd(e.target.value)}
+              >
+                {testOptions &&
+                  testOptions.map((item: any, index: number) => (
+                    <option key={item.id} value={item.id}>
+                      {item.post_course_test_title}
+                    </option>
+                  ))}
+              </Select>
             </FormControl>
           </ModalBody>
           <ModalFooter>

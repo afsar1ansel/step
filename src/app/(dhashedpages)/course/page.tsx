@@ -4,6 +4,7 @@ import { AgGridReact } from "ag-grid-react";
 import React, { useEffect, useState } from "react";
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import { useDropzone } from "react-dropzone";
 import {
   Button,
   FormControl,
@@ -17,19 +18,14 @@ import {
   ModalHeader,
   ModalOverlay,
   useDisclosure,
-  Grid,
-  GridItem,
-  Radio,
-  RadioGroup,
-  Stack,
   Switch,
-  IconButton,
   HStack,
   useToast,
+  Box,
+  Image,
+  Center,
+  Spinner,
 } from "@chakra-ui/react";
-// import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
-
-import Select from "react-select";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -37,17 +33,32 @@ const CourseMaster = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const [rowData, setRowData] = useState<any[]>([]);
   const toast = useToast();
+
+  // Image upload states
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [currentImageUrl, setCurrentImageUrl] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+
+  // Dropzone for image upload
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: {
+      "image/*": [".jpeg", ".jpg", ".png", ".webp"],
+    },
+    maxFiles: 1,
+    onDrop: (acceptedFiles) => {
+      const file = acceptedFiles[0];
+      setSelectedImage(file);
+      setPreview(URL.createObjectURL(file));
+    },
+  });
+
   useEffect(() => {
     fetcherData();
   }, []);
 
-  //fetcher to get all course data
-
   async function fetcherData() {
-    // const tok =
-    //   typeof window !== "undefined" ? localStorage.getItem("token") : null;
     const tok = localStorage.getItem("token");
-    // console.log(tok);
     try {
       const response = await fetch(
         `${baseUrl}/masters/courses/get-all-courses/${tok}`,
@@ -78,18 +89,23 @@ const CourseMaster = () => {
       field: "course_name",
       minWidth: 180,
     },
-    // {
-    //   headerName: "Assigned Subjects",
-    //   field: "subjects",
-    //   cellRenderer: (params: any) => {
-    //     return params.value.join(", ");
-    //   },
-    // },
+    {
+      headerName: "Course Image",
+      field: "course_image",
+      cellRenderer: (params: any) => (
+        <Button
+          variant="link"
+          colorScheme="blue"
+          onClick={() => fetchImage(params.value)}
+        >
+          View Image
+        </Button>
+      ),
+    },
     {
       headerName: "Course Created By",
       field: "created_admin_user_id",
       cellRenderer: (params: any) => {
-        // console.log(params);
         return params.value == 1 ? "Admin" : "Sub Admin";
       },
     },
@@ -126,7 +142,6 @@ const CourseMaster = () => {
         return (
           <HStack spacing={2}>
             <Button
-              // leftIcon={<EditIcon />}
               colorScheme="blue"
               size="sm"
               onClick={() => handleEdit(params.data)}
@@ -134,67 +149,64 @@ const CourseMaster = () => {
             >
               Edit
             </Button>
-            {/* <Button
-              // leftIcon={<DeleteIcon />}
-              colorScheme="red"
-              size="sm"
-              onClick={() => handleDelete(params.data)}
-              variant="outline"
-            >
-              Delete
-            </Button> */}
           </HStack>
         );
       },
     },
   ]);
 
-  // State for Add Course Modal
+  // Modal states
   const {
     isOpen: isAddModalOpen,
     onOpen: onAddModalOpen,
     onClose: onAddModalClose,
   } = useDisclosure();
-
-  // State for Edit Course Modal
   const {
     isOpen: isEditModalOpen,
     onOpen: onEditModalOpen,
     onClose: onEditModalClose,
   } = useDisclosure();
+  const {
+    isOpen: isImageModalOpen,
+    onOpen: onImageModalOpen,
+    onClose: onImageModalClose,
+  } = useDisclosure();
 
+  // Form states
   const [currentCourse, setCurrentCourse] = useState<any>(null);
   const [courseName, setCourseName] = useState("");
-  const [teacherSubjects, setTeacherSubjects] = useState<string[]>([]);
-  const [price, setPrice] = useState("");
-  const [discountPrice, setDiscountPrice] = useState(""); // Added discount price state
   const [editRowId, setEditRowId] = useState("");
-  const [createdAdminUserId, setcreatedAdminUserId] = useState("");
+
+  const fetchImage = async (imageName: string) => {
+    console.log(imageName);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${baseUrl}/masters/courses/course-image/view/${token}/${imageName}`,
+        {
+          method: "GET",
+        }
+      );
+      console.log(response);
+      setCurrentImageUrl(response.url);
+      onImageModalOpen();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleEdit = (data: any) => {
-    // setCurrentCourse(data);
     setEditRowId(data.id);
-    console.log(data.id);
-    console.log(data);
-    setCourseName(data.name);
-    // setTeacherSubjects(data.subjects);
-    // setPrice(data.price);
-    // setDiscountPrice(data.discountPrice); // Set discount price
-    // setcreatedAdminUserId(data.createdAdminUserId);
-    onEditModalOpen(); // Open Edit Modal
+    setCourseName(data.course_name);
+    setCurrentCourse(data);
+    onEditModalOpen();
   };
 
-  const handleDelete = (data: any) => {
-    setRowData((prev) => prev.filter((course) => course.id !== data.id));
-  };
-
-  //toggle function for switch button
   const handleToggle = async (data: any) => {
-
     console.log(data.id);
-    try{
+    try {
       const token = localStorage.getItem("token") ?? "";
-const status = data.status ? 0 : 1; // Toggle status between 0 and 1
+      const status = data.status ? 0 : 1;
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/masters/courses/change-course-status/${status}/${data.id}/${token}`,
         {
@@ -203,21 +215,20 @@ const status = data.status ? 0 : 1; // Toggle status between 0 and 1
       );
       const responseData = await response.json();
       console.log(responseData);
-
     } catch (error) {
       console.error("Error toggling course status:", error);
     }
-
-  }
+  };
 
   const handleAddCourse = async () => {
-    
-    try{
+    setLoading(true);
+    try {
       const form = new FormData();
       form.append("courseName", courseName);
-      // form.append("createdAdminUserId", createdAdminUserId);
       form.append("token", localStorage.getItem("token") ?? "");
-        form.append("courseImage", "2025-05-03_14-02-12_node_logo.png");
+      if (selectedImage) {
+        form.append("courseImage", selectedImage);
+      }
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/masters/courses/add`,
@@ -228,9 +239,8 @@ const status = data.status ? 0 : 1; // Toggle status between 0 and 1
       );
       const responseData = await response.json();
       console.log(responseData);
-      fetcherData(); // Fetch updated data after adding a new course
-      // setRowData((prev) => [...prev, responseData]);
-        
+      fetcherData();
+
       if (responseData.errFlag == 0) {
         toast({
           title: "Course added successfully.",
@@ -240,6 +250,7 @@ const status = data.status ? 0 : 1; // Toggle status between 0 and 1
           isClosable: true,
           position: "top",
         });
+        onAddModalClose();
       } else {
         toast({
           title: "Error adding course.",
@@ -250,85 +261,73 @@ const status = data.status ? 0 : 1; // Toggle status between 0 and 1
           position: "top",
         });
       }
-
-
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Error adding course:", error);
-    }
-    finally {
-      // console.log("we are at finally block");
-    resetForm();
-    onAddModalClose();
+    } finally {
+      setLoading(false);
+      resetForm();
     }
   };
 
   const handleUpdateCourse = async () => {
-   
+    setLoading(true);
+    try {
+      const form = new FormData();
+      form.append("courseName", courseName);
+      form.append("courseId", editRowId);
+      form.append("token", localStorage.getItem("token") ?? "");
+      if (selectedImage) {
+        form.append("courseImage", selectedImage);
+      }
 
-       try {
-         const form = new FormData();
-         form.append("courseName", courseName);
-         form.append("courseId", editRowId);
-          form.append("courseImage", "2025-05-03_14-02-12_node_logo.png");
-         form.append("token", localStorage.getItem("token") ?? "");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/courses/update-course`,
+        {
+          method: "POST",
+          body: form,
+        }
+      );
+      const responseData = await response.json();
+      console.log(responseData);
+      fetcherData();
 
-         console.log(Object.fromEntries(form));
-
-         const response = await fetch(
-           `${process.env.NEXT_PUBLIC_BASE_URL}/masters/courses/update-course`,
-           {
-             method: "POST",
-             body: form,
-           }
-         );
-         const responseData = await response.json();
-         console.log(responseData);
-         fetcherData(); // Fetch updated data after adding a new course
-         // setRowData((prev) => [...prev, responseData]);
-
-         if (responseData.errFlag == 0) {
-           toast({
-             title: "Course updated successfully.",
-             description: responseData.message,
-             status: "success",
-             duration: 3000,
-             isClosable: true,
-             position: "top",
-           });
-         } else {
-           toast({
-             title: "Error updating course.",
-             description: responseData.message,
-             status: "error",
-             duration: 3000,
-             isClosable: true,
-             position: "top",
-           });
-         }
-       } catch (error) {
-         console.error("Error adding course:", error);
-       } finally {
-         // console.log("we are at finally block");
-         resetForm();
-         onAddModalClose();
-       }
-    resetForm();
-    onEditModalClose();
+      if (responseData.errFlag == 0) {
+        toast({
+          title: "Course updated successfully.",
+          description: responseData.message,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+          position: "top",
+        });
+        onEditModalClose();
+      } else {
+        toast({
+          title: "Error updating course.",
+          description: responseData.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+          position: "top",
+        });
+      }
+    } catch (error) {
+      console.error("Error updating course:", error);
+    } finally {
+      setLoading(false);
+      resetForm();
+    }
   };
 
   const resetForm = () => {
     setCourseName("");
-    setTeacherSubjects([]);
-    setPrice("");
-    setDiscountPrice(""); // Reset discount price
-    setcreatedAdminUserId("");
+    setSelectedImage(null);
+    setPreview(null);
     setCurrentCourse(null);
   };
 
-
   return (
-    <div style={{ width: "80vw", height: "60vh" }}>
+    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
       <div
         style={{
           height: "60px",
@@ -352,7 +351,6 @@ const status = data.status ? 0 : 1; // Toggle status between 0 and 1
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={10}
-          // paginationAutoPageSize={true}
           defaultColDef={{
             sortable: true,
             filter: true,
@@ -382,51 +380,60 @@ const status = data.status ? 0 : 1; // Toggle status between 0 and 1
                 value={courseName}
                 onChange={(e) => setCourseName(e.target.value)}
               />
-              {/* <FormLabel>Assign Subject</FormLabel>
-              <Select
-                isMulti
-                options={subjectOptions}
-                value={subjectOptions.filter((option) =>
-                  teacherSubjects.includes(option.value)
+
+              <FormLabel mt={4}>Course Image</FormLabel>
+              <Box
+                {...getRootProps()}
+                border="2px dashed"
+                borderColor={isDragActive ? "green.500" : "gray.300"}
+                borderRadius="md"
+                p={4}
+                textAlign="center"
+                cursor="pointer"
+                _hover={{ borderColor: "green.400" }}
+              >
+                <input {...getInputProps()} />
+                {isDragActive ? (
+                  <p>Drop the image here...</p>
+                ) : (
+                  <p>Drag & drop an image here, or click to select</p>
                 )}
-                onChange={(selectedOptions) =>
-                  setTeacherSubjects(
-                    selectedOptions.map((option) => option.value)
-                  )
-                }
-              /> */}
-              <br />
-              {/* <Grid templateColumns="repeat(2, 1fr)" gap={4} mt={4}>
-                <GridItem>
-                  <FormLabel>Price</FormLabel>
-                  <Input
-                    placeholder="Enter Price"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
+              </Box>
+
+              {preview && (
+                <Box mt={4}>
+                  <Image
+                    src={preview}
+                    alt="Preview"
+                    maxH="200px"
+                    mx="auto"
+                    borderRadius="md"
                   />
-                </GridItem>
-                <GridItem>
-                  <FormLabel>Discount Price</FormLabel>
-                  <Input
-                    placeholder="Enter Discount Price"
-                    value={discountPrice}
-                    onChange={(e) => setDiscountPrice(e.target.value)}
-                  />
-                </GridItem>
-              </Grid> */}
-              {/* <FormLabel>createdAdminUserId</FormLabel>
-              <Input
-                placeholder="Enter created Admin User Id"
-                value={createdAdminUserId}
-                onChange={(e) => setcreatedAdminUserId(e.target.value)}
-              /> */}
+                  <Button
+                    size="sm"
+                    mt={2}
+                    colorScheme="red"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedImage(null);
+                      setPreview(null);
+                    }}
+                  >
+                    Remove Image
+                  </Button>
+                </Box>
+              )}
             </FormControl>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="gray" mr={3} onClick={onAddModalClose}>
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleAddCourse}>
+            <Button
+              colorScheme="green"
+              onClick={handleAddCourse}
+              isLoading={loading}
+            >
               Add
             </Button>
           </ModalFooter>
@@ -447,19 +454,113 @@ const status = data.status ? 0 : 1; // Toggle status between 0 and 1
                 value={courseName}
                 onChange={(e) => setCourseName(e.target.value)}
               />
-            
+
+              <FormLabel mt={4}>Course Image</FormLabel>
+              <Box
+                {...getRootProps()}
+                border="2px dashed"
+                borderColor={isDragActive ? "green.500" : "gray.300"}
+                borderRadius="md"
+                p={4}
+                textAlign="center"
+                cursor="pointer"
+                _hover={{ borderColor: "green.400" }}
+              >
+                <input {...getInputProps()} />
+                {isDragActive ? (
+                  <p>Drop the image here...</p>
+                ) : (
+                  <p>Drag & drop an image here, or click to select</p>
+                )}
+              </Box>
+
+              {preview && (
+                <Box mt={4}>
+                  <Image
+                    src={preview}
+                    alt="Preview"
+                    maxH="200px"
+                    mx="auto"
+                    borderRadius="md"
+                  />
+                  <Button
+                    size="sm"
+                    mt={2}
+                    colorScheme="red"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedImage(null);
+                      setPreview(null);
+                    }}
+                  >
+                    Remove Image
+                  </Button>
+                </Box>
+              )}
             </FormControl>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="gray" mr={3} onClick={onEditModalClose}>
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleUpdateCourse}>
+            <Button
+              colorScheme="green"
+              onClick={handleUpdateCourse}
+              isLoading={loading}
+            >
               Update
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Image Viewer Modal */}
+      <Modal isOpen={isImageModalOpen} onClose={onImageModalClose} size="xl">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Course Image</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Center>
+              {currentImageUrl && (
+                <Image
+                  src={currentImageUrl}
+                  alt="Course Image"
+                  maxH="70vh"
+                  maxW="100%"
+                  objectFit="contain"
+                  borderRadius="md"
+                />
+              )}
+            </Center>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" onClick={onImageModalClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Loading Spinner - Only show when loading AND a modal is open */}
+      {(isAddModalOpen || isEditModalOpen) && loading && (
+        <Center
+          position="fixed"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          zIndex="modal"
+        >
+          <Spinner
+            size="xl"
+            color="blue.500"
+            thickness="4px"
+            emptyColor="gray.200"
+            speed="0.65s"
+          />
+        </Center>
+      )}
     </div>
   );
 };
