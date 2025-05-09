@@ -17,6 +17,7 @@ import { FaUsers } from "react-icons/fa6";
 import { FaPowerOff } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import { FaUserEdit } from "react-icons/fa";
+import { GrNotes } from "react-icons/gr";
 
 import { MdLogout } from "react-icons/md";
 
@@ -52,6 +53,7 @@ type NavItem =
   // | "test"
   | "BannerMaster"
   | "videos"
+  | "Notes"
   | "AppUser"
   | "Masters"
   | "teacher"
@@ -434,6 +436,12 @@ export default function RootLayout({
                       <PiVideoConferenceFill />
                       <Link href="/videos">
                         <p className="linkname">videos</p>
+                      </Link>
+                    </li>
+                    <li className={active === "Notes" ? "active" : ""}>
+                      <GrNotes />
+                      <Link href="/Notes">
+                        <p className="linkname">Notes</p>
                       </Link>
                     </li>
                     <li className={active === "AppUser" ? "active" : ""}>
