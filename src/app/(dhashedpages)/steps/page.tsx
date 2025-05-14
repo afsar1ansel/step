@@ -814,20 +814,20 @@ const StepsTab = () => {
         </p>
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
           <Box>
-        <Select
-          placeholder="Select Subject"
-          onChange={(e) => setStep(e.target.value)}
-        >
-          {subject &&
-            subject.map((item: any, index: number) => (
-          <option key={item.id} value={item.course_id}>
-            {item.subject_name}
-          </option>
-            ))}
-        </Select>
+            <Select
+              placeholder="Select Subject"
+              onChange={(e) => setStep(e.target.value)}
+            >
+              {subject &&
+                subject.map((item: any, index: number) => (
+                  <option key={item.id} value={item.subject_id}>
+                    {item.subject_name}
+                  </option>
+                ))}
+            </Select>
           </Box>
           <Button onClick={openAddModal} colorScheme="green">
-        Add Step
+            Add Step
           </Button>
         </div>
       </div>

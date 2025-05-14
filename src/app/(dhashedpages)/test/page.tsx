@@ -160,7 +160,7 @@ const TestsTab = () => {
   // Fetch courses
   useEffect(() => {
     if (token) {
-      fetch(`${baseUrl}/masters/courses/get-all-courses/${token}`)
+      fetch(`${baseUrl}/masters/subjects/get-all-subjects/${token}`)
         .then((response) => response.json())
         .then((data) => setCourses(data))
         .catch((error) => console.error("Error fetching courses:", error));
@@ -364,9 +364,14 @@ const TestsTab = () => {
     setSyllabusTextLine1(""); // Reset syllabusTextLine1
     setSyllabusTextLine2(""); // Reset syllabusTextLine2
     setSyllabusTextLine3(""); // Reset syllabusTextLine3
-    setIsEditMode(false);
+    setIsEditMode(false); // Reset edit mode
     setCurrentTestId(null);
     setSteps([]);
+  };
+
+  const handleModalClose = () => {
+    resetForm(); // Reset the form and states
+    onModalClose(); // Close the modal
   };
 
   const fetchTests = () => {
@@ -419,22 +424,22 @@ const TestsTab = () => {
       </div>
 
       {/* Add/Edit Test Modal */}
-      <Modal isOpen={isModalOpen} onClose={onModalClose}>
+      <Modal isOpen={isModalOpen} onClose={handleModalClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>{isEditMode ? "Edit Test" : "Add New Test"}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl mb={4}>
-              <FormLabel>Course</FormLabel>
+              <FormLabel>Subject</FormLabel>
               <Select
-                placeholder="Select Course"
+                placeholder="Select Subject"
                 value={selectedCourse}
                 onChange={(e) => setSelectedCourse(e.target.value)}
               >
                 {courses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.course_name}
+                  <option key={course.subject_id} value={course.subject_id}>
+                    {course.subject_name}
                   </option>
                 ))}
               </Select>
@@ -512,7 +517,7 @@ const TestsTab = () => {
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="gray" mr={3} onClick={onModalClose}>
+            <Button colorScheme="gray" mr={3} onClick={handleModalClose}>
               Cancel
             </Button>
             <Button colorScheme="green" onClick={handleAddOrUpdateTest}>
