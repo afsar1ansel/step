@@ -56,6 +56,7 @@ type NavItem =
   | "Notes"
   | "AppUser"
   | "Masters"
+  | "College"
   | "teacher"
   | "subject"
   | "course"
@@ -444,6 +445,12 @@ export default function RootLayout({
                         <p className="linkname">Notes</p>
                       </Link>
                     </li>
+                    <li className={active === "College" ? "active" : ""}>
+                    <FaUserEdit />
+                    <Link href="/College">
+                      <p className="linkname">College</p>
+                    </Link>
+                  </li>
                     <li className={active === "AppUser" ? "active" : ""}>
                       <FaUsers />
                       <Link href="/AppUser">
