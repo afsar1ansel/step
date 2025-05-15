@@ -1430,7 +1430,7 @@ const StepsTab = () => {
       <Modal isOpen={isImageModalOpen} onClose={onImageModalClose} size="xl">
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Doctor Profile Image</ModalHeader>
+          <ModalHeader>Step Preview Image</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Center>

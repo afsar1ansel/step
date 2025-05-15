@@ -18,6 +18,8 @@ import { FaPowerOff } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import { FaUserEdit } from "react-icons/fa";
 import { GrNotes } from "react-icons/gr";
+import { CiBoxList } from "react-icons/ci";
+import { FaRegImages } from "react-icons/fa6";
 
 import { MdLogout } from "react-icons/md";
 
@@ -145,7 +147,7 @@ export default function RootLayout({
           <div className="app-container">
             {/* Header Section */}
             <header className="header">
-              <div className="search-bar">
+              {/* <div className="search-bar">
                 <div>
                   <FaSearch className="searchIcon" />
                   <input
@@ -157,7 +159,7 @@ export default function RootLayout({
                 <div className="icons">
                   <div className="user"></div>
                 </div>
-              </div>
+              </div> */}
             </header>
 
             <div className="main-content">
@@ -226,7 +228,7 @@ export default function RootLayout({
                               padding: "0.5rem 20px",
                             }}
                           >
-                            <TbDeviceAnalytics />
+                            <CiBoxList />
                             <p
                               style={{
                                 flex: 1,
@@ -428,7 +430,7 @@ export default function RootLayout({
                       </Accordion>
                     </li>
                     <li className={active === "BannerMaster" ? "active" : ""}>
-                      <FaUserEdit />
+                      <FaRegImages />
                       <Link href="/BannerMaster">
                         <p className="linkname">Banner Master</p>
                       </Link>
@@ -436,7 +438,7 @@ export default function RootLayout({
                     <li className={active === "videos" ? "active" : ""}>
                       <PiVideoConferenceFill />
                       <Link href="/videos">
-                        <p className="linkname">videos</p>
+                        <p className="linkname">Videos</p>
                       </Link>
                     </li>
                     <li className={active === "Notes" ? "active" : ""}>
@@ -446,11 +448,11 @@ export default function RootLayout({
                       </Link>
                     </li>
                     <li className={active === "College" ? "active" : ""}>
-                    <FaUserEdit />
-                    <Link href="/College">
-                      <p className="linkname">College</p>
-                    </Link>
-                  </li>
+                      <FaUserEdit />
+                      <Link href="/College">
+                        <p className="linkname">College</p>
+                      </Link>
+                    </li>
                     <li className={active === "AppUser" ? "active" : ""}>
                       <FaUsers />
                       <Link href="/AppUser">
