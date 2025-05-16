@@ -211,8 +211,8 @@ const StudentsTab = () => {
   const [videoDurationinMin, setvideoDurationinMin] = useState("");
   const [videoLink, setvideoLink] = useState("");
   const [stepNo, setStepNo] = useState("");
-  const [courseStepDetailsMasterId, setCourseStepDetailsMasterId] =
-    useState("");
+  // const [courseStepDetailsMasterId, setCourseStepDetailsMasterId] =
+  //   useState("");
   const [videoLearningId, setVideoLearningId] = useState("");
 
   const handleEdit = (data: any) => {
@@ -222,7 +222,7 @@ const StudentsTab = () => {
     setvideoLink(data.video_link);
     setvideoDescription(data.video_description);
     setStepNo(data.step_no);
-    setCourseStepDetailsMasterId(data.course_step_details_master_id);
+    // setCourseStepDetailsMasterId(data.course_step_details_master_id);
 
     onEditModalOpen();
   };
@@ -240,7 +240,7 @@ const StudentsTab = () => {
     form.append("videoDescription", videoDescription);
     form.append("videoDurationInMins", videoDurationinMin);
     form.append("videoLink", videoLink);
-    form.append("courseStepDetailsMasterId", courseStepDetailsMasterId);
+    // form.append("courseStepDetailsMasterId", courseStepDetailsMasterId);
     form.append("stepNo", stepNo);
     // console.log(Object.fromEntries(form.entries()));
 
@@ -287,7 +287,7 @@ const StudentsTab = () => {
     form.append("videoDescription", videoDescription);
     form.append("videoDuration", videoDurationinMin);
     form.append("videoLink", videoLink);
-    form.append("courseStepDetailsMasterId", courseStepDetailsMasterId);
+    // form.append("courseStepDetailsMasterId", courseStepDetailsMasterId);
     form.append("stepNo", stepNo);
     form.append("videoLearningId", videoLearningId);
 
@@ -333,7 +333,7 @@ const StudentsTab = () => {
     setvideoDurationinMin("");
     setvideoLink("");
     setStepNo("");
-    setCourseStepDetailsMasterId("");
+    // setCourseStepDetailsMasterId("");
     setVideoLearningId("");
     setvideoDescription(null);
   };
@@ -425,14 +425,14 @@ const StudentsTab = () => {
                 onChange={(e) => setvideoLink(e.target.value)}
               />
             </FormControl>
-            <FormControl mt={4}>
+            {/* <FormControl mt={4}>
               <FormLabel>Course Step Details Master Id</FormLabel>
               <Input
                 placeholder="Enter Course Step Details Master Id"
                 value={courseStepDetailsMasterId}
                 onChange={(e) => setCourseStepDetailsMasterId(e.target.value)}
               />
-            </FormControl>
+            </FormControl> */}
             <FormControl mt={4}>
               <FormLabel>Video Description</FormLabel>
               <textarea
@@ -524,14 +524,14 @@ const StudentsTab = () => {
                 onChange={(e) => setStepNo(e.target.value)}
               />
             </FormControl> */}
-            <FormControl mt={4}>
+            {/* <FormControl mt={4}>
               <FormLabel>Course Step Details Master Id</FormLabel>
               <Input
                 placeholder="Enter Course Step Details Master Id"
                 value={courseStepDetailsMasterId}
                 onChange={(e) => setCourseStepDetailsMasterId(e.target.value)}
               />
-            </FormControl>
+            </FormControl> */}
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="gray" mr={3} onClick={onEditModalClose}>
