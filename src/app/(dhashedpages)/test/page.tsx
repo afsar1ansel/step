@@ -40,7 +40,7 @@ const TestsTab = () => {
   const [preCourseTestDuration, setPreCourseTestDuration] = useState<
     number | ""
   >("");
-  const [stepNo, setStepNo] = useState<number | "">(""); // New state for stepNo
+  // const [stepNo, setStepNo] = useState<number | "">("");
   const [syllabusTextLine1, setSyllabusTextLine1] = useState(""); // New state
   const [syllabusTextLine2, setSyllabusTextLine2] = useState(""); // New state
   const [syllabusTextLine3, setSyllabusTextLine3] = useState(""); // New state
@@ -185,7 +185,7 @@ const TestsTab = () => {
       !selectedStep ||
       !preCourseTestTitle ||
       !preCourseTestDuration ||
-      !stepNo ||
+      // !stepNo ||
       !syllabusTextLine1 ||
       !syllabusTextLine2 ||
       !syllabusTextLine3
@@ -208,7 +208,7 @@ const TestsTab = () => {
       "preCourseTestDurationMinutes",
       String(preCourseTestDuration)
     );
-    formData.append("stepNo", String(stepNo)); // Include stepNo in the form data
+    // formData.append("stepNo", String(stepNo)); // Include stepNo in the form data
     formData.append("syllabusTextLine1", syllabusTextLine1); // Include syllabusTextLine1
     formData.append("syllabusTextLine2", syllabusTextLine2); // Include syllabusTextLine2
     formData.append("syllabusTextLine3", syllabusTextLine3); // Include syllabusTextLine3
@@ -343,7 +343,7 @@ const TestsTab = () => {
     setSelectedStep(data.course_step_details_master_id);
     setPreCourseTestTitle(data.pre_course_test_title);
     setPreCourseTestDuration(data.pre_course_test_duration_minutes);
-    setStepNo(data.step_no); // Set stepNo for editing
+    // setStepNo(data.step_no); // Set stepNo for editing
     setSyllabusTextLine1(data.syllabus_text_line_1); // Set syllabusTextLine1
     setSyllabusTextLine2(data.syllabus_text_line_2); // Set syllabusTextLine2
     setSyllabusTextLine3(data.syllabus_text_line_3); // Set syllabusTextLine3
@@ -360,7 +360,7 @@ const TestsTab = () => {
     setSelectedStep("");
     setPreCourseTestTitle("");
     setPreCourseTestDuration("");
-    setStepNo(""); // Reset stepNo
+    // setStepNo(""); // Reset stepNo
     setSyllabusTextLine1(""); // Reset syllabusTextLine1
     setSyllabusTextLine2(""); // Reset syllabusTextLine2
     setSyllabusTextLine3(""); // Reset syllabusTextLine3
@@ -482,7 +482,7 @@ const TestsTab = () => {
                 }
               />
             </FormControl>
-            <FormControl mb={4}>
+            {/* <FormControl mb={4}>
               <FormLabel>Step No</FormLabel>
               <Input
                 type="number"
@@ -490,7 +490,7 @@ const TestsTab = () => {
                 value={stepNo}
                 onChange={(e) => setStepNo(Number(e.target.value))}
               />
-            </FormControl>
+            </FormControl> */}
             <FormControl mb={4}>
               <FormLabel>Syllabus Line 1</FormLabel>
               <Input
