@@ -19,6 +19,7 @@ import {
   useDisclosure,
   Switch,
   useToast,
+  Select,
 } from "@chakra-ui/react";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -207,10 +208,14 @@ const StudentsTab = () => {
 
   const [currentVideoLink, setCurrentVideoLink] = useState("");
   const [videoDescription, setvideoDescription] = useState<any>(null);
+   const [courses, setCourses] = useState<any[]>([]);
+     const [steps, setSteps] = useState<any[]>([]);
   const [vedioTitle, setvedioTitle] = useState("");
   const [videoDurationinMin, setvideoDurationinMin] = useState("");
   const [videoLink, setvideoLink] = useState("");
   const [stepNo, setStepNo] = useState("");
+   const [selectedCourse, setSelectedCourse] = useState("");
+   const [selectedStep, setSelectedStep] = useState("");
   // const [courseStepDetailsMasterId, setCourseStepDetailsMasterId] =
   //   useState("");
   const [videoLearningId, setVideoLearningId] = useState("");
@@ -221,6 +226,8 @@ const StudentsTab = () => {
     setvideoDurationinMin(data.video_duration_in_mins);
     setvideoLink(data.video_link);
     setvideoDescription(data.video_description);
+    setSelectedCourse(data.course_id); 
+    setSelectedStep(data.course_step_details_master_id);
     setStepNo(data.step_no);
     // setCourseStepDetailsMasterId(data.course_step_details_master_id);
 
@@ -231,6 +238,15 @@ const StudentsTab = () => {
     setRowData((prev) => prev.filter((student) => student.id !== data.id));
   };
 
+//   {
+//     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiNS1hZnNhckBnbWFpbC5jb20tMjAyNTA1MTgxMTIwMzQifQ.IE0VtPD7Q_aXcC6oQALc2zFwtPqi6fBd6I0vLmPSAcI",
+//     "videoTitle": "reshma Ma'am",
+//     "videoDescription": "Madeleine is the first of a series of very short films I'm planning to have fun making.\n\nI've been working professionally for almost eleven years and have found that I have lost touch with who I am artistically.",
+//     "videoDuration": "13",
+//     "videoLink": "https://customer-bo58a3euqp8nmzzt.cloudflarestream.com/b524deed1bb964475f330a704f5b0b31/manifest/video.m3u8",
+//     "courseStepDetailsMasterId": "3"
+// }
+
   const handleAddStudent = () => {
     resetForm();
     const token = localStorage.getItem("token") ?? "";
@@ -240,9 +256,8 @@ const StudentsTab = () => {
     form.append("videoDescription", videoDescription);
     form.append("videoDurationInMins", videoDurationinMin);
     form.append("videoLink", videoLink);
-    // form.append("courseStepDetailsMasterId", courseStepDetailsMasterId);
-    form.append("stepNo", stepNo);
-    // console.log(Object.fromEntries(form.entries()));
+    form.append("courseStepDetailsMasterId", selectedStep);
+    console.log(Object.fromEntries(form.entries()));
 
     try {
       fetch(`${baseUrl}/video-learning/add`, {
@@ -279,19 +294,22 @@ const StudentsTab = () => {
     onAddModalClose();
   };
 
+
+
   const handleEditStudent = () => {
     const token = localStorage.getItem("token") ?? "";
     const form = new FormData();
     form.append("token", token);
+    form.append("videoLearningId", videoLearningId);
     form.append("videoTitle", vedioTitle);
     form.append("videoDescription", videoDescription);
     form.append("videoDuration", videoDurationinMin);
     form.append("videoLink", videoLink);
     // form.append("courseStepDetailsMasterId", courseStepDetailsMasterId);
-    form.append("stepNo", stepNo);
-    form.append("videoLearningId", videoLearningId);
+    form.append("courseStepDetailsMasterId", stepNo);
 
     console.log(Object.fromEntries(form.entries()));
+    console.log("updated")
 
     try {
       fetch(`${baseUrl}/video-learning/update`, {
@@ -300,7 +318,7 @@ const StudentsTab = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          // console.log(data);
+          console.log(data);
           fetchData();
           if (data.errFlag == 0) {
             toast({
@@ -333,6 +351,8 @@ const StudentsTab = () => {
     setvideoDurationinMin("");
     setvideoLink("");
     setStepNo("");
+    setSelectedStep("");
+    setSelectedCourse("");
     // setCourseStepDetailsMasterId("");
     setVideoLearningId("");
     setvideoDescription(null);
@@ -342,6 +362,30 @@ const StudentsTab = () => {
     resetForm(); // Clear the form fields
     onAddModalOpen(); // Open the modal
   };
+
+   // Fetch courses
+    useEffect(() => {
+      // if (token) {
+        const token = localStorage.getItem("token") || "";
+        fetch(`${baseUrl}/masters/subjects/get-all-subjects/${token}`)
+          .then((response) => response.json())
+          .then((data) => setCourses(data))
+          .catch((error) => console.error("Error fetching courses:", error));
+      // }
+    }, [baseUrl]);
+
+      // Fetch steps when a course is selected
+      useEffect(() => {
+        const token = localStorage.getItem("token") || "";
+        if (selectedCourse) {
+          fetch(
+            `${baseUrl}/masters/get-all-course-step-details/${selectedCourse}/${token}`
+          )
+            .then((response) => response.json())
+            .then((data) => setSteps(data))
+            .catch((error) => console.error("Error fetching steps:", error));
+        }
+      }, [selectedCourse, baseUrl]);
 
   return (
     <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
@@ -401,6 +445,39 @@ const StudentsTab = () => {
           <ModalHeader>Add New Video</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            <FormControl mb={4}>
+              <FormLabel>Subject</FormLabel>
+              <Select
+                placeholder="Select Subject"
+                value={selectedCourse}
+                onChange={(e) => setSelectedCourse(e.target.value)}
+              >
+                {courses.map((course) => (
+                  <option key={course.subject_id} value={course.subject_id}>
+                    {course.subject_name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>Step</FormLabel>
+              <Select
+                placeholder="Select Step"
+                value={selectedStep}
+                onChange={(e) => setSelectedStep(e.target.value)}
+                isDisabled={!selectedCourse}
+              >
+                {steps.length > 0 ? (
+                  steps.map((step) => (
+                    <option key={step.id} value={step.id}>
+                      {step.course_step_title}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No data available</option>
+                )}
+              </Select>
+            </FormControl>
             <FormControl>
               <FormLabel>Video Title</FormLabel>
               <Input
@@ -476,6 +553,39 @@ const StudentsTab = () => {
           <ModalHeader>Edit Student</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            <FormControl mb={4}>
+              <FormLabel>Subject</FormLabel>
+              <Select
+                placeholder="Select Subject"
+                value={selectedCourse}
+                onChange={(e) => setSelectedCourse(e.target.value)}
+              >
+                {courses.map((course) => (
+                  <option key={course.subject_id} value={course.subject_id}>
+                    {course.subject_name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>Step</FormLabel>
+              <Select
+                placeholder="Select Step"
+                value={selectedStep}
+                onChange={(e) => setSelectedStep(e.target.value)}
+                isDisabled={!selectedCourse}
+              >
+                {steps.length > 0 ? (
+                  steps.map((step) => (
+                    <option key={step.id} value={step.id}>
+                      {step.course_step_title}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No data available</option>
+                )}
+              </Select>
+            </FormControl>
             <FormControl>
               <FormLabel>Video Title</FormLabel>
               <Input
