@@ -241,7 +241,8 @@ const StudentsTab = () => {
     setnoOfPages(data.no_of_pages);
     setnoteDescription(data.notes_description);
     setnoteId(data.id);
-    // setUploadedFile(data.document_url);
+    setSelectedCourse(data.course_id); // Set courseId
+    setSelectedStep(data.subject_id);  // Set subjectId
     onEditModalOpen();
   };
 
@@ -249,104 +250,104 @@ const StudentsTab = () => {
   //   setRowData((prev) => prev.filter((student) => student.id !== data.id));
   // };
 
-  const handleAddStudent = () => {
-    resetForm();
-    const token = localStorage.getItem("token") ?? "";
-    const form = new FormData();
-    form.append("token", token);
-    form.append("notesTitle", noteTitle);
-    form.append("notesDescription", noteDescription);
-    form.append("noOfPages", noOfPages);
-    form.append("courseStepDetailMasterId", selectedCourse);
-    if (uploadedFile) {
-      form.append("pdfFile", uploadedFile);
-    }
-    console.log(Object.fromEntries(form.entries()));
+const handleAddStudent = () => {
+  resetForm();
+  const token = localStorage.getItem("token") ?? "";
+  const form = new FormData();
+  form.append("token", token);
+  form.append("notesTitle", noteTitle);
+  form.append("notesDescription", noteDescription);
+  form.append("noOfPages", noOfPages);
+  form.append("courseId", selectedCourse); // Changed from courseStepDetailMasterId
+  form.append("subjectId", selectedStep);  // Add subjectId
+  if (uploadedFile) {
+    form.append("pdfFile", uploadedFile);
+  }
+  console.log(Object.fromEntries(form.entries()));
 
-    try {
-      fetch(`${baseUrl}/notes-content/add`, {
-        method: "POST",
-        body: form,
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          // console.log(data);
-          fetchData();
-          if (data.errFlag == 0) {
-            toast({
-              title: "Success",
-              description: "Note Added Successfully",
-              status: "success",
-              duration: 3000,
-              isClosable: true,
-            });
-          } else {
-            toast({
-              title: "Error",
-              description: "Note Not Added",
-              status: "error",
-              duration: 3000,
-              isClosable: true,
-            });
-          }
-        });
-    } catch (error) {
-      console.error("Error adding Note:", error);
-    }
+  try {
+    fetch(`${baseUrl}/notes-content/add`, {
+      method: "POST",
+      body: form,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        fetchData();
+        if (data.errFlag == 0) {
+          toast({
+            title: "Success",
+            description: "Note Added Successfully",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Note Not Added",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+      });
+  } catch (error) {
+    console.error("Error adding Note:", error);
+  }
 
-    resetForm();
-    onAddModalClose();
-  };
+  resetForm();
+  onAddModalClose();
+};
 
-  const handleEditStudent = () => {
-    const token = localStorage.getItem("token") ?? "";
-    const form = new FormData();
-    form.append("token", token);
-    form.append("noteId", noteId);
-    form.append("notesTitle", noteTitle);
-    form.append("notesDescription", noteDescription);
-    form.append("noOfPages", noOfPages);
-    form.append("courseStepDetailMasterId", selectedStep);
-    if (uploadedFile) {
-      form.append("pdfFile", uploadedFile);
-    }
+const handleEditStudent = () => {
+  const token = localStorage.getItem("token") ?? "";
+  const form = new FormData();
+  form.append("token", token);
+  form.append("noteId", noteId);
+  form.append("notesTitle", noteTitle);
+  form.append("notesDescription", noteDescription);
+  form.append("noOfPages", noOfPages);
+  form.append("courseId", selectedCourse); // Changed from courseStepDetailMasterId
+  form.append("subjectId", selectedStep);  // Changed from selectedStep
+  if (uploadedFile) {
+    form.append("pdfFile", uploadedFile);
+  }
 
-    // console.log(Object.fromEntries(form.entries()));
+  console.log(Object.fromEntries(form.entries()));
 
-    try {
-      fetch(`${baseUrl}/notes-content/update`, {
-        method: "POST",
-        body: form,
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          // console.log(data);
-          fetchData();
-          if (data.errFlag == 0) {
-            toast({
-              title: "Success",
-              description: "Notes Updated Successfully",
-              status: "success",
-              duration: 3000,
-              isClosable: true,
-            });
-          } else {
-            toast({
-              title: "Error",
-              description: "Notes Not Updated",
-              status: "error",
-              duration: 3000,
-              isClosable: true,
-            });
-          }
-        });
-    } catch (error) {
-      console.error("Error updating Notes:", error);
-    }
+  try {
+    fetch(`${baseUrl}/notes-content/update`, {
+      method: "POST",
+      body: form,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        fetchData();
+        if (data.errFlag == 0) {
+          toast({
+            title: "Success",
+            description: "Notes Updated Successfully",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Notes Not Updated",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+      });
+  } catch (error) {
+    console.error("Error updating Notes:", error);
+  }
 
-    resetForm();
-    onEditModalClose();
-  };
+  resetForm();
+  onEditModalClose();
+};
 
   const resetForm = () => {
     setnoteTitle("");
@@ -490,9 +491,9 @@ const StudentsTab = () => {
               </Select>
             </FormControl>
             <FormControl mb={4}>
-              <FormLabel>Course Step</FormLabel>
+              <FormLabel>Subject</FormLabel>
               <Select
-                placeholder="Select Step"
+                placeholder="Select Subject"
                 value={selectedStep}
                 onChange={(e) => setSelectedStep(e.target.value)}
                 isDisabled={!selectedCourse}
