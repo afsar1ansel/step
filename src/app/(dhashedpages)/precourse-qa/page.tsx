@@ -251,7 +251,10 @@ const precourseqa = () => {
     try {
       const form = new FormData();
       form.append("token", localStorage.getItem("token") ?? "");
-      form.append("preCourseTestQuestionsMasterId", preCourseTestQuestionsMasterId);
+      form.append(
+        "preCourseTestQuestionsMasterId",
+        preCourseTestQuestionsMasterId
+      );
       form.append("preCourseTestId", testId);
       form.append("questionNo", questionNo);
       form.append("question", editQuestion);

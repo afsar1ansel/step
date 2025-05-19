@@ -465,14 +465,25 @@ const StepsTab = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // courseId,
+  //   subjectId,
+  //   stepNo,
+  //   courseStepTitle,
+  //   courseStepDescription,
+  //   courseOverviewHoursText,
+  //   courseOverviewDownloadableText,
+  //   courseOverviewAccessTimeText,
+  //   noOfTestText,
+  //   doctorId,
+  //   bannerImage(file - Type),
+  //   token;
   const handleAddStep = async () => {
     setIsSubmitting(true);
     const token =
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
     const form = new FormData();
     form.append("courseStepTitle", stepTitle);
-    // form.append("stepNo", stepNumber);
+    form.append("stepNo", stepNumber);
     form.append("courseId", selectedCourse);
     form.append("subjectId", selectedSubject);
     form.append("doctorId", selectedTeacher);
@@ -500,6 +511,8 @@ const StepsTab = () => {
       );
 
       const responseData = await response.json();
+
+      console.log(responseData);
 
       if (responseData.errFlag === 0) {
         toast({
@@ -875,7 +888,7 @@ const StepsTab = () => {
                   />
                 </FormControl>
               </GridItem>
-              {/* <GridItem>
+              <GridItem>
                 <FormControl>
                   <FormLabel>Step Number</FormLabel>
                   <Input
@@ -884,7 +897,7 @@ const StepsTab = () => {
                     onChange={(e) => setStepNumber(e.target.value)}
                   />
                 </FormControl>
-              </GridItem> */}
+              </GridItem>
               <GridItem>
                 <FormControl>
                   <FormLabel>Select Subject</FormLabel>

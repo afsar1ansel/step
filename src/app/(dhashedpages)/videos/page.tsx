@@ -238,14 +238,7 @@ const StudentsTab = () => {
     setRowData((prev) => prev.filter((student) => student.id !== data.id));
   };
 
-//   {
-//     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiNS1hZnNhckBnbWFpbC5jb20tMjAyNTA1MTgxMTIwMzQifQ.IE0VtPD7Q_aXcC6oQALc2zFwtPqi6fBd6I0vLmPSAcI",
-//     "videoTitle": "reshma Ma'am",
-//     "videoDescription": "Madeleine is the first of a series of very short films I'm planning to have fun making.\n\nI've been working professionally for almost eleven years and have found that I have lost touch with who I am artistically.",
-//     "videoDuration": "13",
-//     "videoLink": "https://customer-bo58a3euqp8nmzzt.cloudflarestream.com/b524deed1bb964475f330a704f5b0b31/manifest/video.m3u8",
-//     "courseStepDetailsMasterId": "3"
-// }
+
 
   const handleAddStudent = () => {
     resetForm();
