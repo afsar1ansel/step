@@ -64,6 +64,16 @@ const StepsTab = () => {
       },
     },
     {
+      headerName: "Subject",
+      field: "subject_name",
+      cellStyle: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "80%",
+      },
+    },
+    {
       headerName: "Image",
       field: "banner_image_name",
       cellStyle: {
@@ -996,7 +1006,7 @@ const StepsTab = () => {
               </GridItem>
               <GridItem>
                 <FormControl>
-                  <FormLabel>Course Acess Time </FormLabel>
+                  <FormLabel>Course access Time </FormLabel>
                   <Input
                     placeholder="Enter Course Overview Access Time"
                     value={courseOverviewAccessTimeText}
@@ -1341,7 +1351,7 @@ const StepsTab = () => {
               </GridItem>
               <GridItem>
                 <FormControl>
-                  <FormLabel>course acess Time </FormLabel>
+                  <FormLabel>course access Time </FormLabel>
                   <Input
                     placeholder="Enter Course Overview Access Time"
                     value={courseOverviewAccessTimeText}

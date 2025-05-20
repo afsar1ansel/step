@@ -138,7 +138,9 @@ const TestsTab = () => {
     if (token) {
       fetch(`${baseUrl}/masters/post-course-test-detail/get-all/${token}`)
         .then((response) => response.json())
-        .then((data) => setRowData(data))
+        .then((data) => { setRowData(data)
+          console.log(data)
+        })
         .catch((error) => console.error("Error fetching test data:", error));
     }
   }, [token, baseUrl]);
@@ -148,7 +150,9 @@ const TestsTab = () => {
     if (token) {
       fetch(`${baseUrl}/masters/subjects/get-all-subjects/${token}`)
         .then((response) => response.json())
-        .then((data) => setCourses(data))
+        .then((data) =>  {
+          setCourses(data) 
+          console.log(data)}) 
         .catch((error) => console.error("Error fetching courses:", error));
     }
   }, [token, baseUrl]);
@@ -415,9 +419,9 @@ const TestsTab = () => {
           <ModalCloseButton />
           <ModalBody>
             <FormControl mb={4}>
-              <FormLabel>Course</FormLabel>
+              <FormLabel>Subject</FormLabel>
               <Select
-                placeholder="Select Course"
+                placeholder="Select Subject"
                 value={selectedCourse}
                 onChange={(e) => setSelectedCourse(e.target.value)}
               >
