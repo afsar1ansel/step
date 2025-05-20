@@ -796,7 +796,7 @@ const StepsTab = () => {
         alignItems: "center",
       }}
     >
-      <Box p={4} mb={2}>
+      {/* <Box p={4} mb={2}>
    
         <Select
           placeholder="Select Subject"
@@ -809,7 +809,7 @@ const StepsTab = () => {
               </option>
             ))}
         </Select>
-      </Box>
+      </Box> */}
       <div
         style={{
           height: "60px",
