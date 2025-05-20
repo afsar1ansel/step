@@ -53,7 +53,7 @@ const postcourseqa = () => {
         }
       );
       const responseData = await response.json();
-      console.log(responseData);
+      // console.log(responseData);
       setRowData(responseData);
     } catch {
       (error: Error) => {
@@ -75,7 +75,7 @@ const postcourseqa = () => {
         }
       );
       const responseData = await response.json();
-      // console.log(responseData);
+      console.log(responseData);
       settestOptions(responseData);
     } catch {
       (error: Error) => {
@@ -205,13 +205,16 @@ const postcourseqa = () => {
       form.append("token", localStorage.getItem("token") ?? "");
       form.append("sheetId", sheetId);
       form.append("sheetName", SheetName);
-      form.append("postCourseTestId", testId);
+      form.append("postCourseTestId", testIdAdd);
+      console.log(Object.fromEntries(form));
+
+
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/masters/post-course-test/fetch-questions`,
         {
           method: "POST",
-          body: form,
+          // body: form,
         }
       );
       const responseData = await response.json();
