@@ -214,7 +214,7 @@ const postcourseqa = () => {
         `${process.env.NEXT_PUBLIC_BASE_URL}/masters/post-course-test/fetch-questions`,
         {
           method: "POST",
-          // body: form,
+          body: form,
         }
       );
       const responseData = await response.json();
