@@ -37,12 +37,12 @@ const StudentsTab = () => {
       floatingFilter: true,
       cellStyle: { textAlign: "left" },
     },
-    {
-      headerName: "Step No",
-      field: "step_no",
-      filter: false,
-      cellStyle: { textAlign: "center" },
-    },
+    // {
+    //   headerName: "Step No",
+    //   field: "step_no",
+    //   filter: false,
+    //   cellStyle: { textAlign: "center" },
+    // },
     {
       headerName: "Video Link",
       field: "video_link",
