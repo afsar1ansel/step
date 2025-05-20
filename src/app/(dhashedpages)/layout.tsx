@@ -186,12 +186,12 @@ export default function RootLayout({
                         <p className="linkname">Dashboard</p>
                       </Link>
                     </li>
-                    <li className={active === "StudentData" ? "active" : ""}>
+                    {/* <li className={active === "StudentData" ? "active" : ""}>
                       <FaRegIdCard />
                       <Link href="/StudentData">
                         <p className="linkname">Student Data</p>
                       </Link>
-                    </li>
+                    </li> */}
                     <li className={active === "AdminUsers" ? "active" : ""}>
                       <MdOutlineAdminPanelSettings />
                       <Link href="/AdminUsers">
@@ -459,12 +459,12 @@ export default function RootLayout({
                         <p className="linkname">App User</p>
                       </Link>
                     </li>
-                    <li className={active === "Settings" ? "active" : ""}>
+                    {/* <li className={active === "Settings" ? "active" : ""}>
                       <RiUserSettingsFill />
                       <Link href="/Settings">
                         <p className="linkname">Settings</p>
                       </Link>
-                    </li>
+                    </li> */}
                     <li
                       className={active === "Logout" ? "active" : ""}
                       onClick={onOpen}

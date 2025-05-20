@@ -127,6 +127,7 @@ const StepsTab = () => {
       headerName: "Course Overview Description",
       field: "course_step_description",
       cellClass: "ag-cell-wrap-text",
+      minWidth: 220,
       autoHeight: true,
       wrapText: true,
       cellStyle: {
@@ -781,7 +782,7 @@ const StepsTab = () => {
     // console.log(tok);
     try {
       const response = await fetch(
-        `${baseUrl}/masters/subjects/get-all-subjects/${tok}`,
+        `${baseUrl}/masters/courses/get-all-courses/${tok}`,
         {
           method: "GET",
         }

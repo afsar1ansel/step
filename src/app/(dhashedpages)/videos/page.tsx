@@ -37,31 +37,32 @@ const StudentsTab = () => {
       floatingFilter: true,
       cellStyle: { textAlign: "left" },
     },
-    // {
-    //   headerName: "Step No",
-    //   field: "step_no",
-    //   filter: false,
-    //   cellStyle: { textAlign: "center" },
-    // },
     {
-      headerName: "Video Link",
-      field: "video_link",
+      headerName: "Step No",
+      field: "step_no",
       filter: false,
       cellStyle: { textAlign: "center" },
-      cellRenderer: (params: { value: any }) => {
-        return (
-          <Button
-            colorScheme="blue"
-            size="sm"
-            onClick={() => {
-              setCurrentVideoLink(params.value);
-              onVideoModalOpen();
-            }}
-          >
-            Play Video
-          </Button>
-        );
-      },
+      maxWidth: 90,
+    },
+    {
+      headerName: "Subject",
+      field: "subject_name",
+      filter: false,
+      cellStyle: { textAlign: "center" },
+      // cellRenderer: (params: { value: any }) => {
+      //   return (
+      //     <Button
+      //       colorScheme="blue"
+      //       size="sm"
+      //       onClick={() => {
+      //         setCurrentVideoLink(params.value);
+      //         onVideoModalOpen();
+      //       }}
+      //     >
+      //       Play Video
+      //     </Button>
+      //   );
+      // },
     },
     {
       headerName: "Video Description",
@@ -221,6 +222,7 @@ const StudentsTab = () => {
   const [videoLearningId, setVideoLearningId] = useState("");
 
   const handleEdit = (data: any) => {
+    // console.log(data);
     setVideoLearningId(data.id);
     setvedioTitle(data.video_title);
     setvideoDurationinMin(data.video_duration_in_mins);
@@ -299,7 +301,7 @@ const StudentsTab = () => {
     form.append("videoDuration", videoDurationinMin);
     form.append("videoLink", videoLink);
     // form.append("courseStepDetailsMasterId", courseStepDetailsMasterId);
-    form.append("courseStepDetailsMasterId", stepNo);
+    form.append("courseStepDetailsMasterId", selectedStep);
 
     console.log(Object.fromEntries(form.entries()));
     console.log("updated")
