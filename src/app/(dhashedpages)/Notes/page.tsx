@@ -184,23 +184,53 @@ const StudentsTab = () => {
   const fetchDetail = async (Url: string) => {
     try {
       const token = localStorage.getItem("token");
+      
+      // Clean up the URL - decode any double encodings
+      const cleanUrl = decodeURIComponent(Url);
+      
       const response = await fetch(
-        `${baseUrl}/notes-content/display/presign-url/${token}/${Url}`,
+        `${baseUrl}/notes-content/display/presign-url/${token}/${cleanUrl}`,
         {
           method: "GET",
         }
       );
+      
       const data = await response.json();
-      // console.log(data);
+
+      if (!response.ok) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch PDF. Please try again.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
 
       if (data.errFlag === 0 && data.downloadUrl) {
-        // Open the download URL in a new tab
-        window.open(data.downloadUrl, "_blank");
+        // Decode the URL before opening
+        const decodedUrl = decodeURIComponent(data.downloadUrl);
+        window.open(decodedUrl, "_blank");
       } else {
-        console.error("Error: Invalid response or download URL not found");
+        toast({
+          title: "Error",
+          description: data.message || "Could not fetch PDF",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        console.error("API Error:", data);
       }
     } catch (error) {
-      console.error("Error fetching video detail:", error);
+      console.error("Error fetching PDF:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch PDF",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
@@ -270,7 +300,12 @@ const StudentsTab = () => {
     form.append("courseId", selectedCourse); // Changed from courseStepDetailMasterId
     form.append("subjectId", selectedStep); // Add subjectId
     if (uploadedFile) {
-      form.append("pdfFile", uploadedFile);
+      // Clean filename before upload
+      const cleanFileName = uploadedFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const renamedFile = new File([uploadedFile], cleanFileName, {
+        type: uploadedFile.type
+      });
+      form.append("pdfFile", renamedFile);
     }
     console.log(Object.fromEntries(form.entries()));
 
