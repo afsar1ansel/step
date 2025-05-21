@@ -390,7 +390,7 @@ const StudentsTab = () => {
     if (!token) {
       return;
     } else {
-      fetch(`${baseUrl}/masters/subjects/get-all-subjects/${token}`)
+      fetch(`${baseUrl}/masters/courses/get-all-courses/${token}`)
         .then((response) =>response.json())
         .then((data) => { setCourses(data)
           console.log(data);
@@ -404,8 +404,7 @@ const StudentsTab = () => {
     if (selectedCourse) {
       const token = localStorage.getItem("token");
       fetch(
-        `${baseUrl}/masters/get-all-course-step-details/${selectedCourse}/${token}`
-      )
+        `${baseUrl}/masters/subjects/get-all-subjects/${token}`)
         .then((response) => response.json())
         .then((data) => setSteps(data))
         .catch((error) => console.error("Error fetching steps:", error));
@@ -495,24 +494,24 @@ const StudentsTab = () => {
                 onChange={(e) => setSelectedCourse(e.target.value)}
               >
                 {courses.map((course) => (
-                  <option key={course.subject_id} value={course.subject_id}>
-                    {course.subject_name}
+                  <option key={course.course_id} value={course.course_id}>
+                    {course.course_name}
                   </option>
                 ))}
               </Select>
             </FormControl>
             <FormControl mb={4}>
-              <FormLabel>Step</FormLabel>
+              <FormLabel>Subject</FormLabel>
               <Select
-                placeholder="Select Step"
+                placeholder="Select Subject"
                 value={selectedStep}
                 onChange={(e) => setSelectedStep(e.target.value)}
                 isDisabled={!selectedCourse}
               >
                 {steps.length > 0 ? (
                   steps.map((step) => (
-                    <option key={step.id} value={step.id}>
-                      {step.course_step_title}
+                    <option key={step.subject_id} value={step.subject_id}>
+                      {step.subject_name}
                     </option>
                   ))
                 ) : (
@@ -604,24 +603,24 @@ const StudentsTab = () => {
                 onChange={(e) => setSelectedCourse(e.target.value)}
               >
                 {courses.map((course) => (
-                  <option key={course.subject_id} value={course.subject_id}>
-                    {course.subject_name}
+                  <option key={course.course_id} value={course.course_id}>
+                    {course.course_name}
                   </option>
                 ))}
               </Select>
             </FormControl>
             <FormControl mb={4}>
-              <FormLabel>Course Step</FormLabel>
+              <FormLabel>Subject</FormLabel>
               <Select
-                placeholder="Select Step"
+                placeholder="Select Subject"
                 value={selectedStep}
                 onChange={(e) => setSelectedStep(e.target.value)}
                 isDisabled={!selectedCourse}
               >
                 {steps.length > 0 ? (
                   steps.map((step) => (
-                    <option key={step.id} value={step.id}>
-                      {step.course_step_title}
+                    <option key={step.subject_id} value={step.subject_id}>
+                      {step.subject_name}
                     </option>
                   ))
                 ) : (
