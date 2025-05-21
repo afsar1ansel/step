@@ -19,6 +19,7 @@ import {
   useDisclosure,
   Select,
   useToast,
+  Textarea,
 } from "@chakra-ui/react";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -33,6 +34,13 @@ const precourseqa = () => {
     const [questionNo, setQuestionNo] = useState("");
     const [editQuestion, setEditQuestion] = useState("");
     const [ testIdAdd, setTestIdAdd] = useState("");
+    const [option1, setOption1] = useState("");
+    const [option2, setOption2] = useState("");
+     const [option3, setOption3] = useState("");
+     const [option4, setOption4] = useState("");
+         const [questionid, setQuestionId] = useState("");
+         const [correctOption, setCorrectOption] = useState("");
+         const [solutionText, setSolutionText] = useState("");
   const toast = useToast();
   useEffect(() => {
     fetchTest();
@@ -191,10 +199,44 @@ const precourseqa = () => {
   const [SheetName, setSheetName] = useState("");
   const [testCourseId, settestCourseId] = useState("");
 
+//   {
+//     "options": [
+//         {
+//             "correct_option": 1,
+//             "option_id": 573,
+//             "option_text": "Increase in length of 25 centimeters in the first year."
+//         },
+//         {
+//             "correct_option": 0,
+//             "option_id": 574,
+//             "option_text": "Weight gain of 300 grams per month till 1 year."
+//         },
+//         {
+//             "correct_option": 0,
+//             "option_id": 575,
+//             "option_text": "Anterior fontanelle closure by 6 months of age."
+//         },
+//         {
+//             "correct_option": 0,
+//             "option_id": 576,
+//             "option_text": "Weight under the 75th percentile and height under the 25th percentile."
+//         }
+//     ],
+//     "question": "Which is the best indicator of monitoring adequate growth in an infant with a birth weight of 2.9 kg during the first year of life?",
+//     "question_id": 144,
+//     "question_no": 1
+// }
+
   const handleEdit = (data: any) => {
-   setPreCourseTestQuestionsMasterId(data.question_id);
+    console.log(data); 
+  //  setPreCourseTestQuestionsMasterId(data.question_id);
     setQuestionNo(data.question_no);
     setEditQuestion(data.question);
+    setQuestionId(data.question_id);
+    setOption1(data.options[0].option_text);
+    setOption2(data.options[1].option_text);
+    setOption3(data.options[2].option_text);
+    setOption4(data.options[3].option_text);
     // console.log(data)
     onEditModalOpen(); 
   };
@@ -247,17 +289,36 @@ const precourseqa = () => {
     }
   };
 
+  // token,
+  //   questionId,
+  //   preCourseTestId,
+  //   questionNo,
+  //   question,
+  //   solutionText,
+  //   correctOption,
+  //   option1,
+  //   option2,
+  //   option3,
+  //   option4; 
+
   const handleUpdateCourse = async () => {
     try {
       const form = new FormData();
       form.append("token", localStorage.getItem("token") ?? "");
-      form.append(
-        "preCourseTestQuestionsMasterId",
-        preCourseTestQuestionsMasterId
-      );
+      // form.append(
+      //   "preCourseTestQuestionsMasterId",
+      //   preCourseTestQuestionsMasterId
+      // );
       form.append("preCourseTestId", testId);
       form.append("questionNo", questionNo);
       form.append("question", editQuestion);
+      form.append("solutionText", solutionText);
+      form.append("correctOption", correctOption);
+      form.append("option1", option1);
+      form.append("option2", option2);
+      form.append("option3", option3);
+      form.append("option4", option4);
+      form.append("questionId", questionid);
 
       console.log(Object.fromEntries(form));
 
@@ -419,6 +480,58 @@ const precourseqa = () => {
                 placeholder="Enter Question"
                 value={editQuestion}
                 onChange={(e) => setEditQuestion(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Option 1</FormLabel>
+              <Input
+                placeholder="Enter Option 1"
+                value={option1}
+                onChange={(e) => setOption1(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Option 2</FormLabel>
+              <Input
+                placeholder="Enter Option 2"
+                value={option2}
+                onChange={(e) => setOption2(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Option 3</FormLabel>
+              <Input
+                placeholder="Enter Option 3"
+                value={option3}
+                onChange={(e) => setOption3(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Option 4</FormLabel>
+              <Input
+                placeholder="Enter Option 4"
+                value={option4}
+                onChange={(e) => setOption4(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Correct Option</FormLabel>
+              <Select
+                placeholder="Select correct option"
+                onChange={(e) => setCorrectOption(e.target.value)}
+              >
+                <option value="1">{option1}</option>
+                <option value="2">{option2}</option>
+                <option value="3">{option3}</option>
+                <option value="4">{option4}</option>
+              </Select>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Solution Text</FormLabel>
+              <Textarea
+                placeholder="Enter Solution Text"
+                value={solutionText}
+                onChange={(e) => setSolutionText(e.target.value)}
               />
             </FormControl>
           </ModalBody>

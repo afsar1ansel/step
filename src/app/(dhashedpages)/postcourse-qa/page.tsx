@@ -19,6 +19,7 @@ import {
   useDisclosure,
   Select,
   useToast,
+  Textarea,
 } from "@chakra-ui/react";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -33,6 +34,13 @@ const postcourseqa = () => {
     const [questionNo, setquestionNo] = useState("");
     const [editQuestion, setEditQuestion] = useState("");
      const [ testIdAdd, setTestIdAdd] = useState("");
+     const [option1, setOption1] = useState("");
+     const [option2, setOption2] = useState("");
+     const [option3, setOption3] = useState("");
+     const [option4, setOption4] = useState("");
+     const [questionid, setQuestionId] = useState("");
+     const [correctOption, setCorrectOption] = useState("");
+     const [solutionText, setSolutionText] = useState("");
   const toast = useToast();
   useEffect(() => {
     fetchTest();
@@ -53,7 +61,7 @@ const postcourseqa = () => {
         }
       );
       const responseData = await response.json();
-      // console.log(responseData);
+      console.log(responseData);
       setRowData(responseData);
     } catch {
       (error: Error) => {
@@ -75,8 +83,14 @@ const postcourseqa = () => {
         }
       );
       const responseData = await response.json();
-      console.log(responseData);
+      // { errFlag: 1, message: 'Invalid token' }
+      if (responseData.message == "Invalid token" || responseData.errFlag == 1) {
+        localStorage.removeItem("token");
+        window.location.href = "/auth/login";
+      }
+      // console.log(responseData);
       settestOptions(responseData);
+      
     } catch {
       (error: Error) => {
         console.error("Error fetching data:", error);
@@ -191,10 +205,45 @@ const postcourseqa = () => {
   const [SheetName, setSheetName] = useState("");
   const [testCourseId, settestCourseId] = useState("");
 
+
+//   {
+//     "options": [
+//         {
+//             "correct_option": 0,
+//             "option_id": 161,
+//             "option_text": "Middle cerebral artery"
+//         },
+//         {
+//             "correct_option": 0,
+//             "option_id": 162,
+//             "option_text": "Anterior choroidal artery"
+//         },
+//         {
+//             "correct_option": 0,
+//             "option_id": 163,
+//             "option_text": "Anterior cerebral artery"
+//         },
+//         {
+//             "correct_option": 1,
+//             "option_id": 164,
+//             "option_text": "Anterior communicating artery"
+//         }
+//     ],
+//     "question": "A patient presents with progressive vision impairment. Imaging reveals an aneurysm affecting the optic chiasma. Given the anatomical location, which of the following arteries is most likely responsible for this damage?",
+//     "question_id": 41,
+//     "question_no": 1
+// }
+
   const handleEdit = (data: any) => {
-   setpostCourseTestQuestionsMasterId(data.question_id);
+    console.log(data);
+  //  setpostCourseTestQuestionsMasterId(data.question_id);
     setquestionNo(data.question_no);
     setEditQuestion(data.question);
+    setQuestionId(data.question_id);
+    setOption1(data.options[0].option_text);
+    setOption2(data.options[1].option_text);
+    setOption3(data.options[2].option_text);
+    setOption4(data.options[3].option_text);
     // console.log(data)
     onEditModalOpen(); 
   };
@@ -248,14 +297,31 @@ const postcourseqa = () => {
     }
   };
 
+  // token,
+  //   questionId,
+  //   postCourseTestId,
+  //   questionNo,
+  //   question,
+  //   solutionText,
+  //   correctOption,
+  //   option1,
+  //   option2,
+  //   option3,
+  //   option4; 
   const handleUpdateCourse = async () => {
     try {
       const form = new FormData();
       form.append("token", localStorage.getItem("token") ?? "");
-      form.append("postCourseTestQuestionsMasterId", postCourseTestQuestionsMasterId);
+      // form.append("postCourseTestQuestionsMasterId", postCourseTestQuestionsMasterId);
       form.append("postCourseTestId", testId);
       form.append("questionNo", questionNo);
       form.append("question", editQuestion);
+      form.append("option1", option1);
+      form.append("option2", option2);
+      form.append("option3", option3);
+      form.append("option4", option4);
+      form.append("questionId", questionid);
+      form.append("correctOption", correctOption);
 
       console.log(Object.fromEntries(form));
 
@@ -417,6 +483,58 @@ const postcourseqa = () => {
                 placeholder="Enter Question"
                 value={editQuestion}
                 onChange={(e) => setEditQuestion(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Option 1</FormLabel>
+              <Input
+                placeholder="Enter Option 1"
+                value={option1}
+                onChange={(e) => setOption1(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Option 2</FormLabel>
+              <Input
+                placeholder="Enter Option 2"
+                value={option2}
+                onChange={(e) => setOption2(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Option 3</FormLabel>
+              <Input
+                placeholder="Enter Option 3"
+                value={option3}
+                onChange={(e) => setOption3(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Option 4</FormLabel>
+              <Input
+                placeholder="Enter Option 4"
+                value={option4}
+                onChange={(e) => setOption4(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Correct Option</FormLabel>
+              <Select
+                placeholder="Select correct option"
+                onChange={(e) => setCorrectOption(e.target.value)}
+              >
+                <option value="1">{option1}</option>
+                <option value="2">{option2}</option>
+                <option value="3">{option3}</option>
+                <option value="4">{option4}</option>
+              </Select>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Solution Text</FormLabel>
+              <Textarea
+                placeholder="Enter Solution Text"
+                value={solutionText}
+                onChange={(e) => setSolutionText(e.target.value)}
               />
             </FormControl>
           </ModalBody>
