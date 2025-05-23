@@ -524,7 +524,7 @@ const fetchDetail = async (url: string) => {
                 onChange={(e) => setSelectedCourse(e.target.value)}
               >
                 {courses.map((course) => (
-                  <option key={course.course_id} value={course.course_id}>
+                  <option key={course.id} value={course.id}>
                     {course.course_name}
                   </option>
                 ))}
@@ -633,7 +633,7 @@ const fetchDetail = async (url: string) => {
                 onChange={(e) => setSelectedCourse(e.target.value)}
               >
                 {courses.map((course) => (
-                  <option key={course.course_id} value={course.course_id}>
+                  <option key={course.id} value={course.id}>
                     {course.course_name}
                   </option>
                 ))}
