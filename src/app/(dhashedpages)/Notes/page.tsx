@@ -181,58 +181,53 @@ const StudentsTab = () => {
     }
   }
 
-  const fetchDetail = async (Url: string) => {
-    try {
-      const token = localStorage.getItem("token");
-      
-      // Clean up the URL - decode any double encodings
-      const cleanUrl = decodeURIComponent(Url);
-      
-      const response = await fetch(
-        `${baseUrl}/notes-content/display/presign-url/${token}/${cleanUrl}`,
-        {
-          method: "GET",
-        }
-      );
-      
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast({
-          title: "Error",
-          description: "Failed to fetch PDF. Please try again.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-        return;
+const fetchDetail = async (url: string) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(
+      `${baseUrl}/notes-content/display/presign-url/${token}/${url}`,
+      {
+        method: "GET",
       }
+    );
+    
+    const data = await response.json();
 
-      if (data.errFlag === 0 && data.downloadUrl) {
-        // Decode the URL before opening
-        const decodedUrl = decodeURIComponent(data.downloadUrl);
-        window.open(decodedUrl, "_blank");
-      } else {
-        toast({
-          title: "Error",
-          description: data.message || "Could not fetch PDF",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-        console.error("API Error:", data);
-      }
-    } catch (error) {
-      console.error("Error fetching PDF:", error);
+    if (!response.ok) {
       toast({
         title: "Error",
-        description: "Failed to fetch PDF",
+        description: "Failed to fetch PDF. Please try again.",
         status: "error",
         duration: 3000,
         isClosable: true,
       });
+      return;
     }
-  };
+
+    if (data.errFlag === 0 && data.downloadUrl) {
+      // Open the presigned URL directly
+      window.open(data.downloadUrl, "_blank");
+    } else {
+      toast({
+        title: "Error",
+        description: data.message || "Could not fetch PDF",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      console.error("API Error:", data);
+    }
+  } catch (error) {
+    console.error("Error fetching PDF:", error);
+    toast({
+      title: "Error",
+      description: "Failed to fetch PDF",
+      status: "error",
+      duration: 3000,
+      isClosable: true,
+    });
+  }
+};  
 
   // State for Add Student Modal
   const {
