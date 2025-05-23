@@ -315,9 +315,9 @@ const fetchDetail = async (url: string) => {
           if (data.errFlag == 0) {
             toast({
               title: "Success",
-              description: "Note Added Successfully",
+              description: `Note Added Successfully, Selected Course: ${selectedCourse}`,
               status: "success",
-              duration: 3000,
+              duration: 3000, 
               isClosable: true,
             });
     resetForm();
