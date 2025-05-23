@@ -150,6 +150,12 @@ const precourseqa = () => {
       // width: 150,
     },
     {
+      field: "solution_text",
+      headerName: "Solution Text",
+      filter: false,
+      cellStyle: { backgroundColor: "white" },
+    },
+    {
       field: "question_id",
       headerName: "Actions",
       filter: false,
@@ -199,33 +205,6 @@ const precourseqa = () => {
   const [SheetName, setSheetName] = useState("");
   const [testCourseId, settestCourseId] = useState("");
 
-//   {
-//     "options": [
-//         {
-//             "correct_option": 1,
-//             "option_id": 573,
-//             "option_text": "Increase in length of 25 centimeters in the first year."
-//         },
-//         {
-//             "correct_option": 0,
-//             "option_id": 574,
-//             "option_text": "Weight gain of 300 grams per month till 1 year."
-//         },
-//         {
-//             "correct_option": 0,
-//             "option_id": 575,
-//             "option_text": "Anterior fontanelle closure by 6 months of age."
-//         },
-//         {
-//             "correct_option": 0,
-//             "option_id": 576,
-//             "option_text": "Weight under the 75th percentile and height under the 25th percentile."
-//         }
-//     ],
-//     "question": "Which is the best indicator of monitoring adequate growth in an infant with a birth weight of 2.9 kg during the first year of life?",
-//     "question_id": 144,
-//     "question_no": 1
-// }
 
   const handleEdit = (data: any) => {
     console.log(data); 
@@ -237,6 +216,9 @@ const precourseqa = () => {
     setOption2(data.options[1].option_text);
     setOption3(data.options[2].option_text);
     setOption4(data.options[3].option_text);
+    // const correct = data.options.find((opt: any) => opt.correct_option === 1);
+    // setCorrectOption(correct ? correct.option_id : "");
+    setSolutionText(data.solution_text);
     // console.log(data)
     onEditModalOpen(); 
   };
@@ -289,17 +271,33 @@ const precourseqa = () => {
     }
   };
 
-  // token,
-  //   questionId,
-  //   preCourseTestId,
-  //   questionNo,
-  //   question,
-  //   solutionText,
-  //   correctOption,
-  //   option1,
-  //   option2,
-  //   option3,
-  //   option4; 
+//   {
+//     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiNS1hZnNhckBnbWFpbC5jb20tMjAyNTA1MjMxMDE3MjAifQ._YmbjiV7IBLUHBVLwXMX8sBCpGZByLcxhQV2HvGNGO4",
+//     "preCourseTestId": "1",
+//     "questionNo": "1",
+//     "question": "What is the best indicator of monitoring adequate growth
+//  in an infant with a birth weight of 2.9 kg during the first year of life?",
+//     "solutionText": "A. Increase in length of 25 centimeters in the first year\nLength (or height) is one of the most reliable indicators of adequate growth in infancy. During the first year, a healthy infant typically increases in length by approximately 25 cm, which represents rapid skeletal growth and overall nutritional adequacy. This is a key marker of normal growth.\n\nIncorrect Options:\nB. Weight gain of 300 grams per month till 1 year\nWhile weight gain is an important parameter, the typical weight gain during the first 3 months is around 20-30g per day, which slows to 400-500 grams per month upto 1 year. Option in the question shows inadequate growth.\nC. Anterior fontanelle closure by 6 months of age\nThe anterior fontanelle typically closes by 12-18 months, not by 6 months. Its closure is not a primary indicator of adequate growth during infancy.\nD. Weight under the 75th percentile and height under the 25th percentile\nPercentiles are used to track growth patterns. A weight under the 75th percentile and height under the 25th percentile indicates disproportionate growth and does not reflect adequate overall growth.\n\nConcept Box: Indicators of Adequate Growth in Infancy\n\nReferences:\nNelson Textbook of Pediatrics, 21st Edition: Growth and development milestones in infancy P.No. 151, 3055\nGhai Essential Pediatrics, 9th Edition: Guidelines on growth monitoring and expected changes in weight, length, and head circumference P. No.13,31",
+//     "correctOption": "3",
+//     "option1": "Increase in length of 25 centimeters in the first year.",
+//     "option2": "Weight gain of 300 grams per month till 1 year.",
+//     "option3": "Anterior fontanelle closure by 6 months of age.",
+//     "option4": "Weight under the 75th percentile and height under the 25th percentile.",
+//     "questionId": "144"
+// }
+
+
+// token,
+//   questionId,
+//   preCourseTestId,
+//   questionNo,
+//   question,
+//   solutionText,
+//   correctOption,
+//   option1,
+//   option2,
+//   option3,
+//   option4; 
 
   const handleUpdateCourse = async () => {
     try {
@@ -320,10 +318,21 @@ const precourseqa = () => {
       form.append("option4", option4);
       form.append("questionId", questionid);
 
+      if (correctOption === "") {
+        toast({
+          title: "Please select a correct option.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+
       console.log(Object.fromEntries(form));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/pre-course-test/questions/update`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/pre-course-test/questions/edit`,
         {
           method: "POST",
           body: form,
@@ -335,6 +344,7 @@ const precourseqa = () => {
       // setRowData((prev) => [...prev, responseData]);
 
       if (responseData.errFlag == 0) {
+        fetchTest();
         toast({
           title: "Course updated successfully.",
           description: responseData.message,
@@ -468,7 +478,7 @@ const precourseqa = () => {
       </Modal>
 
       {/* Edit Course Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={onEditModalClose}>
+      <Modal isOpen={isEditModalOpen} onClose={onEditModalClose} size="xl"> 
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Course</ModalHeader>
@@ -519,6 +529,7 @@ const precourseqa = () => {
               <Select
                 placeholder="Select correct option"
                 onChange={(e) => setCorrectOption(e.target.value)}
+                value={correctOption}
               >
                 <option value="1">{option1}</option>
                 <option value="2">{option2}</option>

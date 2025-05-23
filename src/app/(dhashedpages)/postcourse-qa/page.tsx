@@ -156,6 +156,12 @@ const postcourseqa = () => {
       // width: 150,
     },
     {
+      field: "solution_text",
+      headerName: "Solution Text",
+      filter: false,
+      cellStyle: { backgroundColor: "white" },
+    },
+    {
       field: "question_id",
       headerName: "Actions",
       filter: false,
@@ -206,34 +212,6 @@ const postcourseqa = () => {
   const [testCourseId, settestCourseId] = useState("");
 
 
-//   {
-//     "options": [
-//         {
-//             "correct_option": 0,
-//             "option_id": 161,
-//             "option_text": "Middle cerebral artery"
-//         },
-//         {
-//             "correct_option": 0,
-//             "option_id": 162,
-//             "option_text": "Anterior choroidal artery"
-//         },
-//         {
-//             "correct_option": 0,
-//             "option_id": 163,
-//             "option_text": "Anterior cerebral artery"
-//         },
-//         {
-//             "correct_option": 1,
-//             "option_id": 164,
-//             "option_text": "Anterior communicating artery"
-//         }
-//     ],
-//     "question": "A patient presents with progressive vision impairment. Imaging reveals an aneurysm affecting the optic chiasma. Given the anatomical location, which of the following arteries is most likely responsible for this damage?",
-//     "question_id": 41,
-//     "question_no": 1
-// }
-
   const handleEdit = (data: any) => {
     console.log(data);
   //  setpostCourseTestQuestionsMasterId(data.question_id);
@@ -244,6 +222,7 @@ const postcourseqa = () => {
     setOption2(data.options[1].option_text);
     setOption3(data.options[2].option_text);
     setOption4(data.options[3].option_text);
+    setSolutionText(data.solution_text);
     // console.log(data)
     onEditModalOpen(); 
   };
@@ -297,17 +276,6 @@ const postcourseqa = () => {
     }
   };
 
-  // token,
-  //   questionId,
-  //   postCourseTestId,
-  //   questionNo,
-  //   question,
-  //   solutionText,
-  //   correctOption,
-  //   option1,
-  //   option2,
-  //   option3,
-  //   option4; 
   const handleUpdateCourse = async () => {
     try {
       const form = new FormData();
@@ -321,12 +289,13 @@ const postcourseqa = () => {
       form.append("option3", option3);
       form.append("option4", option4);
       form.append("questionId", questionid);
+      form.append("solutionText", solutionText);
       form.append("correctOption", correctOption);
 
       console.log(Object.fromEntries(form));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/post-course-test/questions/update`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/post-course-test/questions/edit`,
         {
           method: "POST",
           body: form,
@@ -338,6 +307,7 @@ const postcourseqa = () => {
       // setRowData((prev) => [...prev, responseData]);
 
       if (responseData.errFlag == 0) {
+        fetchTest();
         toast({
           title: "Course updated successfully.",
           description: responseData.message,
