@@ -285,7 +285,7 @@ const fetchDetail = async (url: string) => {
 //     }
 // }
   const handleAddStudent = () => {
-    resetForm();
+
     const token = localStorage.getItem("token") ?? "";
     const form = new FormData();
     form.append("token", token);
@@ -320,6 +320,9 @@ const fetchDetail = async (url: string) => {
               duration: 3000,
               isClosable: true,
             });
+    resetForm();
+    onAddModalClose();
+ 
           } else {
             toast({
               title: "Error",
@@ -333,10 +336,7 @@ const fetchDetail = async (url: string) => {
     } catch (error) {
       console.error("Error adding Note:", error);
     }
-
-    resetForm();
-    onAddModalClose();
-  };
+ };
 
   const handleEditStudent = () => {
     const token = localStorage.getItem("token") ?? "";
@@ -370,6 +370,9 @@ const fetchDetail = async (url: string) => {
               duration: 3000,
               isClosable: true,
             });
+    resetForm();
+    onEditModalClose();
+ 
           } else {
             toast({
               title: "Error",
@@ -383,10 +386,7 @@ const fetchDetail = async (url: string) => {
     } catch (error) {
       console.error("Error updating Notes:", error);
     }
-
-    resetForm();
-    onEditModalClose();
-  };
+ };
 
   const resetForm = () => {
     setnoteTitle("");
