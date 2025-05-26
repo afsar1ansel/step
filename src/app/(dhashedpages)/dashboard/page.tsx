@@ -8,10 +8,8 @@ import { RiUser3Line } from "react-icons/ri";
 import { IoMdPaper } from "react-icons/io";
 import { VscFileSymlinkDirectory } from "react-icons/vsc";
 
-
-
 import { AgGridReact } from "ag-grid-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import {
@@ -28,161 +26,355 @@ import {
   ModalOverlay,
   useDisclosure,
   Switch,
+  useToast,
+  Box,
+  Image,
+  Center,
+  Spinner,
 } from "@chakra-ui/react";
+import { useDropzone } from "react-dropzone";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-
 export default function Home() {
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const toast = useToast();
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-  const [rowData, setRowData] = useState<any[]>([
-      {
-        id: "01",
-        name: "John Doe",
-        email: "john@email.com",
-        registration: "12345",
-        contact: "9876543210",
-        registrationDate: "2025-02-10",
-        mode: "Paid",
-        subscription: "Active",
-      },
-      {
-        id: "02",
-        name: "Jane Smith",
-        email: "jane@email.com",
-        registration: "67890",
-        contact: "9876543211",
-        registrationDate: "2025-02-09",
-        mode: "Free",
-        subscription: "Inactive",
-      },
-    ]);
-  
-    const [columnDefs, setColumnDefs] = useState<ColDef[]>([
-      { headerName: "Sl. No", field: "id", maxWidth: 80 },
-      { headerName: "Student Name", field: "name", minWidth: 180 , filter: true},
-      { headerName: "Email", field: "email", minWidth: 200 },
-      { headerName: "Registration No.", field: "registration", maxWidth: 150 },
-      { headerName: "Contact No.", field: "contact", maxWidth: 120 },
-      {
-        headerName: "Registration Date",
-        field: "registrationDate",
-        // minWidth: 100,
-        maxWidth: 150,
-      },
-      {
-        headerName: "Status",
-        field: "subscription",
-        maxWidth: 130,
-        cellRenderer: (params: any) => (
-          <Switch
-            isChecked={params.value === "Active"}
-            onChange={() => toggleSubscription(params.data)}
-            colorScheme="green"
-          >
-            {params.value}
-          </Switch>
-        ),
-      },
-      {
-        headerName: "Mode",
-        field: "mode",
-        maxWidth: 100,
-        cellRenderer: (params: any) => (
-          <span
-            style={{
-              color: "white",
-              backgroundColor: params.value === "Paid" ? "#81C784" : "#FFB74D",
-              padding: "5px 10px",
-              borderRadius: "8px",
-            }}
-          >
-            {params.value}
-          </span>
-        ),
-      },
-      {
-        headerName: "Actions",
-        cellRenderer: (params: any) => (
-          <div>
-            <button
-              onClick={() => handleEdit(params.data)}
-              style={{ marginRight: "10px" }}
-            >
-              Edit
-            </button>
-            <button onClick={() => handleDelete(params.data)}>Delete</button>
-          </div>
-        ),
-      },
-    ]);
-  
-    // State for Add Student Modal
-    const {
-      isOpen: isAddModalOpen,
-      onOpen: onAddModalOpen,
-      onClose: onAddModalClose,
-    } = useDisclosure();
-  
-    // State for Edit Student Modal
-    const {
-      isOpen: isEditModalOpen,
-      onOpen: onEditModalOpen,
-      onClose: onEditModalClose,
-    } = useDisclosure();
-  
-    const [currentStudent, setCurrentStudent] = useState<any>(null);
-    const [studentName, setStudentName] = useState("");
-    const [studentEmail, setStudentEmail] = useState("");
-    const [studentContact, setStudentContact] = useState("");
-  
-    const handleEdit = (data: any) => {
-      setCurrentStudent(data);
-      setStudentName(data.name);
-      setStudentEmail(data.email);
-      setStudentContact(data.contact);
-      onEditModalOpen();
-    };
-  
-    const handleDelete = (data: any) => {
-      setRowData((prev) => prev.filter((student) => student.id !== data.id));
-    };
-  
-    const toggleSubscription = (data: any) => {
-      setRowData((prev) =>
-        prev.map((student) =>
-          student.id === data.id
-            ? {
-                ...student,
-                subscription:
-                  student.subscription === "Active" ? "Inactive" : "Active",
-              }
-            : student
-        )
+  // Dropzone for image upload
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: {
+      "image/*": [".jpeg", ".jpg", ".png", ".webp"],
+    },
+    maxFiles: 1,
+    onDrop: (acceptedFiles) => {
+      const file = acceptedFiles[0];
+      setSelectedImage(file);
+      setPreview(URL.createObjectURL(file));
+    },
+  });
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  async function fetchData() {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${baseUrl}/app-users/get-all-app-users/${token}`,
+        {
+          method: "GET",
+        }
       );
-    };
-  
-    const handleAddStudent = () => {
-      const newStudent = {
-        id: String(rowData.length + 1),
-        name: studentName,
-        email: studentEmail,
-        contact: studentContact,
-        registrationDate: new Date().toISOString().split("T")[0],
-        subscription: "Inactive",
-      };
-      setRowData((prev) => [...prev, newStudent]);
-      resetForm();
-      onAddModalClose();
-    };
-  
-    const resetForm = () => {
-      setStudentName("");
-      setStudentEmail("");
-      setStudentContact("");
-      setCurrentStudent(null);
-    };
+      const data = await response.json();
+      setRowData(data);
+      console.log(data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch data",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  }
 
+  const [rowData, setRowData] = useState<any[]>();
+
+  const [columnDefs, setColumnDefs] = useState<ColDef[]>([
+    {
+      headerName: "Sl. No",
+      field: "id",
+      maxWidth: 80,
+      filter: false,
+      suppressAutoSize: true,
+      cellRenderer: (params: any) => {
+        return params.node.rowIndex + 1;
+      },
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Name",
+      field: "app_user_name",
+      // minWidth: 180,
+    },
+    // {
+    //   headerName: "Doctor Image",
+    //   field: "doctor_profile_pic",
+    //   cellRenderer: (params: any) => (
+    //     <Button
+    //       variant="link"
+    //       colorScheme="blue"
+    //       onClick={() => fetchImage(params.value)}
+    //     >
+    //       View Image
+    //     </Button>
+    //   ),
+    // },
+    {
+      headerName: "Email",
+      field: "app_user_email",
+    },
+    {
+      headerName: "Mobile",
+      field: "app_user_mobile",
+    },
+    {
+      headerName: "College",
+      field: "college",
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      cellStyle: { textAlign: "center" },
+      filter: false,
+      maxWidth: 150,
+      cellRenderer: (params: any) => (
+        // console.log(params.value),
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <Switch
+            colorScheme="green"
+            onChange={(event) => handleToggle(params.data)}
+            defaultChecked={params.value === 1 ? true : false}
+          />
+        </div>
+      ),
+    },
+    {
+      headerName: "Creation date",
+      field: "created_date",
+    },
+    // {
+    //   headerName: "Actions",
+    //   filter: false,
+    //   cellRenderer: (params: any) => {
+    //     return (
+    //       <HStack spacing={2}>
+    //         <Button
+    //           // leftIcon={<EditIcon />}
+    //           colorScheme="blue"
+    //           size="sm"
+    //           onClick={() => handleEdit(params.data)}
+    //           variant="outline"
+    //         >
+    //           Edit
+    //         </Button>
+    //         {/* <Button
+    //              // leftIcon={<DeleteIcon />}
+    //              colorScheme="red"
+    //              size="sm"
+    //              onClick={() => handleDelete(params.data)}
+    //              variant="outline"
+    //            >
+    //              Delete
+    //            </Button> */}
+    //       </HStack>
+    //     );
+    //   },
+    // },
+  ]);
+
+  const fetchImage = async (id: any) => {
+    // console.log(id);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${baseUrl}//${token}/${id}`, {
+        method: "GET",
+      });
+      setCurrentImageUrl(response.url); // Set the image URL to state
+      onImageModalOpen();
+
+      // console.log(response.url);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //toggle function for switch button
+  const handleToggle = async (data: any) => {
+    console.log(data);
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token") ?? "";
+      const status = data.status == 1 ? 0 : 1;
+      console.log(status);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/app-users/update-app-user-status/${status}/${data.id}/${token}`,
+        {
+          method: "GET",
+        }
+      );
+      const responseData = await response.json();
+      console.log(responseData);
+    } catch (error) {
+      console.error("Error toggling course status:", error);
+    }
+    setLoading(false);
+  };
+
+  // State for Add Subject Modal
+  const {
+    isOpen: isAddModalOpen,
+    onOpen: onAddModalOpen,
+    onClose: onAddModalClose,
+  } = useDisclosure();
+
+  // State for Edit Subject Modal
+  const {
+    isOpen: isEditModalOpen,
+    onOpen: onEditModalOpen,
+    onClose: onEditModalClose,
+  } = useDisclosure();
+
+  // Add this with your other modal states
+  const {
+    isOpen: isImageModalOpen,
+    onOpen: onImageModalOpen,
+    onClose: onImageModalClose,
+  } = useDisclosure();
+
+  // Add state to store the image URL
+  const [currentImageUrl, setCurrentImageUrl] = useState<string>("");
+  const [name, setname] = useState("");
+  const [doctorEducation, setdoctorEducation] = useState("");
+  const [docExperience, setdocExperience] = useState("");
+  const [userId, setuserId] = useState("");
+  const [doctorPracticeProfession, setdoctorPracticeProfession] = useState<any>(
+    []
+  );
+  const [loading, setLoading] = useState(false);
+
+  const handleEdit = (data: any) => {
+    // console.log(data);
+    setname(data.doctor_full_name);
+    setdoctorEducation(data.doctor_education);
+    setdocExperience(data.years_of_experience);
+    setdoctorPracticeProfession(data.doctor_practice_profession);
+    setuserId(data.id);
+    onEditModalOpen(); // Open Edit Modal
+  };
+
+  const handleDelete = (data: any) => {
+    setRowData((prev) => prev?.filter((subject) => subject.id !== data.id));
+  };
+
+  const handleAddSubject = async () => {
+    // console.log(name, doctorEducation, role , doctorPracticeProfession);
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token") ?? "";
+      const form = new FormData();
+      form.append("doctorName", name);
+      form.append("doctorEducation", doctorEducation);
+      form.append("doctorPracticeProfession", doctorPracticeProfession);
+      form.append("yearsOfExperience", docExperience);
+      form.append("token", token);
+      if (selectedImage) {
+        form.append("doctorProfilePic", selectedImage);
+      }
+      console.log(Object.fromEntries(form.entries()));
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}`, {
+        method: "POST",
+        body: form,
+      });
+      const responseData = await response.json();
+      console.log(responseData);
+      fetchData();
+
+      if (responseData.errFlag === 0) {
+        toast({
+          title: "Success",
+          description: "Subject added successfully",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        fetchData();
+        resetForm();
+        onAddModalClose();
+      } else {
+        toast({
+          title: "Error",
+          description: responseData.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    setLoading(false);
+  };
+
+  const handleUpdateSubject = async () => {
+    try {
+      const token = localStorage.getItem("token") ?? "";
+      const form = new FormData();
+      form.append("doctorName", name);
+      form.append("doctorEducation", doctorEducation);
+      form.append("doctorPracticeProfession", doctorPracticeProfession);
+      form.append("yearsOfExperience", docExperience);
+      form.append("doctorId", userId);
+      form.append("token", token);
+      if (selectedImage) {
+        form.append("doctorProfilePic", selectedImage);
+      }
+      console.log(Object.fromEntries(form.entries()));
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}`, {
+        method: "POST",
+        body: form,
+      });
+      const responseData = await response.json();
+      console.log(responseData);
+      fetchData();
+      if (responseData.errFlag === 0) {
+        toast({
+          title: "Success",
+          description: "Subject updated successfully",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        fetchData();
+        resetForm();
+        onEditModalClose();
+      } else {
+        toast({
+          title: "Error",
+          description: responseData.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        resetForm();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const resetForm = () => {
+    setname("");
+    setdoctorEducation("");
+    setdocExperience("");
+    setdoctorPracticeProfession("");
+    setSelectedImage(null);
+    setPreview(null);
+  };
 
   return (
     <div className={styles.page}>
@@ -237,7 +429,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className={styles.chartBox}>
+      <div style={{ width: "95%", height: "60vh" }}>
         <div
           style={{
             height: "60px",
@@ -250,20 +442,273 @@ export default function Home() {
             alignItems: "center",
           }}
         >
-          <p style={{ fontSize: "16px", fontWeight: "600" }}>Students Data</p>
+          <p style={{ fontSize: "16px", fontWeight: "600" }}>App Users</p>
           {/* <Button onClick={onAddModalOpen} colorScheme="green">
-                  Add Student
-                </Button> */}
+                     Add New User
+                   </Button> */}
         </div>
         <div style={{ height: "100%", width: "100%" }}>
           <AgGridReact
             rowData={rowData}
             columnDefs={columnDefs}
             pagination={true}
-            paginationPageSize={10}
-            paginationAutoPageSize={true}
+            // paginationPageSize={10}
+            paginationPageSize={5}
+            paginationPageSizeSelector={[5, 10, 15]}
+            // paginationAutoPageSize={true}
+            defaultColDef={{
+              sortable: true,
+              filter: true,
+              floatingFilter: true,
+              resizable: true,
+              flex: 1,
+              filterParams: {
+                debounceMs: 0,
+                buttons: ["reset"],
+              },
+            }}
+            getRowHeight={function (params) {
+              const description = params.data?.banner_description || "";
+              const words = description.split(" ").length;
+              const baseHeight = 50;
+              const heightPerWord = 6;
+              const minHeight = 50;
+              const calculatedHeight = baseHeight + words * heightPerWord;
+              return Math.max(minHeight, calculatedHeight);
+            }}
+            suppressCellFocus={true}
           />
         </div>
+
+        {/* Add Subject Modal */}
+        <Modal isOpen={isAddModalOpen} onClose={onAddModalClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Add New User</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl>
+                <FormLabel>Name</FormLabel>
+                <Input
+                  placeholder="Enter Doctor's Name"
+                  value={name}
+                  onChange={(e) => setname(e.target.value)}
+                />
+
+                <FormLabel>Doctor Education</FormLabel>
+                <Input
+                  placeholder="Enter Doctor Education"
+                  value={doctorEducation}
+                  onChange={(e) => setdoctorEducation(e.target.value)}
+                />
+
+                <FormLabel>Doctor Profession</FormLabel>
+                <Input
+                  placeholder="Enter Doctor Practice Profession"
+                  value={doctorPracticeProfession}
+                  onChange={(e) => setdoctorPracticeProfession(e.target.value)}
+                />
+
+                <FormLabel>Experience Year</FormLabel>
+                <Input
+                  placeholder="Enter Experience Year"
+                  value={docExperience}
+                  onChange={(e) => setdocExperience(e.target.value)}
+                />
+
+                {/* Add input fields for doctor image  */}
+                <FormLabel mt={4}>Doctor Image</FormLabel>
+                <Box
+                  {...getRootProps()}
+                  border="2px dashed"
+                  borderColor={isDragActive ? "green.500" : "gray.300"}
+                  borderRadius="md"
+                  p={4}
+                  textAlign="center"
+                  cursor="pointer"
+                  _hover={{ borderColor: "green.400" }}
+                >
+                  <input {...getInputProps()} />
+                  {isDragActive ? (
+                    <p>Drop the image here...</p>
+                  ) : (
+                    <p>Drag & drop an image here, or click to select</p>
+                  )}
+                </Box>
+
+                {preview && (
+                  <Box mt={4}>
+                    <Image
+                      src={preview}
+                      alt="Preview"
+                      maxH="200px"
+                      mx="auto"
+                      borderRadius="md"
+                    />
+                    <Button
+                      size="sm"
+                      mt={2}
+                      colorScheme="red"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedImage(null);
+                        setPreview(null);
+                      }}
+                    >
+                      Remove Image
+                    </Button>
+                  </Box>
+                )}
+              </FormControl>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="gray" mr={3} onClick={onAddModalClose}>
+                Cancel
+              </Button>
+              <Button colorScheme="green" onClick={handleAddSubject}>
+                Add
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        {/* Edit Subject Modal */}
+        <Modal isOpen={isEditModalOpen} onClose={onEditModalClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Edit Doctor Details</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl>
+                <FormLabel>Name</FormLabel>
+                <Input
+                  placeholder="Enter Doctor's Name"
+                  value={name}
+                  onChange={(e) => setname(e.target.value)}
+                />
+
+                <FormLabel>Doctor Education</FormLabel>
+                <Input
+                  placeholder="Enter Doctor Education"
+                  value={doctorEducation}
+                  onChange={(e) => setdoctorEducation(e.target.value)}
+                />
+
+                <FormLabel>Doctor Profession</FormLabel>
+                <Input
+                  placeholder="Enter Doctor Practice Profession"
+                  value={doctorPracticeProfession}
+                  onChange={(e) => setdoctorPracticeProfession(e.target.value)}
+                />
+
+                <FormLabel>Experience Year</FormLabel>
+                <Input
+                  placeholder="Enter Experience Year"
+                  value={docExperience}
+                  onChange={(e) => setdocExperience(e.target.value)}
+                />
+
+                {/* Add input fields for doctor image  */}
+                <FormLabel mt={4}>Doctor Image</FormLabel>
+                <Box
+                  {...getRootProps()}
+                  border="2px dashed"
+                  borderColor={isDragActive ? "green.500" : "gray.300"}
+                  borderRadius="md"
+                  p={4}
+                  textAlign="center"
+                  cursor="pointer"
+                  _hover={{ borderColor: "green.400" }}
+                >
+                  <input {...getInputProps()} />
+                  {isDragActive ? (
+                    <p>Drop the image here...</p>
+                  ) : (
+                    <p>Drag & drop an image here, or click to select</p>
+                  )}
+                </Box>
+
+                {preview && (
+                  <Box mt={4}>
+                    <Image
+                      src={preview}
+                      alt="Preview"
+                      maxH="200px"
+                      mx="auto"
+                      borderRadius="md"
+                    />
+                    <Button
+                      size="sm"
+                      mt={2}
+                      colorScheme="red"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedImage(null);
+                        setPreview(null);
+                      }}
+                    >
+                      Remove Image
+                    </Button>
+                  </Box>
+                )}
+              </FormControl>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="gray" mr={3} onClick={onEditModalClose}>
+                Cancel
+              </Button>
+              <Button colorScheme="green" onClick={handleUpdateSubject}>
+                Update
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        {/* Image Viewer Modal */}
+        <Modal isOpen={isImageModalOpen} onClose={onImageModalClose} size="xl">
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Doctor Profile Image</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Center>
+                {currentImageUrl && (
+                  <Image
+                    src={currentImageUrl}
+                    alt="Doctor Profile"
+                    maxH="70vh"
+                    maxW="100%"
+                    objectFit="contain"
+                    borderRadius="md"
+                  />
+                )}
+              </Center>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="blue" onClick={onImageModalClose}>
+                Close
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        {loading && (
+          <Center
+            position="absolute"
+            top="50%"
+            left="50%"
+            transform="translate(-50%, -50%)"
+            zIndex={10}
+          >
+            <Spinner
+              size="xl"
+              color="blue.500"
+              thickness="4px"
+              emptyColor="gray.200"
+              speed="0.65s"
+            />
+          </Center>
+        )}
       </div>
     </div>
   );
