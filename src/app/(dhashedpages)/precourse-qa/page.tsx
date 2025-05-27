@@ -20,6 +20,7 @@ import {
   Select,
   useToast,
   Textarea,
+  HStack,
 } from "@chakra-ui/react";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -329,6 +330,8 @@ const precourseqa = () => {
           isClosable: true,
           position: "top",
         });
+        resetAddQuestionForm();
+        onAddQuestionModalClose(); // <-- Only close on success!
       } else {
         toast({
           title: "Error adding question.",
@@ -338,12 +341,19 @@ const precourseqa = () => {
           isClosable: true,
           position: "top",
         });
+        // Do NOT close the modal here!
       }
     } catch (error) {
       console.error("Error adding question:", error);
-    } finally {
-      resetAddQuestionForm();
-      onAddQuestionModalClose();
+      toast({
+        title: "Error adding question.",
+        description: "An unexpected error occurred.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
+      // Do NOT close the modal here!
     }
   };
 
@@ -458,12 +468,14 @@ const precourseqa = () => {
                 </option>
               ))}
           </Select>
-          <Button onClick={onAddQuestionModalOpen} colorScheme="blue">
-            Add Question
-          </Button>
-          <Button onClick={onAddModalOpen} colorScheme="green">
-            Add Test
-          </Button>
+          <HStack spacing={4}>
+            <Button onClick={onAddQuestionModalOpen} colorScheme="blue" px={6}>
+              Add Question
+            </Button>
+            <Button onClick={onAddModalOpen} colorScheme="green" px={6}>
+              Add Test
+            </Button>
+          </HStack>
         </div>
       </div>
       <div style={{ height: "100%", width: "100%" }}>
