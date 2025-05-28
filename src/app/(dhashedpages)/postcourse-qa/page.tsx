@@ -21,6 +21,7 @@ import {
   useToast,
   Textarea,
 } from "@chakra-ui/react";
+import EditorComponent from "@/app/componant/editor";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -31,16 +32,27 @@ const postcourseqa = () => {
   const [testOptions, settestOptions] = useState<any[]>([]);
   const [postCourseTestQuestionsMasterId, setpostCourseTestQuestionsMasterId] =
     useState("");
-    const [questionNo, setquestionNo] = useState("");
-    const [editQuestion, setEditQuestion] = useState("");
-     const [ testIdAdd, setTestIdAdd] = useState("");
-     const [option1, setOption1] = useState("");
-     const [option2, setOption2] = useState("");
-     const [option3, setOption3] = useState("");
-     const [option4, setOption4] = useState("");
-     const [questionid, setQuestionId] = useState("");
-     const [correctOption, setCorrectOption] = useState("");
-     const [solutionText, setSolutionText] = useState("");
+  const [questionNo, setquestionNo] = useState("");
+  const [editQuestion, setEditQuestion] = useState("");
+  const [testIdAdd, setTestIdAdd] = useState("");
+  const [option1, setOption1] = useState("");
+  const [option2, setOption2] = useState("");
+  const [option3, setOption3] = useState("");
+  const [option4, setOption4] = useState("");
+  const [questionid, setQuestionId] = useState("");
+  const [correctOption, setCorrectOption] = useState("");
+  const [solutionText, setSolutionText] = useState("");
+  const [isAddQuestionModalOpen, setIsAddQuestionModalOpen] = useState(false);
+  const [newQuestionNo, setNewQuestionNo] = useState("");
+  const [newQuestionData, setNewQuestionData] = useState<any>({ blocks: [] });
+  const [newOption1, setNewOption1] = useState("");
+  const [newOption2, setNewOption2] = useState("");
+  const [newOption3, setNewOption3] = useState("");
+  const [newOption4, setNewOption4] = useState("");
+  const [newCorrectOption, setNewCorrectOption] = useState("");
+  const [newSolutionText, setNewSolutionText] = useState("");
+  const [newTestId, setNewTestId] = useState("");
+
   const toast = useToast();
   useEffect(() => {
     fetchTest();
@@ -84,13 +96,15 @@ const postcourseqa = () => {
       );
       const responseData = await response.json();
       // { errFlag: 1, message: 'Invalid token' }
-      if (responseData.message == "Invalid token" || responseData.errFlag == 1) {
+      if (
+        responseData.message == "Invalid token" ||
+        responseData.errFlag == 1
+      ) {
         localStorage.removeItem("token");
         window.location.href = "/auth/login";
       }
       // console.log(responseData);
       settestOptions(responseData);
-      
     } catch {
       (error: Error) => {
         console.error("Error fetching data:", error);
@@ -211,10 +225,9 @@ const postcourseqa = () => {
   const [SheetName, setSheetName] = useState("");
   const [testCourseId, settestCourseId] = useState("");
 
-
   const handleEdit = (data: any) => {
     console.log(data);
-  //  setpostCourseTestQuestionsMasterId(data.question_id);
+    //  setpostCourseTestQuestionsMasterId(data.question_id);
     setquestionNo(data.question_no);
     setEditQuestion(data.question);
     setQuestionId(data.question_id);
@@ -224,7 +237,7 @@ const postcourseqa = () => {
     setOption4(data.options[3].option_text);
     setSolutionText(data.solution_text);
     // console.log(data)
-    onEditModalOpen(); 
+    onEditModalOpen();
   };
 
   const handleAddCourse = async () => {
@@ -236,8 +249,6 @@ const postcourseqa = () => {
       form.append("postCourseTestId", testIdAdd);
       console.log(Object.fromEntries(form));
 
-
-
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/masters/post-course-test/fetch-questions`,
         {
@@ -247,7 +258,7 @@ const postcourseqa = () => {
       );
       const responseData = await response.json();
       console.log(responseData);
-      
+
       if (responseData.errFlag == 0) {
         toast({
           title: "Test added successfully.",
@@ -342,6 +353,90 @@ const postcourseqa = () => {
     setSheetName("");
   };
 
+  // Add this function to reset the modal state
+  const resetAddQuestionForm = () => {
+    setNewQuestionNo("");
+    setNewQuestionData({ blocks: [] });
+    setNewOption1("");
+    setNewOption2("");
+    setNewOption3("");
+    setNewOption4("");
+    setNewCorrectOption("");
+    setNewSolutionText("");
+    setNewTestId("");
+  };
+
+  // Add this handler for posting a new question
+  const handleAddQuestion = async () => {
+    try {
+      const form = new FormData();
+      form.append("token", localStorage.getItem("token") ?? "");
+      form.append("postCourseTestId", newTestId);
+      form.append("questionNo", newQuestionNo);
+      form.append("question", newQuestionData);
+      // form.append("question", JSON.stringify(newQuestionData));
+      form.append("solutionText", newSolutionText);
+      form.append("correctOption", newCorrectOption);
+      form.append("option1", newOption1);
+      form.append("option2", newOption2);
+      form.append("option3", newOption3);
+      form.append("option4", newOption4);
+
+      if (newCorrectOption === "") {
+        toast({
+          title: "Please select a correct option.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/post-course-test/questions/add`,
+        {
+          method: "POST",
+          body: form,
+        }
+      );
+      const responseData = await response.json();
+
+      if (responseData.errFlag == 0) {
+        fetchTest();
+        toast({
+          title: "Question added successfully.",
+          description: responseData.message,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+          position: "top",
+        });
+        resetAddQuestionForm();
+        setIsAddQuestionModalOpen(false); // Only close on success
+      } else {
+        toast({
+          title: "Error adding question.",
+          description: responseData.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+          position: "top",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding question:", error);
+      toast({
+        title: "Error adding question.",
+        description: "An unexpected error occurred.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
+    }
+  };
+
   return (
     <div style={{ width: "80vw", height: "60vh" }}>
       <div
@@ -371,6 +466,13 @@ const postcourseqa = () => {
           </Select>
           <Button onClick={onAddModalOpen} colorScheme="green">
             Add test
+          </Button>
+          <Button
+            onClick={() => setIsAddQuestionModalOpen(true)}
+            colorScheme="blue"
+            px={6}
+          >
+            Add Question
           </Button>
         </div>
       </div>
@@ -514,6 +616,128 @@ const postcourseqa = () => {
             </Button>
             <Button colorScheme="green" onClick={handleUpdateCourse}>
               Update
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Add Question Modal */}
+      <Modal
+        isOpen={isAddQuestionModalOpen}
+        onClose={() => {
+          setIsAddQuestionModalOpen(false);
+          resetAddQuestionForm();
+        }}
+        size="xl"
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add New Question</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel>Select Test</FormLabel>
+              <Select
+                placeholder="Select Test"
+                onChange={(e) => setNewTestId(e.target.value)}
+                value={newTestId}
+              >
+                {testOptions &&
+                  testOptions.map((item: any, index: number) => (
+                    <option key={item.id} value={item.id}>
+                      {item.post_course_test_title}
+                    </option>
+                  ))}
+              </Select>
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Question No</FormLabel>
+              <Input
+                placeholder="Enter Question Number"
+                value={newQuestionNo}
+                onChange={(e) => setNewQuestionNo(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Question</FormLabel>
+              <EditorComponent
+                data={newQuestionData}
+                onChange={setNewQuestionData}
+                holder="add-question-editor"
+              />
+              {/* <Input
+                placeholder="Enter Question"
+                value={newQuestion}
+                onChange={(e) => setNewQuestion(e.target.value)}
+              /> */}
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Option 1</FormLabel>
+              <Input
+                placeholder="Enter Option 1"
+                value={newOption1}
+                onChange={(e) => setNewOption1(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Option 2</FormLabel>
+              <Input
+                placeholder="Enter Option 2"
+                value={newOption2}
+                onChange={(e) => setNewOption2(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Option 3</FormLabel>
+              <Input
+                placeholder="Enter Option 3"
+                value={newOption3}
+                onChange={(e) => setNewOption3(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Option 4</FormLabel>
+              <Input
+                placeholder="Enter Option 4"
+                value={newOption4}
+                onChange={(e) => setNewOption4(e.target.value)}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Correct Option</FormLabel>
+              <Select
+                placeholder="Select correct option"
+                onChange={(e) => setNewCorrectOption(e.target.value)}
+                value={newCorrectOption}
+              >
+                <option value="1">Option 1</option>
+                <option value="2">Option 2</option>
+                <option value="3">Option 3</option>
+                <option value="4">Option 4</option>
+              </Select>
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Solution Text</FormLabel>
+              <Textarea
+                placeholder="Enter Solution Text"
+                value={newSolutionText}
+                onChange={(e) => setNewSolutionText(e.target.value)}
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="gray"
+              mr={3}
+              onClick={() => {
+                setIsAddQuestionModalOpen(false);
+                resetAddQuestionForm();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button colorScheme="blue" onClick={handleAddQuestion}>
+              Add Question
             </Button>
           </ModalFooter>
         </ModalContent>

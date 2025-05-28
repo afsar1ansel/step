@@ -271,19 +271,7 @@ const fetchDetail = async (url: string) => {
     onEditModalOpen();
   };
 
- 
-//   {
-//     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoiOC15YXNoQGdtYWlsLmNvbS0yMDI1MDUyMTE5NDYwMiJ9.Kla-HA-MqUxgY3Ko3j3QsFspZVmT_vUX2hQbbBVtaRM",
-//     "notesTitle": "title",
-//     "notesDescription": "notes description",
-//     "noOfPages": "2",
-//     "courseId": "1",
-//     "subjectId": "1",
-//     "pdfFile": {
-//         "path": "./Übersetzung User App.pdf",
-//         "relativePath": "./Übersetzung User App.pdf"
-//     }
-// }
+
   const handleAddStudent = () => {
 
     const token = localStorage.getItem("token") ?? "";

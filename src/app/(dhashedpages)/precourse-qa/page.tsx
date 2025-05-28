@@ -22,6 +22,7 @@ import {
   Textarea,
   HStack,
 } from "@chakra-ui/react";
+import EditorComponent from "@/app/componant/editor";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -53,6 +54,8 @@ const precourseqa = () => {
   const [newCorrectOption, setNewCorrectOption] = useState("");
   const [newSolutionText, setNewSolutionText] = useState("");
   const [newTestId, setNewTestId] = useState("");
+
+  const [newQuestionData, setNewQuestionData] = useState<any>({ blocks: [] });
 
   const toast = useToast();
 
@@ -289,7 +292,7 @@ const precourseqa = () => {
       form.append("token", localStorage.getItem("token") ?? "");
       form.append("preCourseTestId", newTestId);
       form.append("questionNo", newQuestionNo);
-      form.append("question", newQuestion);
+      form.append("question", JSON.stringify(newQuestionData));
       form.append("solutionText", newSolutionText);
       form.append("correctOption", newCorrectOption);
       form.append("option1", newOption1);
@@ -580,10 +583,10 @@ const precourseqa = () => {
             </FormControl>
             <FormControl mt={4}>
               <FormLabel>Question</FormLabel>
-              <Input
-                placeholder="Enter Question"
-                value={newQuestion}
-                onChange={(e) => setNewQuestion(e.target.value)}
+              <EditorComponent
+                data={newQuestionData}
+                onChange={setNewQuestionData}
+                holder="add-question-editor"
               />
             </FormControl>
             <FormControl mt={4}>
