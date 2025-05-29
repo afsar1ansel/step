@@ -1,5 +1,8 @@
 "use client";
-
+import dynamic from "next/dynamic";
+const EditorComponent = dynamic(() => import("@/app/componant/editor"), {
+  ssr: false,
+});
 import { AgGridReact } from "ag-grid-react";
 import React, { useEffect, useState } from "react";
 import type { ColDef } from "ag-grid-community";
@@ -22,7 +25,7 @@ import {
   Textarea,
   HStack,
 } from "@chakra-ui/react";
-import EditorComponent from "@/app/componant/editor";
+
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
