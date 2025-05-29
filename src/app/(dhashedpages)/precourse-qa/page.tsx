@@ -116,6 +116,48 @@ const precourseqa = () => {
     {
       field: "question",
       headerName: "Question",
+      editable: false,
+      cellRenderer: (params: any) => {
+        const isJson = (str: string) => {
+          try {
+            const parsed = JSON.parse(str);
+            // Optionally check for structure, e.g., if it has expected keys
+            return typeof parsed === "object" && parsed !== null;
+          } catch (e) {
+            return false;
+          }
+        };
+
+        const questionData = params.data.question;
+
+        if (typeof questionData === "string" && isJson(questionData)) {
+          const parsedData = JSON.parse(questionData);
+          return (
+            <EditorComponent
+              data={parsedData}
+              onChange={(data: any) => {
+                params.data.question = JSON.stringify(data);
+              }}
+              // readOnlytoggle={true}
+              holder="add-question-editor"
+            />
+          );
+        } else {
+          return (
+            <div
+              style={{
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
+                overflow: "auto",
+                maxHeight: "200px", // optional: scroll if too tall
+              }}
+            >
+              {questionData}
+            </div>
+          );
+        }
+      },
     },
     {
       headerName: "Option 1",
@@ -222,7 +264,8 @@ const precourseqa = () => {
   const handleEdit = (data: any) => {
     console.log(data);
     setQuestionNo(data.question_no);
-    setEditQuestion(data.question);
+    setEditQuestion(JSON.parse(data.question));
+    console.log(JSON.parse(data.question));
     setQuestionId(data.question_id);
     setOption1(data.options[0].option_text);
     setOption2(data.options[1].option_text);
@@ -366,7 +409,8 @@ const precourseqa = () => {
       form.append("token", localStorage.getItem("token") ?? "");
       form.append("preCourseTestId", testId);
       form.append("questionNo", questionNo);
-      form.append("question", editQuestion);
+      // form.append("question", editQuestion);
+      form.append("question", JSON.stringify(editQuestion));
       form.append("solutionText", solutionText);
       form.append("correctOption", correctOption);
       form.append("option1", option1);
@@ -455,7 +499,7 @@ const precourseqa = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          border: "1px solid black",
+          // border: "1px solid black",
         }}
       >
         <p style={{ fontSize: "16px", fontWeight: "600" }}>Course Data</p>
@@ -497,6 +541,18 @@ const precourseqa = () => {
               debounceMs: 0,
               buttons: ["reset"],
             },
+          }}
+          domLayout="autoHeight"
+          getRowHeight={(params : any) => {
+            // console.log({ params });
+            return (
+              150
+            )
+            // if (params?.data.sub_category_data.length > 1) {
+            //   return params.data.sub_category_data.length * 45;
+            // } else {
+            //   return 80;
+            // }
           }}
           suppressCellFocus={true}
         />
@@ -583,11 +639,13 @@ const precourseqa = () => {
             </FormControl>
             <FormControl mt={4}>
               <FormLabel>Question</FormLabel>
-              <EditorComponent
-                data={newQuestionData}
-                onChange={setNewQuestionData}
-                holder="add-question-editor"
-              />
+              <div style={{ border: "1px solid #ccc", padding: "10px" }}>
+                <EditorComponent
+                  data={newQuestionData}
+                  onChange={setNewQuestionData}
+                  holder="add-question-editor"
+                />
+              </div>
             </FormControl>
             <FormControl mt={4}>
               <FormLabel>Option 1</FormLabel>
@@ -671,10 +729,10 @@ const precourseqa = () => {
             </FormControl>
             <FormControl mt={4}>
               <FormLabel>Question</FormLabel>
-              <Input
-                placeholder="Enter Question"
-                value={editQuestion}
-                onChange={(e) => setEditQuestion(e.target.value)}
+              <EditorComponent
+                data={editQuestion}
+                onChange={setEditQuestion}
+                holder="add-question-editor"
               />
             </FormControl>
             <FormControl mt={4}>
