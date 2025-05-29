@@ -20,6 +20,7 @@ import {
   Select,
   useToast,
   Textarea,
+  HStack,
 } from "@chakra-ui/react";
 import EditorComponent from "@/app/componant/editor";
 
@@ -123,11 +124,11 @@ const postcourseqa = () => {
       field: "question",
       headerName: "Question",
       editable: false,
+      flex: 2,
       cellRenderer: (params: any) => {
         const isJson = (str: string) => {
           try {
             const parsed = JSON.parse(str);
-            // Optionally check for structure, e.g., if it has expected keys
             return typeof parsed === "object" && parsed !== null;
           } catch (e) {
             return false;
@@ -135,16 +136,23 @@ const postcourseqa = () => {
         };
 
         const questionData = params.data.question;
-        
 
         if (typeof questionData === "string" && isJson(questionData)) {
           const parsedData = JSON.parse(questionData);
           return (
-            <EditorComponent
-              data={parsedData}
-              readOnly={true}
-              holder="readOnly-question-editor"
-            />
+            <div
+              style={{
+                height: "400px",
+                overflow: "auto",
+                scrollbarWidth: "none",
+              }}
+            >
+              <EditorComponent
+                data={parsedData}
+                readOnly={true}
+                holder="readOnly-question-editor"
+              />
+            </div>
           );
         } else {
           return (
@@ -154,7 +162,8 @@ const postcourseqa = () => {
                 wordWrap: "break-word",
                 overflowWrap: "break-word",
                 overflow: "auto",
-                maxHeight: "200px", // optional: scroll if too tall
+                scrollbarWidth: "none",
+                padding: "8px",
               }}
             >
               {questionData}
@@ -162,64 +171,155 @@ const postcourseqa = () => {
           );
         }
       },
+      cellStyle: {
+        height: "100%",
+        padding: "8px",
+      },
+      autoHeight: true,
     },
     {
       headerName: "Option 1",
       filter: false,
+      flex: 1,
       valueGetter: (params) => params.data.options?.[0]?.option_text,
-      cellStyle: (params) => ({
-        backgroundColor: params.data.options?.[0]?.correct_option
-          ? "#e6f7e6"
-          : "white",
-      }),
-      // width: 150,
+      cellRenderer: (params: any) => {
+        const optionText = params.data.options?.[0]?.option_text || "";
+        return (
+          <div
+            style={{
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              overflow: "auto",
+              height: "100%",
+              scrollbarWidth: "none",
+              padding: "8px",
+              backgroundColor: params.data.options?.[0]?.correct_option
+                ? "#e6f7e6"
+                : "transparent",
+            }}
+          >
+            {optionText}
+          </div>
+        );
+      },
     },
     {
       headerName: "Option 2",
       filter: false,
+      flex: 1,
       valueGetter: (params) => params.data.options?.[1]?.option_text,
-      cellStyle: (params) => ({
-        backgroundColor: params.data.options?.[1]?.correct_option
-          ? "#e6f7e6"
-          : "white",
-      }),
-      // width: 150,
+      cellRenderer: (params: any) => {
+        const optionText = params.data.options?.[1]?.option_text || "";
+        return (
+          <div
+            style={{
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              overflow: "auto",
+              height: "100%",
+              scrollbarWidth: "none",
+              padding: "8px",
+              backgroundColor: params.data.options?.[1]?.correct_option
+                ? "#e6f7e6"
+                : "transparent",
+            }}
+          >
+            {optionText}
+          </div>
+        );
+      },
     },
     {
       headerName: "Option 3",
       filter: false,
+      flex: 1,
       valueGetter: (params) => params.data.options?.[2]?.option_text,
-      cellStyle: (params) => ({
-        backgroundColor: params.data.options?.[2]?.correct_option
-          ? "#e6f7e6"
-          : "white",
-      }),
-      // width: 150,
+      cellRenderer: (params: any) => {
+        const optionText = params.data.options?.[2]?.option_text || "";
+        return (
+          <div
+            style={{
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              overflow: "auto",
+              height: "100%",
+              scrollbarWidth: "none",
+              padding: "8px",
+              backgroundColor: params.data.options?.[2]?.correct_option
+                ? "#e6f7e6"
+                : "transparent",
+            }}
+          >
+            {optionText}
+          </div>
+        );
+      },
     },
     {
       headerName: "Option 4",
       filter: false,
+      flex: 1,
       valueGetter: (params) => params.data.options?.[3]?.option_text,
-      cellStyle: (params) => ({
-        backgroundColor: params.data.options?.[3]?.correct_option
-          ? "#e6f7e6"
-          : "white",
-      }),
-      // width: 150,
+      cellRenderer: (params: any) => {
+        const optionText = params.data.options?.[3]?.option_text || "";
+        return (
+          <div
+            style={{
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              overflow: "auto",
+              height: "100%",
+              scrollbarWidth: "none",
+              padding: "8px",
+              backgroundColor: params.data.options?.[3]?.correct_option
+                ? "#e6f7e6"
+                : "transparent",
+            }}
+          >
+            {optionText}
+          </div>
+        );
+      },
+      cellStyle: {
+        height: "100%",
+        padding: "0px",
+      },
     },
     {
       field: "solution_text",
       headerName: "Solution Text",
       filter: false,
-      cellStyle: { backgroundColor: "white" },
+      flex: 2,
+      cellRenderer: (params: any) => {
+        const solutionText = params.data.solution_text || "";
+        return (
+          <div
+            style={{
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              overflow: "auto",
+              height: "100%",
+              scrollbarWidth: "none",
+              padding: "8px",
+              backgroundColor: "transparent",
+            }}
+          >
+            {solutionText}
+          </div>
+        );
+      },
     },
     {
       field: "question_id",
       headerName: "Actions",
+      maxWidth: 100,
       filter: false,
-      cellStyle: { backgroundColor: "white" },
       cellRenderer: (params: any) => {
-        // console.log(params)
         return (
           <div
             style={{
@@ -502,16 +602,18 @@ const postcourseqa = () => {
                 </option>
               ))}
           </Select>
-          <Button onClick={onAddModalOpen} colorScheme="green">
-            Add test
-          </Button>
-          <Button
-            onClick={() => setIsAddQuestionModalOpen(true)}
-            colorScheme="blue"
-            px={6}
-          >
-            Add Question
-          </Button>
+          <HStack spacing={4}>
+            <Button
+              onClick={() => setIsAddQuestionModalOpen(true)}
+              colorScheme="blue"
+              px={6}
+            >
+              Add Question
+            </Button>
+            <Button onClick={onAddModalOpen} colorScheme="green">
+              Add test
+            </Button>
+          </HStack>
         </div>
       </div>
       <div style={{ height: "100%", width: "100%" }}>
@@ -520,6 +622,7 @@ const postcourseqa = () => {
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={10}
+          paginationPageSizeSelector={[10, 20, 30]}
           defaultColDef={{
             sortable: true,
             filter: true,
@@ -530,6 +633,16 @@ const postcourseqa = () => {
               debounceMs: 0,
               buttons: ["reset"],
             },
+          }}
+          domLayout="autoHeight"
+          getRowHeight={(params: any) => {
+            // console.log({ params });
+            return 300;
+            // if (params?.data.sub_category_data.length > 1) {
+            //   return params.data.sub_category_data.length * 45;
+            // } else {
+            //   return 80;
+            // }
           }}
           suppressCellFocus={true}
         />
@@ -581,7 +694,7 @@ const postcourseqa = () => {
       </Modal>
 
       {/* Edit Course Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={onEditModalClose}>
+      <Modal isOpen={isEditModalOpen} onClose={onEditModalClose} size={"xl"}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Course</ModalHeader>
