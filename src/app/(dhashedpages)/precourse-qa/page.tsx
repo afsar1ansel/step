@@ -117,11 +117,11 @@ const precourseqa = () => {
       field: "question",
       headerName: "Question",
       editable: false,
+      flex: 2,
       cellRenderer: (params: any) => {
         const isJson = (str: string) => {
           try {
             const parsed = JSON.parse(str);
-            // Optionally check for structure, e.g., if it has expected keys
             return typeof parsed === "object" && parsed !== null;
           } catch (e) {
             return false;
@@ -133,11 +133,19 @@ const precourseqa = () => {
         if (typeof questionData === "string" && isJson(questionData)) {
           const parsedData = JSON.parse(questionData);
           return (
-            <EditorComponent
-              data={parsedData}
-              readOnly={true}
-              holder="readOnly-question-editor"
-            />
+            <div
+              style={{
+                height: "400px",
+                overflow: "auto",
+                scrollbarWidth: "none",
+              }}
+            >
+              <EditorComponent
+                data={parsedData}
+                readOnly={true}
+                holder="readOnly-question-editor"
+              />
+            </div>
           );
         } else {
           return (
@@ -147,7 +155,8 @@ const precourseqa = () => {
                 wordWrap: "break-word",
                 overflowWrap: "break-word",
                 overflow: "auto",
-                maxHeight: "200px", // optional: scroll if too tall
+                scrollbarWidth: "none",
+                padding: "8px",
               }}
             >
               {questionData}
@@ -155,58 +164,154 @@ const precourseqa = () => {
           );
         }
       },
+      cellStyle: {
+        height: "100%",
+        padding: "8px",
+      },
+      autoHeight: true,
     },
     {
       headerName: "Option 1",
       filter: false,
+      flex: 1,
       valueGetter: (params) => params.data.options?.[0]?.option_text,
-      cellStyle: (params) => ({
-        backgroundColor: params.data.options?.[0]?.correct_option
-          ? "#e6f7e6"
-          : "white",
-      }),
+      cellRenderer: (params: any) => {
+        const optionText = params.data.options?.[0]?.option_text || "";
+        return (
+          <div
+            style={{
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              overflow: "auto",
+              height: "100%",
+              scrollbarWidth: "none",
+              padding: "8px",
+              backgroundColor: params.data.options?.[0]?.correct_option
+                ? "#e6f7e6"
+                : "transparent",
+            }}
+          >
+            {optionText}
+          </div>
+        );
+      },
     },
     {
       headerName: "Option 2",
       filter: false,
+      flex: 1,
       valueGetter: (params) => params.data.options?.[1]?.option_text,
-      cellStyle: (params) => ({
-        backgroundColor: params.data.options?.[1]?.correct_option
-          ? "#e6f7e6"
-          : "white",
-      }),
+      cellRenderer: (params: any) => {
+        const optionText = params.data.options?.[1]?.option_text || "";
+        return (
+          <div
+            style={{
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              overflow: "auto",
+              height: "100%",
+              scrollbarWidth: "none",
+              padding: "8px",
+              backgroundColor: params.data.options?.[1]?.correct_option
+                ? "#e6f7e6"
+                : "transparent",
+            }}
+          >
+            {optionText}
+          </div>
+        );
+      },
     },
     {
       headerName: "Option 3",
       filter: false,
+      flex: 1,
       valueGetter: (params) => params.data.options?.[2]?.option_text,
-      cellStyle: (params) => ({
-        backgroundColor: params.data.options?.[2]?.correct_option
-          ? "#e6f7e6"
-          : "white",
-      }),
+      cellRenderer: (params: any) => {
+        const optionText = params.data.options?.[2]?.option_text || "";
+        return (
+          <div
+            style={{
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              overflow: "auto",
+              height: "100%",
+              scrollbarWidth: "none",
+              padding: "8px",
+              backgroundColor: params.data.options?.[2]?.correct_option
+                ? "#e6f7e6"
+                : "transparent",
+            }}
+          >
+            {optionText}
+          </div>
+        );
+      },
     },
     {
       headerName: "Option 4",
       filter: false,
+      flex: 1,
       valueGetter: (params) => params.data.options?.[3]?.option_text,
-      cellStyle: (params) => ({
-        backgroundColor: params.data.options?.[3]?.correct_option
-          ? "#e6f7e6"
-          : "white",
-      }),
+      cellRenderer: (params: any) => {
+        const optionText = params.data.options?.[3]?.option_text || "";
+        return (
+          <div
+            style={{
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              overflow: "auto",
+              height: "100%",
+              scrollbarWidth: "none",
+              padding: "8px",
+              backgroundColor: params.data.options?.[3]?.correct_option
+                ? "#e6f7e6"
+                : "transparent",
+            }}
+          >
+            {optionText}
+          </div>
+        );
+      },
+      cellStyle: {
+        height: "100%",
+        padding: "0px",
+      },
     },
     {
       field: "solution_text",
       headerName: "Solution Text",
       filter: false,
-      cellStyle: { backgroundColor: "white" },
+      flex: 2,
+      cellRenderer: (params: any) => {
+        const solutionText = params.data.solution_text || "";
+        return (
+          <div
+            style={{
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+              overflow: "auto",
+              height: "100%",
+              scrollbarWidth: "none",
+              padding: "8px",
+              backgroundColor: "transparent",
+            }}
+          >
+            {solutionText}
+          </div>
+        );
+      },
     },
     {
       field: "question_id",
       headerName: "Actions",
+      maxWidth: 100,
       filter: false,
-      cellStyle: { backgroundColor: "white" },
       cellRenderer: (params: any) => {
         return (
           <div
@@ -528,6 +633,7 @@ const precourseqa = () => {
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={10}
+          paginationPageSizeSelector={[10, 20, 30]}
           defaultColDef={{
             sortable: true,
             filter: true,
@@ -540,11 +646,9 @@ const precourseqa = () => {
             },
           }}
           domLayout="autoHeight"
-          getRowHeight={(params : any) => {
+          getRowHeight={(params: any) => {
             // console.log({ params });
-            return (
-              150
-            )
+            return 300;
             // if (params?.data.sub_category_data.length > 1) {
             //   return params.data.sub_category_data.length * 45;
             // } else {
@@ -727,11 +831,11 @@ const precourseqa = () => {
             <FormControl mt={4}>
               <FormLabel>Question</FormLabel>
               <div style={{ border: "1px solid #ccc", padding: "10px" }}>
-              <EditorComponent
-                data={editQuestion}
-                onChange={setEditQuestion}
-                holder="add-question-editor"
-              />
+                <EditorComponent
+                  data={editQuestion}
+                  onChange={setEditQuestion}
+                  holder="edit-question-editor"
+                />
               </div>
             </FormControl>
             <FormControl mt={4}>
