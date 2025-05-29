@@ -10,12 +10,13 @@ import Table from "@editorjs/table";
 import Quote from "@editorjs/quote";
 import InlineCode from "@editorjs/inline-code";
 import Paragraph from "@editorjs/paragraph";
+import { read } from "fs";
 
 interface EditorComponentProps {
   data?: any;
-  onChange: (data: any) => void;
+  onChange?: (data: any) => void;
   holder: string;
-  // readOnlytoggle?: boolean;
+  readOnly?: boolean;
 }
 
 const dummy = {
@@ -86,7 +87,7 @@ const dummy = {
   version: "2.31.0-rc.7",
 };
 
-const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
+const EditorComponent = ({ data, onChange, holder , readOnly }: EditorComponentProps) => {
   const editorRef = useRef<EditorJS | null>(null);
 
   useEffect(() => {
@@ -104,7 +105,7 @@ const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
   const initEditor = () => {
     const editor = new EditorJS({
       holder: holder,
-      // readOnly: readOnlytoggle || false,
+      readOnly: readOnly,
       tools: {
         header: {
           class: Header as any,

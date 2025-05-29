@@ -135,11 +135,8 @@ const precourseqa = () => {
           return (
             <EditorComponent
               data={parsedData}
-              onChange={(data: any) => {
-                params.data.question = JSON.stringify(data);
-              }}
-              // readOnlytoggle={true}
-              holder="add-question-editor"
+              readOnly={true}
+              holder="readOnly-question-editor"
             />
           );
         } else {
@@ -729,11 +726,13 @@ const precourseqa = () => {
             </FormControl>
             <FormControl mt={4}>
               <FormLabel>Question</FormLabel>
+              <div style={{ border: "1px solid #ccc", padding: "10px" }}>
               <EditorComponent
                 data={editQuestion}
                 onChange={setEditQuestion}
                 holder="add-question-editor"
               />
+              </div>
             </FormControl>
             <FormControl mt={4}>
               <FormLabel>Option 1</FormLabel>

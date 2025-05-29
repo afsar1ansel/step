@@ -122,8 +122,46 @@ const postcourseqa = () => {
     {
       field: "question",
       headerName: "Question",
-      // width: 250,
-      // filter: true,
+      editable: false,
+      cellRenderer: (params: any) => {
+        const isJson = (str: string) => {
+          try {
+            const parsed = JSON.parse(str);
+            // Optionally check for structure, e.g., if it has expected keys
+            return typeof parsed === "object" && parsed !== null;
+          } catch (e) {
+            return false;
+          }
+        };
+
+        const questionData = params.data.question;
+        
+
+        if (typeof questionData === "string" && isJson(questionData)) {
+          const parsedData = JSON.parse(questionData);
+          return (
+            <EditorComponent
+              data={parsedData}
+              readOnly={true}
+              holder="readOnly-question-editor"
+            />
+          );
+        } else {
+          return (
+            <div
+              style={{
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
+                overflow: "auto",
+                maxHeight: "200px", // optional: scroll if too tall
+              }}
+            >
+              {questionData}
+            </div>
+          );
+        }
+      },
     },
     {
       headerName: "Option 1",
@@ -229,7 +267,7 @@ const postcourseqa = () => {
     console.log(data);
     //  setpostCourseTestQuestionsMasterId(data.question_id);
     setquestionNo(data.question_no);
-    setEditQuestion(data.question);
+    setEditQuestion(JSON.parse(data.question));
     setQuestionId(data.question_id);
     setOption1(data.options[0].option_text);
     setOption2(data.options[1].option_text);
@@ -294,7 +332,7 @@ const postcourseqa = () => {
       // form.append("postCourseTestQuestionsMasterId", postCourseTestQuestionsMasterId);
       form.append("postCourseTestId", testId);
       form.append("questionNo", questionNo);
-      form.append("question", editQuestion);
+      form.append("question", JSON.stringify(editQuestion));
       form.append("option1", option1);
       form.append("option2", option2);
       form.append("option3", option3);
@@ -373,8 +411,8 @@ const postcourseqa = () => {
       form.append("token", localStorage.getItem("token") ?? "");
       form.append("postCourseTestId", newTestId);
       form.append("questionNo", newQuestionNo);
-      form.append("question", newQuestionData);
-      // form.append("question", JSON.stringify(newQuestionData));
+      // form.append("question", newQuestionData);
+      form.append("question", JSON.stringify(newQuestionData));
       form.append("solutionText", newSolutionText);
       form.append("correctOption", newCorrectOption);
       form.append("option1", newOption1);
@@ -549,13 +587,24 @@ const postcourseqa = () => {
           <ModalHeader>Edit Course</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            <FormControl mt={4}>
+              <FormLabel>Question No</FormLabel>
+              <Input
+                placeholder="Enter Question Number"
+                value={questionNo}
+                onChange={(e) => setquestionNo(e.target.value)}
+              />
+            </FormControl>
             <FormControl>
               <FormLabel>Question</FormLabel>
-              <Input
-                placeholder="Enter Question"
-                value={editQuestion}
-                onChange={(e) => setEditQuestion(e.target.value)}
-              />
+              <div style={{ border: "1px solid #ccc", padding: "10px" }}>
+                <EditorComponent
+                  data={editQuestion}
+                  onChange={setEditQuestion}
+                  holder="edit-question-editor"
+                  readOnly={false}
+                />
+              </div>
             </FormControl>
             <FormControl>
               <FormLabel>Option 1</FormLabel>
@@ -660,16 +709,13 @@ const postcourseqa = () => {
             </FormControl>
             <FormControl mt={4}>
               <FormLabel>Question</FormLabel>
-              <EditorComponent
-                data={newQuestionData}
-                onChange={setNewQuestionData}
-                holder="add-question-editor"
-              />
-              {/* <Input
-                placeholder="Enter Question"
-                value={newQuestion}
-                onChange={(e) => setNewQuestion(e.target.value)}
-              /> */}
+              <div style={{ border: "1px solid #ccc", padding: "10px" }}>
+                <EditorComponent
+                  data={newQuestionData}
+                  onChange={setNewQuestionData}
+                  holder="add-question-editor"
+                />
+              </div>
             </FormControl>
             <FormControl mt={4}>
               <FormLabel>Option 1</FormLabel>
