@@ -135,6 +135,7 @@ const precourseqa = () => {
 
         if (typeof questionData === "string" && isJson(questionData)) {
           const parsedData = JSON.parse(questionData);
+          const header = `Questioneditor: ${params.data.question_no}`;
           return (
             <div
               style={{
@@ -146,7 +147,7 @@ const precourseqa = () => {
               <EditorComponent
                 data={parsedData}
                 readOnly={true}
-                holder="readOnly-question-editor"
+                holder={header}
               />
             </div>
           );

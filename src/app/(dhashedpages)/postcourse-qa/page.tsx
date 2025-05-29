@@ -27,7 +27,6 @@ import {
   HStack,
 } from "@chakra-ui/react";
 
-
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const postcourseqa = () => {
@@ -143,6 +142,7 @@ const postcourseqa = () => {
 
         if (typeof questionData === "string" && isJson(questionData)) {
           const parsedData = JSON.parse(questionData);
+          const header = `Questioneditor: ${params.data.question_no}`;
           return (
             <div
               style={{
@@ -154,7 +154,7 @@ const postcourseqa = () => {
               <EditorComponent
                 data={parsedData}
                 readOnly={true}
-                holder="readOnly-question-editor"
+                holder={header}
               />
             </div>
           );
@@ -554,8 +554,7 @@ const postcourseqa = () => {
           isClosable: true,
           position: "top",
         });
-        resetAddQuestionForm();
-        setIsAddQuestionModalOpen(false); // Only close on success
+        handleAddQuestionModalClose();
       } else {
         toast({
           title: "Error adding question.",
@@ -577,6 +576,11 @@ const postcourseqa = () => {
         position: "top",
       });
     }
+  };
+
+  const handleAddQuestionModalClose = () => {
+    setIsAddQuestionModalOpen(false);
+    resetAddQuestionForm();
   };
 
   return (
@@ -790,10 +794,7 @@ const postcourseqa = () => {
       {/* Add Question Modal */}
       <Modal
         isOpen={isAddQuestionModalOpen}
-        onClose={() => {
-          setIsAddQuestionModalOpen(false);
-          resetAddQuestionForm();
-        }}
+        onClose={handleAddQuestionModalClose}
         size="xl"
       >
         <ModalOverlay />
@@ -892,10 +893,7 @@ const postcourseqa = () => {
             <Button
               colorScheme="gray"
               mr={3}
-              onClick={() => {
-                setIsAddQuestionModalOpen(false);
-                resetAddQuestionForm();
-              }}
+              onClick={handleAddQuestionModalClose}
             >
               Cancel
             </Button>
