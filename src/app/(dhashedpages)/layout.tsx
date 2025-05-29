@@ -20,6 +20,7 @@ import { FaUserEdit } from "react-icons/fa";
 import { GrNotes } from "react-icons/gr";
 import { CiBoxList } from "react-icons/ci";
 import { FaRegImages } from "react-icons/fa6";
+import { GrTestDesktop } from "react-icons/gr";
 
 import { MdLogout } from "react-icons/md";
 
@@ -68,7 +69,8 @@ type NavItem =
   | "test"
   | "precourse-qa"
   | "postcourse-test"
-  | "postcourse-qa";
+  | "postcourse-qa"
+  | "ExamModule";
 
 export default function RootLayout({
   children,
@@ -428,6 +430,12 @@ export default function RootLayout({
                           </AccordionPanel>
                         </AccordionItem>
                       </Accordion>
+                    </li>
+                    <li className={active === "ExamModule" ? "active" : ""}>
+                      <GrTestDesktop />
+                      <Link href="/ExamModule">
+                        <p className="linkname">Exam Module</p>
+                      </Link>
                     </li>
                     <li className={active === "BannerMaster" ? "active" : ""}>
                       <FaRegImages />
