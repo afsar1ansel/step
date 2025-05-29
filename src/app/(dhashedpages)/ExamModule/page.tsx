@@ -384,52 +384,52 @@ const ExamModule = () => {
     onEditModalOpen();
   };
 
-  const handleAddExam = async () => {
-    try {
-      const form = new FormData();
-      form.append("token", localStorage.getItem("token") ?? "");
-      form.append("sheetId", sheetId);
-      form.append("sheetName", SheetName);
-      form.append("preCourseTestId", testIdAdd);
+  // const handleAddExam = async () => {
+  //   try {
+  //     const form = new FormData();
+  //     form.append("token", localStorage.getItem("token") ?? "");
+  //     form.append("sheetId", sheetId);
+  //     form.append("sheetName", SheetName);
+  //     form.append("preCourseTestId", testIdAdd);
 
-      console.log(Object.fromEntries(form));
+  //     console.log(Object.fromEntries(form));
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/pre-course-test/fetch-questions`,
-        {
-          method: "POST",
-          body: form,
-        }
-      );
-      const responseData = await response.json();
-      console.log(responseData);
+  //     const response = await fetch(
+  //       `${process.env.NEXT_PUBLIC_BASE_URL}/masters/pre-course-test/fetch-questions`,
+  //       {
+  //         method: "POST",
+  //         body: form,
+  //       }
+  //     );
+  //     const responseData = await response.json();
+  //     console.log(responseData);
 
-      if (responseData.errFlag == 0) {
-        toast({
-          title: "Test added successfully.",
-          description: responseData.message,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-          position: "top",
-        });
-      } else {
-        toast({
-          title: "Error adding test.",
-          description: responseData.message,
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-          position: "top",
-        });
-      }
-    } catch (error) {
-      console.error("Error adding Test:", error);
-    } finally {
-      resetForm();
-      onAddModalClose();
-    }
-  };
+  //     if (responseData.errFlag == 0) {
+  //       toast({
+  //         title: "Test added successfully.",
+  //         description: responseData.message,
+  //         status: "success",
+  //         duration: 3000,
+  //         isClosable: true,
+  //         position: "top",
+  //       });
+  //     } else {
+  //       toast({
+  //         title: "Error adding test.",
+  //         description: responseData.message,
+  //         status: "error",
+  //         duration: 3000,
+  //         isClosable: true,
+  //         position: "top",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error adding Test:", error);
+  //   } finally {
+  //     resetForm();
+  //     onAddModalClose();
+  //   }
+  // };
 
   const handleAddQuestion = async () => {
     try {
@@ -621,9 +621,9 @@ const ExamModule = () => {
             <Button onClick={onAddQuestionModalOpen} colorScheme="blue" px={6}>
               Add Question
             </Button>
-            <Button onClick={onAddModalOpen} colorScheme="green" px={6}>
+            {/* <Button onClick={onAddModalOpen} colorScheme="green" px={6}>
               Add exam
-            </Button>
+            </Button> */}
           </HStack>
         </div>
       </div>
@@ -660,10 +660,10 @@ const ExamModule = () => {
       </div>
 
       {/* Add Test Modal (from Google Sheet) */}
-      <Modal isOpen={isAddModalOpen} onClose={onAddModalClose}>
+      {/* <Modal isOpen={isAddModalOpen} onClose={onAddModalClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Insert Test Questions from Google Sheet</ModalHeader>
+          <ModalHeader>Insert Exam Questions from Google Sheet</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl>
@@ -702,7 +702,7 @@ const ExamModule = () => {
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
+      </Modal> */}
 
       {/* Add Question Modal */}
       <Modal
