@@ -20,16 +20,15 @@ interface EditorComponentProps {
 }
 
 const dummy = {
-  time: 1748503092233,
+  time: 1748582727919,
   blocks: [
-    { id: "oWf_PutRxA", type: "paragraph", data: { text: "question text" } },
     {
-      id: "Rxq8MQ0h34",
-      type: "header",
-      data: { text: "question heading", level: 3 },
+      id: "SUWx1nxZV0",
+      type: "paragraph",
+      data: { text: "question one"},
     },
     {
-      id: "5kybGH89q2",
+      id: "flWI-cNqyw",
       type: "image",
       data: {
         caption: "",
@@ -37,57 +36,20 @@ const dummy = {
         withBackground: false,
         stretched: false,
         file: {
-          url: "https://stepgha.blr1.cdn.digitaloceanspaces.com/qa_pre_post_te/editpanel_2025-05-29_12-46-21_web.jpg",
+          url: "https://stepgha.blr1.cdn.digitaloceanspaces.com/qa_pre_post_te/editpanel_2025-05-30_10-55-22_web.jpg",
         },
-      },
-    },
-    {
-      id: "nExw5jHzgS",
-      type: "list",
-      data: {
-        style: "unordered",
-        meta: {},
-        items: [
-          { content: "list unordered", meta: {}, items: [] },
-          { content: "one and two", meta: {}, items: [] },
-        ],
-      },
-    },
-    {
-      id: "HRbHlqZUa-",
-      type: "list",
-      data: {
-        style: "ordered",
-        meta: { counterType: "numeric" },
-        items: [
-          {
-            content: "list ordred ",
-            meta: {},
-            items: [
-              { content: "second ordered listh", meta: {}, items: [] },
-              { content: "new", meta: {}, items: [] },
-            ],
-          },
-        ],
-      },
-    },
-    {
-      id: "0kckZ9MzeL",
-      type: "table",
-      data: {
-        withHeadings: false,
-        stretched: false,
-        content: [
-          ["heading", "new head", "head"],
-          ["h1", "h2&nbsp;", "h3"],
-        ],
       },
     },
   ],
   version: "2.31.0-rc.7",
 };
 
-const EditorComponent = ({ data, onChange, holder , readOnly }: EditorComponentProps) => {
+const EditorComponent = ({
+  data,
+  onChange,
+  holder,
+  readOnly,
+}: EditorComponentProps) => {
   const editorRef = useRef<EditorJS | null>(null);
 
   useEffect(() => {
@@ -107,18 +69,18 @@ const EditorComponent = ({ data, onChange, holder , readOnly }: EditorComponentP
       holder: holder,
       readOnly: readOnly,
       tools: {
-        header: {
-          class: Header as any,
-          config: {
-            placeholder: "Enter a header",
-            levels: [1, 2, 3, 4],
-            defaultLevel: 3,
-          },
-        },
-        list: {
-          class: List as any,
-          inlineToolbar: true,
-        },
+        // header: {
+        //   class: Header as any,
+        //   config: {
+        //     placeholder: "Enter a header",
+        //     levels: [1, 2, 3, 4],
+        //     defaultLevel: 3,
+        //   },
+        // },
+        // list: {
+        //   class: List as any,
+        //   inlineToolbar: true,
+        // },
         image: {
           class: ImageTool,
           config: {
@@ -182,25 +144,26 @@ const EditorComponent = ({ data, onChange, holder , readOnly }: EditorComponentP
             },
           },
         },
-        table: {
-          class: Table as any,
-          inlineToolbar: true,
-        },
-        quote: {
-          class: Quote,
-          inlineToolbar: true,
-        },
-        inlineCode: {
-          class: InlineCode,
-        },
-        paragraph: {
-          class: Paragraph as any,
-          inlineToolbar: true,
-        },
+        // table: {
+        //   class: Table as any,
+        //   inlineToolbar: true,
+        // },
+        // quote: {
+        //   class: Quote,
+        //   inlineToolbar: true,
+        // },
+        // inlineCode: {
+        //   class: InlineCode,
+        // },
+        // paragraph: {
+        //   class: Paragraph as any,
+        //   inlineToolbar: true,
+        // },
       },
       data: data || { blocks: [] },
       async onChange(api) {
         const content = await api.saver.save();
+        console.log("Editor content changed:", content);
         if (onChange) {
           onChange(content);
         }

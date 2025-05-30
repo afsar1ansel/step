@@ -295,27 +295,57 @@ const postcourseqa = () => {
     },
     {
       field: "solution_text",
-      headerName: "Solution Text",
+      headerName: "Solution",
       filter: false,
       flex: 2,
       cellRenderer: (params: any) => {
-        const solutionText = params.data.solution_text || "";
-        return (
-          <div
-            style={{
-              whiteSpace: "pre-wrap",
-              wordWrap: "break-word",
-              overflowWrap: "break-word",
-              overflow: "auto",
-              height: "100%",
-              scrollbarWidth: "none",
-              padding: "8px",
-              backgroundColor: "transparent",
-            }}
-          >
-            {solutionText}
-          </div>
-        );
+        const isJson = (str: string) => {
+          try {
+            const parsed = JSON.parse(str);
+            return typeof parsed === "object" && parsed !== null;
+          } catch (e) {
+            return false;
+          }
+        };
+
+        const solutionData = params.data.solution_text;
+
+        if (typeof solutionData === "string" && isJson(solutionData)) {
+          const parsedData = JSON.parse(solutionData);
+          const header = `SolutionEditor: ${params.data.question_no}`;
+          return (
+            <div
+              style={{
+                height: "400px",
+                overflow: "auto",
+                scrollbarWidth: "none",
+              }}
+            >
+              <EditorComponent
+                data={parsedData}
+                readOnly={true}
+                holder={header}
+              />
+            </div>
+          );
+        } else {
+          return (
+            <div
+              style={{
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
+                overflow: "auto",
+                height: "100%",
+                scrollbarWidth: "none",
+                padding: "8px",
+                backgroundColor: "transparent",
+              }}
+            >
+              {solutionData}
+            </div>
+          );
+        }
       },
     },
     {
@@ -368,17 +398,38 @@ const postcourseqa = () => {
   const [testCourseId, settestCourseId] = useState("");
 
   const handleEdit = (data: any) => {
-    console.log(data);
-    //  setpostCourseTestQuestionsMasterId(data.question_id);
     setquestionNo(data.question_no);
-    setEditQuestion(JSON.parse(data.question));
+
+    // Handle question (parse if JSON)
+    let questionValue = data.question;
+    try {
+      const parsed = JSON.parse(data.question);
+      if (typeof parsed === "object" && parsed !== null) {
+        questionValue = parsed;
+      }
+    } catch {
+      // If parsing fails, keep as string
+    }
+    setEditQuestion(questionValue);
+
     setQuestionId(data.question_id);
     setOption1(data.options[0].option_text);
     setOption2(data.options[1].option_text);
     setOption3(data.options[2].option_text);
     setOption4(data.options[3].option_text);
-    setSolutionText(data.solution_text);
-    // console.log(data)
+
+    // Handle solution_text (parse if JSON)
+    let solutionValue = data.solution_text;
+    try {
+      const parsedSolution = JSON.parse(data.solution_text);
+      if (typeof parsedSolution === "object" && parsedSolution !== null) {
+        solutionValue = parsedSolution;
+      }
+    } catch {
+      // If parsing fails, keep as string
+    }
+    setSolutionText(solutionValue);
+
     onEditModalOpen();
   };
 
@@ -515,9 +566,21 @@ const postcourseqa = () => {
       form.append("token", localStorage.getItem("token") ?? "");
       form.append("postCourseTestId", newTestId);
       form.append("questionNo", newQuestionNo);
-      // form.append("question", newQuestionData);
-      form.append("question", JSON.stringify(newQuestionData));
-      form.append("solutionText", newSolutionText);
+
+      // Stringify question if it's an object (EditorJS data)
+      const questionToStore =
+        typeof newQuestionData === "object"
+          ? JSON.stringify(newQuestionData)
+          : newQuestionData;
+      form.append("question", questionToStore);
+
+      // Stringify solution if it's an object (EditorJS data)
+      const solutionToStore =
+        typeof newSolutionText === "object"
+          ? JSON.stringify(newSolutionText)
+          : newSolutionText;
+      form.append("solutionText", solutionToStore);
+
       form.append("correctOption", newCorrectOption);
       form.append("option1", newOption1);
       form.append("option2", newOption2);
@@ -723,7 +786,6 @@ const postcourseqa = () => {
                   data={editQuestion}
                   onChange={setEditQuestion}
                   holder="edit-question-editor"
-                  readOnly={false}
                 />
               </div>
             </FormControl>
@@ -772,12 +834,14 @@ const postcourseqa = () => {
               </Select>
             </FormControl>
             <FormControl>
-              <FormLabel>Solution Text</FormLabel>
-              <Textarea
-                placeholder="Enter Solution Text"
-                value={solutionText}
-                onChange={(e) => setSolutionText(e.target.value)}
-              />
+              <FormLabel>Solution</FormLabel>
+              <div style={{ border: "1px solid #ccc", padding: "10px" }}>
+                <EditorComponent
+                  data={solutionText}
+                  onChange={setSolutionText}
+                  holder="edit-solution-editor"
+                />
+              </div>
             </FormControl>
           </ModalBody>
           <ModalFooter>
@@ -881,12 +945,14 @@ const postcourseqa = () => {
               </Select>
             </FormControl>
             <FormControl mt={4}>
-              <FormLabel>Solution Text</FormLabel>
-              <Textarea
-                placeholder="Enter Solution Text"
-                value={newSolutionText}
-                onChange={(e) => setNewSolutionText(e.target.value)}
-              />
+              <FormLabel>Solution</FormLabel>
+              <div style={{ border: "1px solid #ccc", padding: "10px" }}>
+                <EditorComponent
+                  data={newSolutionText}
+                  onChange={setNewSolutionText}
+                  holder="add-question-solution-editor"
+                />
+              </div>
             </FormControl>
           </ModalBody>
           <ModalFooter>

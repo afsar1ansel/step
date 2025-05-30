@@ -26,7 +26,6 @@ import {
   HStack,
 } from "@chakra-ui/react";
 
-
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const precourseqa = () => {
@@ -288,27 +287,57 @@ const precourseqa = () => {
     },
     {
       field: "solution_text",
-      headerName: "Solution Text",
+      headerName: "Solution",
       filter: false,
       flex: 2,
       cellRenderer: (params: any) => {
-        const solutionText = params.data.solution_text || "";
-        return (
-          <div
-            style={{
-              whiteSpace: "pre-wrap",
-              wordWrap: "break-word",
-              overflowWrap: "break-word",
-              overflow: "auto",
-              height: "100%",
-              scrollbarWidth: "none",
-              padding: "8px",
-              backgroundColor: "transparent",
-            }}
-          >
-            {solutionText}
-          </div>
-        );
+        const isJson = (str: string) => {
+          try {
+            const parsed = JSON.parse(str);
+            return typeof parsed === "object" && parsed !== null;
+          } catch (e) {
+            return false;
+          }
+        };
+
+        const solutionData = params.data.solution_text;
+
+        if (typeof solutionData === "string" && isJson(solutionData)) {
+          const parsedData = JSON.parse(solutionData);
+          const header = `SolutionEditor: ${params.data.question_no}`;
+          return (
+            <div
+              style={{
+                height: "400px",
+                overflow: "auto",
+                scrollbarWidth: "none",
+              }}
+            >
+              <EditorComponent
+                data={parsedData}
+                readOnly={true}
+                holder={header}
+              />
+            </div>
+          );
+        } else {
+          return (
+            <div
+              style={{
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
+                overflow: "auto",
+                height: "100%",
+                scrollbarWidth: "none",
+                padding: "8px",
+                backgroundColor: "transparent",
+              }}
+            >
+              {solutionData}
+            </div>
+          );
+        }
       },
     },
     {
@@ -370,8 +399,21 @@ const precourseqa = () => {
   const handleEdit = (data: any) => {
     console.log(data);
     setQuestionNo(data.question_no);
-    setEditQuestion(JSON.parse(data.question));
-    console.log(JSON.parse(data.question));
+    let questionValue = data.question;
+    let solutionValue = data.solution_text;
+    try {
+      const parsed = JSON.parse(data.question);
+      const parsedSolution = JSON.parse(data.solution_text);
+      if (typeof parsed === "object" && parsed !== null) {
+
+        questionValue = parsed;
+        solutionValue = parsedSolution;
+      }
+    } catch {
+      // If parsing fails, keep the original string
+    }
+    setEditQuestion(questionValue);
+    // console.log(JSON.parse(data.question));
     setQuestionId(data.question_id);
     setOption1(data.options[0].option_text);
     setOption2(data.options[1].option_text);
@@ -384,7 +426,7 @@ const precourseqa = () => {
     // );
     // setCorrectOption(correctOption ? correctOption.option_no.toString() : "");
 
-    setSolutionText(data.solution_text);
+    setSolutionText(solutionValue);
     onEditModalOpen();
   };
 
@@ -442,7 +484,7 @@ const precourseqa = () => {
       form.append("preCourseTestId", newTestId);
       form.append("questionNo", newQuestionNo);
       form.append("question", JSON.stringify(newQuestionData));
-      form.append("solutionText", newSolutionText);
+      form.append("solutionText", JSON.stringify(newSolutionText));
       form.append("correctOption", newCorrectOption);
       form.append("option1", newOption1);
       form.append("option2", newOption2);
@@ -517,7 +559,7 @@ const precourseqa = () => {
       form.append("questionNo", questionNo);
       // form.append("question", editQuestion);
       form.append("question", JSON.stringify(editQuestion));
-      form.append("solutionText", solutionText);
+      form.append("solutionText", JSON.stringify(solutionText));
       form.append("correctOption", correctOption);
       form.append("option1", option1);
       form.append("option2", option2);
@@ -798,12 +840,19 @@ const precourseqa = () => {
               </Select>
             </FormControl>
             <FormControl mt={4}>
-              <FormLabel>Solution Text</FormLabel>
-              <Textarea
-                placeholder="Enter Solution Text"
+              <FormLabel>Solution</FormLabel>
+              {/* <Textarea
+                placeholder="Enter Solution"
                 value={newSolutionText}
                 onChange={(e) => setNewSolutionText(e.target.value)}
-              />
+              /> */}
+              <div style={{ border: "1px solid #ccc", padding: "10px" }}>
+                <EditorComponent
+                  data={newSolutionText}
+                  onChange={setNewSolutionText}
+                  holder="add-question-solution-editor"
+                />
+              </div>
             </FormControl>
           </ModalBody>
           <ModalFooter>
@@ -888,12 +937,19 @@ const precourseqa = () => {
               </Select>
             </FormControl>
             <FormControl mt={4}>
-              <FormLabel>Solution Text</FormLabel>
-              <Textarea
-                placeholder="Enter Solution Text"
+              <FormLabel>Solution</FormLabel>
+              {/* <Textarea
+                placeholder="Enter Solution"
                 value={solutionText}
                 onChange={(e) => setSolutionText(e.target.value)}
-              />
+              /> */}
+              <div style={{ border: "1px solid #ccc", padding: "10px" }}>
+                <EditorComponent
+                  data={solutionText}
+                  onChange={setSolutionText}
+                  holder="edit-solution-editor"
+                />
+              </div>
             </FormControl>
           </ModalBody>
           <ModalFooter>

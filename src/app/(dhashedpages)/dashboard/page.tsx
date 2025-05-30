@@ -71,6 +71,17 @@ export default function Home() {
       const data = await response.json();
       setRowData(data);
       console.log(data);
+      if (data.message === "Invalid token") {
+        toast({
+          title: "Error",
+          description: data.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        window.location.href = "/auth/login";
+      } 
+      
     } catch (error) {
       toast({
         title: "Error",
@@ -184,21 +195,21 @@ export default function Home() {
     // },
   ]);
 
-  const fetchImage = async (id: any) => {
-    // console.log(id);
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${baseUrl}//${token}/${id}`, {
-        method: "GET",
-      });
-      setCurrentImageUrl(response.url); // Set the image URL to state
-      onImageModalOpen();
+  // const fetchImage = async (id: any) => {
+  //   // console.log(id);
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const response = await fetch(`${baseUrl}//${token}/${id}`, {
+  //       method: "GET",
+  //     });
+  //     setCurrentImageUrl(response.url); // Set the image URL to state
+  //     onImageModalOpen();
 
-      // console.log(response.url);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //     // console.log(response.url);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   //toggle function for switch button
   const handleToggle = async (data: any) => {
