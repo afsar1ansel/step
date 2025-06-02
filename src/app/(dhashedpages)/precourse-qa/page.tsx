@@ -399,31 +399,59 @@ const precourseqa = () => {
   const handleEdit = (data: any) => {
     console.log(data);
     setQuestionNo(data.question_no);
-    let questionValue = data.question;
-    let solutionValue = data.solution_text;
-    try {
-      const parsed = JSON.parse(data.question);
-      const parsedSolution = JSON.parse(data.solution_text);
-      if (typeof parsed === "object" && parsed !== null) {
 
-        questionValue = parsed;
-        solutionValue = parsedSolution;
-      }
+    // Parse question data
+    let questionValue;
+    try {
+      questionValue =
+        typeof data.question === "string"
+          ? JSON.parse(data.question)
+          : data.question;
     } catch {
-      // If parsing fails, keep the original string
+      // If parsing fails or it's plain text, convert to EditorJS format
+      questionValue = {
+        blocks: [
+          {
+            type: "paragraph",
+            data: {
+              text: data.question || "",
+            },
+          },
+        ],
+      };
     }
+
+    // Parse solution data
+    let solutionValue;
+    try {
+      solutionValue =
+        typeof data.solution_text === "string"
+          ? JSON.parse(data.solution_text)
+          : data.solution_text;
+    } catch {
+      solutionValue = {
+        blocks: [
+          {
+            type: "paragraph",
+            data: {
+              text: data.solution_text || "",
+            },
+          },
+        ],
+      };
+    }
+
     setEditQuestion(questionValue);
-    // console.log(JSON.parse(data.question));
     setQuestionId(data.question_id);
-    setOption1(data.options[0].option_text);
-    setOption2(data.options[1].option_text);
-    setOption3(data.options[2].option_text);
-    setOption4(data.options[3].option_text);
+    setOption1(data.options[0]?.option_text || "");
+    setOption2(data.options[1]?.option_text || "");
+    setOption3(data.options[2]?.option_text || "");
+    setOption4(data.options[3]?.option_text || "");
 
     // Find which option is correct
-    // const correctOption = data.options.find(
-    //   (opt: any) => opt.correct_option === 1
-    // );
+    const correctOption = data.options.find(
+      (opt: any) => opt.correct_option === 1
+    );
     // setCorrectOption(correctOption ? correctOption.option_no.toString() : "");
 
     setSolutionText(solutionValue);
