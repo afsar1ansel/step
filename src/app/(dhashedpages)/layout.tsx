@@ -70,7 +70,9 @@ type NavItem =
   | "precourse-qa"
   | "postcourse-test"
   | "postcourse-qa"
-  | "ExamModule";
+  | "ExamModule"
+  | "exam-test"
+  | "exam-qa";
 
 export default function RootLayout({
   children,
@@ -109,6 +111,13 @@ export default function RootLayout({
       ].includes(basePath)
     ) {
       setActive("test");
+    } else if (
+      [
+        "exam-test",
+        "exam-qa",
+      ].includes(basePath)
+    ) {
+      setActive("ExamModule");
     } else {
       setActive(basePath as NavItem);
     }
@@ -431,11 +440,84 @@ export default function RootLayout({
                         </AccordionItem>
                       </Accordion>
                     </li>
-                    <li className={active === "ExamModule" ? "active" : ""}>
-                      <GrTestDesktop />
-                      <Link href="/ExamModule">
-                        <p className="linkname">Exam Module</p>
-                      </Link>
+                    <li
+                      style={{ padding: 0, margin: 0 }}
+                      className={
+                        ["ExamModule", "exam-test", "exam-qa"].includes(active) || ["exam-test", "exam-qa"].includes(basePath)
+                          ? "active"
+                          : ""
+                      }
+                    >
+                      <Accordion allowToggle defaultIndex={["exam-test", "exam-qa"].includes(basePath) ? [0] : []}>
+                        <AccordionItem border="none">
+                          <AccordionButton
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              width: "100%",
+                              padding: "0.5rem 20px",
+                            }}
+                          >
+                            <GrTestDesktop />
+                            <p
+                              style={{
+                                flex: 1,
+                                textAlign: "left",
+                                marginLeft: "0.5rem",
+                              }}
+                            >
+                              Exam Module
+                            </p>
+                            <AccordionIcon />
+                          </AccordionButton>
+                          <AccordionPanel
+                            pb={0}
+                            pl={1}
+                            margin={0}
+                            padding={0}
+                            style={{ marginTop: "-2px" }}
+                          >
+                            <ul style={{ listStyle: "none", padding: 0 }}>
+                              <li>
+                                <Link href="/exam-test">
+                                  <p
+                                    className={
+                                      basePath === "exam-test"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Test
+                                  </p>
+                                </Link>
+                              </li>
+                              <li>
+                                <Link href="/exam-qa">
+                                  <p
+                                    className={
+                                      basePath === "exam-qa"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Q/A
+                                  </p>
+                                </Link>
+                              </li>
+                            </ul>
+                          </AccordionPanel>
+                        </AccordionItem>
+                      </Accordion>
                     </li>
                     <li className={active === "BannerMaster" ? "active" : ""}>
                       <FaRegImages />
