@@ -66,7 +66,8 @@ const postcourseqa = () => {
   }, [testId]);
 
   async function fetchTest() {
-    const token = localStorage.getItem("token") ?? "";
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
     try {
       const response = await fetch(
         `${baseUrl}/masters/post-course-test/questions/view/${testId}/${token}`,
@@ -86,9 +87,9 @@ const postcourseqa = () => {
 
   //fetcher to get all test data
   async function fetcherDrop() {
-    // const tok =
-    //   typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    const tok = localStorage.getItem("token");
+    const tok =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    // const tok = localStorage.getItem("token");
     try {
       const response = await fetch(
         `${baseUrl}/masters/post-course-test-detail/get-all/${tok}`,
@@ -343,9 +344,11 @@ const postcourseqa = () => {
   };
 
   const handleAddCourse = async () => {
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
     try {
       const form = new FormData();
-      form.append("token", localStorage.getItem("token") ?? "");
+      form.append("token", token ?? "");
       form.append("sheetId", sheetId);
       form.append("sheetName", SheetName);
       form.append("postCourseTestId", testIdAdd);
