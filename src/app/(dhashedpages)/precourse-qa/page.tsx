@@ -23,6 +23,7 @@ import {
   Textarea,
   HStack,
 } from "@chakra-ui/react";
+import ContentFormatter from "@/app/componant/ContentFormatter";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -118,55 +119,9 @@ const precourseqa = () => {
       headerName: "Question",
       editable: false,
       flex: 2,
-      // cellRenderer: (params: any) => {
-      //   const isJson = (str: string) => {
-      //     try {
-      //       const parsed = JSON.parse(str);
-      //       return typeof parsed === "object" && parsed !== null;
-      //     } catch (e) {
-      //       return false;
-      //     }
-      //   };
-
-      //   const questionData = params.data.question;
-
-      //   if (typeof questionData === "string" && isJson(questionData)) {
-      //     const parsedData = JSON.parse(questionData);
-      //     const header = `Questioneditor: ${params.data.question_no}`;
-      //     return (
-      //       <div
-      //         style={{
-      //           height: "400px",
-      //           overflow: "auto",
-      //           scrollbarWidth: "none",
-      //         }}
-      //       >
-      //         data
-      //         {/* <EditorComponent
-      //           data={parsedData}
-      //           // readOnly={true}
-      //           onChange={() => {}}
-      //           holder={header}
-      //         /> */}
-      //       </div>
-      //     );
-      //   } else {
-      //     return (
-      //       <div
-      //         style={{
-      //           whiteSpace: "pre-wrap",
-      //           wordWrap: "break-word",
-      //           overflowWrap: "break-word",
-      //           overflow: "auto",
-      //           scrollbarWidth: "none",
-      //           padding: "8px",
-      //         }}
-      //       >
-      //         {questionData}
-      //       </div>
-      //     );
-      //   }
-      // },
+      cellRenderer: (params: any) => {
+        return <ContentFormatter content={params.value} />;
+      },
       cellStyle: {
         height: "100%",
         padding: "8px",
@@ -290,56 +245,9 @@ const precourseqa = () => {
       headerName: "Solution",
       filter: false,
       flex: 2,
-      // cellRenderer: (params: any) => {
-      //   const isJson = (str: string) => {
-      //     try {
-      //       const parsed = JSON.parse(str);
-      //       return typeof parsed === "object" && parsed !== null;
-      //     } catch (e) {
-      //       return false;
-      //     }
-      //   };
-
-      //   const solutionData = params.data.solution_text;
-
-      //   if (typeof solutionData === "string" && isJson(solutionData)) {
-      //     const parsedData = JSON.parse(solutionData);
-      //     const header = `SolutionEditor: ${params.data.question_no}`;
-      //     return (
-      //       <div
-      //         style={{
-      //           height: "400px",
-      //           overflow: "auto",
-      //           scrollbarWidth: "none",
-      //         }}
-      //       >
-      //         data
-      //         {/* <EditorComponent
-      //           data={parsedData}
-      //           readOnly={true}
-      //           holder={header}
-      //         /> */}
-      //       </div>
-      //     );
-      //   } else {
-      //     return (
-      //       <div
-      //         style={{
-      //           whiteSpace: "pre-wrap",
-      //           wordWrap: "break-word",
-      //           overflowWrap: "break-word",
-      //           overflow: "auto",
-      //           height: "100%",
-      //           scrollbarWidth: "none",
-      //           padding: "8px",
-      //           backgroundColor: "transparent",
-      //         }}
-      //       >
-      //         {solutionData}
-      //       </div>
-      //     );
-      //   }
-      // },
+      cellRenderer: (params: any) => {
+        return <ContentFormatter content={params.value} />;
+      },
     },
     {
       field: "question_id",

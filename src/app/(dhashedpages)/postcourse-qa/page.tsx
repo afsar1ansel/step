@@ -23,6 +23,7 @@ import {
   Textarea,
   HStack,
 } from "@chakra-ui/react";
+import ContentFormatter from "@/app/componant/ContentFormatter";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -125,7 +126,9 @@ const postcourseqa = () => {
       headerName: "Question",
       editable: false,
       flex: 2,
-   
+      cellRenderer: (params: any) => {
+              return <ContentFormatter content={params.value} />;
+            },
       cellStyle: {
         height: "100%",
         padding: "8px",
@@ -248,6 +251,9 @@ const postcourseqa = () => {
       field: "solution_text",
       headerName: "Solution",
       filter: false,
+      cellRenderer: (params: any) => {
+              return <ContentFormatter content={params.value} />;
+            },
       flex: 2,
     
     },
