@@ -28,6 +28,7 @@ const TestsTab = () => {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const examBaseUrl = "https://step-exam-app-3utka.ondigitalocean.app";
   const toast = useToast();
 
   const [rowData, setRowData] = useState<any[]>([]);
@@ -35,16 +36,15 @@ const TestsTab = () => {
   const [steps, setSteps] = useState<any[]>([]);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedStep, setSelectedStep] = useState("");
-  const [preCourseTestTitle, setPreCourseTestTitle] = useState("");
-  const [preCourseTestDuration, setPreCourseTestDuration] = useState<
+  const [examTitle, setExamTitle] = useState(""); // Renamed from preCourseTestTitle
+  const [examDurationMinutes, setExamDurationMinutes] = useState< // Renamed from preCourseTestDuration
     number | ""
   >("");
-  // const [stepNo, setStepNo] = useState<number | "">("");
-  const [syllabusTextLine1, setSyllabusTextLine1] = useState(""); // New state
-  const [syllabusTextLine2, setSyllabusTextLine2] = useState(""); // New state
-  const [syllabusTextLine3, setSyllabusTextLine3] = useState(""); // New state
+  const [syllabusTextLine1, setSyllabusTextLine1] = useState("");
+  const [syllabusTextLine2, setSyllabusTextLine2] = useState("");
+  const [syllabusTextLine3, setSyllabusTextLine3] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
-  const [currentTestId, setCurrentTestId] = useState<number | null>(null);
+  const [currentExamId, setCurrentExamId] = useState<number | null>(null); // Renamed from currentTestId for clarity
 
   const {
     isOpen: isModalOpen,
@@ -55,7 +55,7 @@ const TestsTab = () => {
   const [columnDefs] = useState<ColDef[]>([
     {
       headerName: "Title",
-      field: "pre_course_test_title",
+      field: "exam_title", // Changed from pre_course_test_title
       // minWidth: 250,
     },
     {
@@ -75,7 +75,7 @@ const TestsTab = () => {
 
     {
       headerName: "Total Time (Minutes)",
-      field: "pre_course_test_duration_minutes",
+      field: "exam_duration_minutes", // Changed from pre_course_test_duration_minutes
       // maxWidth: 150,
       filter: false,
     },
@@ -143,23 +143,27 @@ const TestsTab = () => {
     },
   ]);
 
-  // Fetch tests data
+  // Fetch exams data
   useEffect(() => {
     if (token) {
-      fetch(`${baseUrl}/masters/pre-course-test/get-all/${token}`)
+      fetch(`${examBaseUrl}/masters/exam/get-all`, { // Changed endpoint
+        headers: { // Added headers for token
+          'Authorization': `Bearer ${token}`
+        }
+      })
         .then((response) => response.json())
         .then((data) => {
-          console.log("Fetched test data:", data);
+          console.log("Fetched exam data:", data);
           setRowData(data);
         })
-        .catch((error) => console.error("Error fetching test data:", error));
+        .catch((error) => console.error("Error fetching exam data:", error));
     }
-  }, [token, baseUrl]);
+  }, [token, examBaseUrl]);
 
   // Fetch courses
   useEffect(() => {
     if (token) {
-      fetch(`${baseUrl}/masters/subjects/get-all-subjects/${token}`)
+      fetch(`${baseUrl}/masters/subjects/get-all-subjects/${token}`) // Assuming this endpoint is correct and separate
         .then((response) => response.json())
         .then((data) => setCourses(data))
         .catch((error) => console.error("Error fetching courses:", error));
@@ -170,7 +174,7 @@ const TestsTab = () => {
   useEffect(() => {
     if (selectedCourse && token) {
       fetch(
-        `${baseUrl}/masters/get-all-course-step-details/${selectedCourse}/${token}`
+        `${baseUrl}/masters/get-all-course-step-details/${selectedCourse}/${token}` // Assuming this endpoint is correct and separate
       )
         .then((response) => response.json())
         .then((data) => setSteps(data))
@@ -182,8 +186,8 @@ const TestsTab = () => {
     if (
       !selectedCourse ||
       !selectedStep ||
-      !preCourseTestTitle ||
-      !preCourseTestDuration ||
+      !examTitle || // Changed from preCourseTestTitle
+      !examDurationMinutes || // Changed from preCourseTestDuration
       !syllabusTextLine1 ||
       !syllabusTextLine2 ||
       !syllabusTextLine3
@@ -199,27 +203,29 @@ const TestsTab = () => {
     }
 
     const formData = new FormData();
-    formData.append("token", token || "");
+    // formData.append("token", token || ""); // Token will be sent in header
     formData.append("courseStepDetailsMasterId", selectedStep);
-    formData.append("preCourseTestTitle", preCourseTestTitle);
+    formData.append("examTitle", examTitle); // Changed from preCourseTestTitle
     formData.append(
-      "preCourseTestDurationMinutes",
-      String(preCourseTestDuration)
+      "examDurationMinutes", // Changed from preCourseTestDurationMinutes
+      String(examDurationMinutes) // Changed from preCourseTestDuration
     );
-    // formData.append("stepNo", String(stepNo));
     formData.append("syllabusTextLine1", syllabusTextLine1);
     formData.append("syllabusTextLine2", syllabusTextLine2);
     formData.append("syllabusTextLine3", syllabusTextLine3);
 
     const url = isEditMode
-      ? `${baseUrl}/masters/pre-course-test/update`
-      : `${baseUrl}/masters/pre-course-test/add`;
+      ? `${examBaseUrl}/masters/exam/update` // Changed endpoint
+      : `${examBaseUrl}/masters/exam/add`; // Changed endpoint
     if (isEditMode) {
-      formData.append("preCourseTestId", String(currentTestId));
+      formData.append("examId", String(currentExamId)); // Changed from preCourseTestId
     }
 
     fetch(url, {
       method: "POST",
+      headers: { // Added headers for token
+        'Authorization': `Bearer ${token}`
+      },
       body: formData,
     })
       .then((response) => response.json())
@@ -261,8 +267,13 @@ const TestsTab = () => {
     const newStatus = data.status === 1 ? 0 : 1;
     try {
       const response = await fetch(
-        `${baseUrl}/masters/pre-course-test/change-status/${newStatus}/${data.id}/${token}`,
-        { method: "GET" }
+        `${examBaseUrl}/masters/exam/change-status/${newStatus}/${data.id}`, // Changed endpoint, removed token from URL
+        { 
+          method: "GET",
+          headers: { // Added headers for token
+            'Authorization': `Bearer ${token}`
+          }
+        }
       );
       if (response.ok) {
         setRowData((prev) =>
@@ -300,12 +311,11 @@ const TestsTab = () => {
 
   const handleEdit = (data: any) => {
     setIsEditMode(true);
-    setCurrentTestId(data.id);
-    setSelectedCourse(data.course_id);
+    setCurrentExamId(data.id); // Renamed state variable
+    setSelectedCourse(data.course_id); 
     setSelectedStep(data.course_step_details_master_id);
-    setPreCourseTestTitle(data.pre_course_test_title);
-    setPreCourseTestDuration(data.pre_course_test_duration_minutes);
-    // setStepNo(data.step_no);
+    setExamTitle(data.exam_title); // Changed from pre_course_test_title
+    setExamDurationMinutes(data.exam_duration_minutes); // Changed from pre_course_test_duration_minutes
     setSyllabusTextLine1(data.syllabus_text_line_1);
     setSyllabusTextLine2(data.syllabus_text_line_2);
     setSyllabusTextLine3(data.syllabus_text_line_3);
@@ -315,15 +325,14 @@ const TestsTab = () => {
   const resetForm = () => {
     setSelectedCourse("");
     setSelectedStep("");
-    setPreCourseTestTitle("");
-    setPreCourseTestDuration("");
-    // setStepNo("");
+    setExamTitle(""); // Changed from setPreCourseTestTitle
+    setExamDurationMinutes(""); // Changed from setPreCourseTestDuration
     setSyllabusTextLine1("");
     setSyllabusTextLine2("");
     setSyllabusTextLine3("");
     setIsEditMode(false);
-    setCurrentTestId(null);
-    setSteps([]); // Clear steps when course changes or form resets
+    setCurrentExamId(null); // Renamed state variable
+    setSteps([]); 
   };
 
   const handleModalClose = () => {
@@ -331,12 +340,16 @@ const TestsTab = () => {
     onModalClose();
   };
 
-  const fetchTests = () => {
+  const fetchTests = () => { // Renamed to fetchExams for clarity, but keeping as fetchTests to match original call
     if (token) {
-      fetch(`${baseUrl}/masters/pre-course-test/get-all/${token}`)
+      fetch(`${examBaseUrl}/masters/exam/get-all`, { // Changed endpoint
+         headers: { // Added headers for token
+          'Authorization': `Bearer ${token}`
+        }
+      })
         .then((response) => response.json())
         .then((data) => setRowData(data))
-        .catch((error) => console.error("Error fetching test data:", error));
+        .catch((error) => console.error("Error fetching exam data:", error));
     }
   };
 
@@ -384,7 +397,7 @@ const TestsTab = () => {
       <Modal isOpen={isModalOpen} onClose={handleModalClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>{isEditMode ? "Edit Test" : "Add New Test"}</ModalHeader>
+          <ModalHeader>{isEditMode ? "Edit Exam" : "Add New Exam"}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl mb={4}>
@@ -427,21 +440,21 @@ const TestsTab = () => {
               </Select>
             </FormControl>
             <FormControl mb={4}>
-              <FormLabel>Test Title</FormLabel>
+              <FormLabel>Exam Title</FormLabel> 
               <Input
-                placeholder="Enter Test Title"
-                value={preCourseTestTitle}
-                onChange={(e) => setPreCourseTestTitle(e.target.value)}
+                placeholder="Enter Exam Title"
+                value={examTitle} // Changed from preCourseTestTitle
+                onChange={(e) => setExamTitle(e.target.value)} // Changed from setPreCourseTestTitle
               />
             </FormControl>
             <FormControl mb={4}>
-              <FormLabel>Test Duration (Minutes)</FormLabel>
+              <FormLabel>Exam Duration (Minutes)</FormLabel>
               <Input
                 type="number"
-                placeholder="Enter Test Duration"
-                value={preCourseTestDuration}
+                placeholder="Enter Exam Duration"
+                value={examDurationMinutes} // Changed from preCourseTestDuration
                 onChange={(e) =>
-                  setPreCourseTestDuration(Number(e.target.value))
+                  setExamDurationMinutes(Number(e.target.value)) // Changed from setPreCourseTestDuration
                 }
               />
             </FormControl>

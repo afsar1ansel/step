@@ -30,11 +30,11 @@ import ContentFormatter from "@/app/componant/ContentFormatter";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const PrecourseQaPage = () => { // Renamed component for clarity, ensure export default uses this name
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+const PrecourseQaPage = () => { 
+  const baseUrl = "https://step-exam-app-3utka.ondigitalocean.app"; 
   const [rowData, setRowData] = useState<any[]>([]);
-  const [testId, setTestId] = useState(""); // Initialize with empty string or a default valid ID
-  const [testOptions, settestOptions] = useState<any[]>([]);
+  const [testId, setTestId] = useState(""); // This will represent examId for selecting an exam
+  const [testOptions, settestOptions] = useState<any[]>([]); // To be populated by exams
   // const [preCourseTestQuestionsMasterId, setPreCourseTestQuestionsMasterId] = useState(""); // This state seems unused in the original precourse-qa
   const [questionNo, setQuestionNo] = useState("");
   const [editQuestion, setEditQuestion] = useState<any>({ blocks: [] }); // Initialize for EditorJS
@@ -61,62 +61,65 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
   const toast = useToast();
 
   useEffect(() => {
-    fetcherDrop(); // Fetch dropdown options first
+    fetcherDrop(); 
   }, []);
 
   useEffect(() => {
-    if (testId) { // Fetch test questions only if a testId is selected
-      fetchTest();
+    if (testId) { 
+      fetchTestQuestions(); // Renamed for clarity
     } else {
-      setRowData([]); // Clear table if no test is selected
+      setRowData([]); 
     }
   }, [testId]);
 
-  async function fetchTest() {
+  async function fetchTestQuestions() { // Renamed from fetchTest
     const token = localStorage.getItem("token") ?? "";
-    if (!testId) return; // Do not fetch if testId is not set
+    if (!testId) return; 
     try {
       const response = await fetch(
-        `${baseUrl}/masters/pre-course-test/questions/view/${testId}/${token}`,
+        `${baseUrl}/admin/masters/exam/questions/view/${testId}`, // Changed endpoint
         {
           method: "GET",
+          headers: { // Added headers for token
+            'Authorization': `Bearer ${token}`
+          }
         }
       );
-      const responseData = await response.json();
-      if (responseData.errFlag === 0) {
-        setRowData(responseData.data || []); // Assuming data is in responseData.data
+      if (response.ok) {
+        const responseData = await response.json();
+        setRowData(responseData || []); // API returns array directly
       } else {
+        const errorData = await response.json().catch(() => ({ message: "Failed to fetch exam questions." }));
         setRowData([]);
-        // toast({ title: "Error", description: responseData.message, status: "error", duration: 3000, isClosable: true });
+        toast({ title: "Error", description: errorData.message || "Failed to fetch exam questions.", status: "error", duration: 3000, isClosable: true });
       }
     } catch (error) {
       console.error("Error fetching data:", error);
       setRowData([]);
-      // toast({ title: "Error", description: "Failed to fetch test questions.", status: "error", duration: 3000, isClosable: true });
+      toast({ title: "Error", description: "Failed to fetch exam questions.", status: "error", duration: 3000, isClosable: true });
     }
   }
 
-  async function fetcherDrop() {
+  async function fetcherDrop() { // Fetches exams for the dropdown
     const tok = localStorage.getItem("token");
     try {
       const response = await fetch(
-        `${baseUrl}/masters/pre-course-test/get-all/${tok}`,
+        `${baseUrl}/masters/exam/get-all`, // Changed endpoint
         {
           method: "GET",
+          headers: { // Added headers for token
+            'Authorization': `Bearer ${tok}`
+          }
         }
       );
       const responseData = await response.json();
       if (responseData && responseData.length > 0) {
         settestOptions(responseData);
-        // Optionally set the first test as default, or leave it for user selection
-        // if (responseData.length > 0 && !testId) {
-        //   setTestId(responseData[0].id); 
-        // }
       } else {
         settestOptions([]);
       }
     } catch (error) {
-      console.error("Error fetching test options:", error);
+      console.error("Error fetching exam options:", error);
       settestOptions([]);
     }
   }
@@ -129,7 +132,7 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
       filter: false,
     },
     {
-      field: "question",
+      field: "question_text", // Changed from question
       headerName: "Question",
       editable: false,
       flex: 2,
@@ -344,12 +347,13 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
 
     let questionValue;
     try {
-      questionValue = typeof data.question === "string" ? JSON.parse(data.question) : data.question;
-      if (typeof questionValue !== 'object' || !questionValue.blocks) { // Ensure it's valid EditorJS structure
-        questionValue = { blocks: [{ type: "paragraph", data: { text: data.question || "" } }] };
+      // Assuming question_text is the field from API for EditorJS JSON
+      questionValue = typeof data.question_text === "string" ? JSON.parse(data.question_text) : data.question_text;
+      if (typeof questionValue !== 'object' || !questionValue.blocks) { 
+        questionValue = { blocks: [{ type: "paragraph", data: { text: data.question_text || "" } }] };
       }
     } catch {
-      questionValue = { blocks: [{ type: "paragraph", data: { text: data.question || "" } }] };
+      questionValue = { blocks: [{ type: "paragraph", data: { text: data.question_text || "" } }] };
     }
     setEditQuestion(questionValue);
 
@@ -376,22 +380,26 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
     onEditModalOpen();
   };
 
-  const handleAddCourse = async () => { // This is "Add Test from Sheet"
-    if (!testIdAdd) {
-      toast({ title: "Error", description: "Please select a test to add questions to.", status: "error", duration: 3000, isClosable: true, position: "top" });
+  const handleAddCourse = async () => { // This is "Add Questions from Sheet"
+    if (!testIdAdd) { // testIdAdd is the selected examId
+      toast({ title: "Error", description: "Please select an exam to add questions to.", status: "error", duration: 3000, isClosable: true, position: "top" });
       return;
     }
+    const token = localStorage.getItem("token") ?? "";
     try {
       const form = new FormData();
-      form.append("token", localStorage.getItem("token") ?? "");
+      // form.append("token", token); // Token in header
       form.append("sheetId", sheetId);
       form.append("sheetName", SheetName);
-      form.append("preCourseTestId", testIdAdd); // Use testIdAdd which is selected in the modal
+      form.append("examId", testIdAdd); // Changed from preCourseTestId
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/pre-course-test/fetch-questions`,
+        `${baseUrl}/admin/masters/exam/questions/fetch-questions`, // Changed endpoint and used baseUrl
         {
           method: "POST",
+          headers: { // Added headers for token
+            'Authorization': `Bearer ${token}`
+          },
           body: form,
         }
       );
@@ -399,19 +407,19 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
 
       if (responseData.errFlag == 0) {
         toast({
-          title: "Test questions added successfully.",
+          title: "Exam questions added successfully.",
           description: responseData.message,
           status: "success",
           duration: 3000,
           isClosable: true,
           position: "top",
         });
-        if (testIdAdd === testId) fetchTest(); // Refresh if current test was updated
+        if (testIdAdd === testId) fetchTestQuestions(); // Refresh if current exam was updated
         resetSheetForm();
         onAddModalClose();
       } else {
         toast({
-          title: "Error adding test questions.",
+          title: "Error adding exam questions.",
           description: responseData.message,
           status: "error",
           duration: 3000,
@@ -426,17 +434,18 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
   };
 
   const handleAddQuestion = async () => {
-    if (!newTestId || !newQuestionNo || !newCorrectOption) {
-         toast({ title: "Validation Error", description: "Please fill all required fields (Test, Question No, Correct Option).", status: "warning", duration: 3000, isClosable: true, position: "top" });
+    if (!newTestId || !newQuestionNo || !newCorrectOption) { // newTestId is examId
+         toast({ title: "Validation Error", description: "Please fill all required fields (Exam, Question No, Correct Option).", status: "warning", duration: 3000, isClosable: true, position: "top" });
          return;
     }
+    const token = localStorage.getItem("token") ?? "";
     try {
       const form = new FormData();
-      form.append("token", localStorage.getItem("token") ?? "");
-      form.append("preCourseTestId", newTestId);
+      // form.append("token", token); // Token in header
+      form.append("examId", newTestId); // Changed from preCourseTestId
       form.append("questionNo", newQuestionNo);
-      form.append("question", JSON.stringify(newQuestionData)); // Assuming newQuestionData is EditorJS object
-      form.append("solutionText", JSON.stringify(newSolutionText)); // Assuming newSolutionText is EditorJS object
+      form.append("questionText", JSON.stringify(newQuestionData)); // Changed from question
+      form.append("solutionText", JSON.stringify(newSolutionText)); 
       form.append("correctOption", newCorrectOption);
       form.append("option1", newOption1);
       form.append("option2", newOption2);
@@ -444,16 +453,19 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
       form.append("option4", newOption4);
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/pre-course-test/questions/add`,
+        `${baseUrl}/admin/masters/exam/questions/add`, // Changed endpoint and used baseUrl
         {
           method: "POST",
+          headers: { // Added headers for token
+            'Authorization': `Bearer ${token}`
+          },
           body: form,
         }
       );
       const responseData = await response.json();
 
       if (responseData.errFlag == 0) {
-        if (newTestId === testId) fetchTest(); // Refresh if current test was updated
+        if (newTestId === testId) fetchTestQuestions(); // Refresh if current exam was updated
         toast({
           title: "Question added successfully.",
           description: responseData.message,
@@ -485,13 +497,14 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
          toast({ title: "Validation Error", description: "Please select a correct option.", status: "warning", duration: 3000, isClosable: true, position: "top" });
          return;
     }
+    const token = localStorage.getItem("token") ?? "";
     try {
       const form = new FormData();
-      form.append("token", localStorage.getItem("token") ?? "");
-      form.append("preCourseTestId", testId); // Current test being viewed/edited
+      // form.append("token", token); // Token in header
+      form.append("examId", testId); // Changed from preCourseTestId, testId is current examId
       form.append("questionNo", questionNo);
-      form.append("question", JSON.stringify(editQuestion)); // Assuming editQuestion is EditorJS object
-      form.append("solutionText", JSON.stringify(solutionText)); // Assuming solutionText is EditorJS object
+      form.append("questionText", JSON.stringify(editQuestion)); // Changed from question
+      form.append("solutionText", JSON.stringify(solutionText)); 
       form.append("correctOption", correctOption);
       form.append("option1", option1);
       form.append("option2", option2);
@@ -501,16 +514,19 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
 
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/pre-course-test/questions/edit`,
+        `${baseUrl}/admin/masters/exam/questions/edit`, // Changed endpoint and used baseUrl
         {
           method: "POST",
+          headers: { // Added headers for token
+            'Authorization': `Bearer ${token}`
+          },
           body: form,
         }
       );
       const responseData = await response.json();
 
       if (responseData.errFlag == 0) {
-        fetchTest(); // Refresh the current test's questions
+        fetchTestQuestions(); // Refresh the current exam's questions
         toast({
           title: "Question updated successfully.",
           description: responseData.message,
@@ -534,14 +550,13 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
       console.error("Error updating question:", error);
       toast({ title: "Error", description: "An unexpected error occurred.", status: "error", duration: 3000, isClosable: true, position: "top" });
     }
-    // resetEditForm(); // Reset form fields after attempting update, regardless of success/failure, or only on success.
-    // onEditModalClose(); // Moved to success case
+    // resetEditForm(); // Optional: if you want to clear edit form fields after closing
   };
 
   const resetSheetForm = () => {
     setsheetId("");
     setSheetName("");
-    setTestIdAdd(""); // Reset selected test for adding from sheet
+    setTestIdAdd(""); // Reset selected exam for adding from sheet
   };
 
   const resetAddQuestionForm = () => {
@@ -553,20 +568,8 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
     setNewOption4("");
     setNewCorrectOption("");
     setNewSolutionText({ blocks: [] });
-    setNewTestId(""); // Reset selected test for new question
+    setNewTestId(""); // Reset selected exam for new question
   };
-
-  // const resetEditForm = () => { // Optional: if you want to clear edit form fields after closing
-  //   setQuestionNo("");
-  //   setEditQuestion({ blocks: [] });
-  //   setOption1("");
-  //   setOption2("");
-  //   setOption3("");
-  //   setOption4("");
-  //   setCorrectOption("");
-  //   setSolutionText({ blocks: [] });
-  //   setQuestionId("");
-  // };
 
 
   return (
@@ -581,21 +584,21 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: "1px solid #eee" // Added a light border
+          marginBottom: "1px solid #eee" 
         }}
       >
         <p style={{ fontSize: "16px", fontWeight: "600" }}>Exam Q/A Data</p>
         <div style={{ display: "flex", gap: "12px" }}>
           <Select
-            placeholder="Select Test"
-            value={testId}
+            placeholder="Select Exam" // Changed from Test
+            value={testId} // testId here is examId
             onChange={(e) => setTestId(e.target.value)}
-            minW="200px" // Give select some minimum width
+            minW="200px" 
           >
             {testOptions &&
-              testOptions.map((item: any) => ( // Removed index as key if id is unique
+              testOptions.map((item: any) => ( 
                 <option key={item.id} value={item.id}>
-                  {item.pre_course_test_title}
+                  {item.exam_title} {/* Changed from pre_course_test_title */}
                 </option>
               ))}
           </Select>
@@ -638,20 +641,20 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
       <Modal isOpen={isAddModalOpen} onClose={() => { resetSheetForm(); onAddModalClose();}}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Insert Test Questions from Google Sheet</ModalHeader>
+          <ModalHeader>Insert Exam Questions from Google Sheet</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl isRequired>
-              <FormLabel>Select Test to Add Questions To</FormLabel>
+              <FormLabel>Select Exam to Add Questions To</FormLabel>
               <Select
-                placeholder="Select Test"
-                value={testIdAdd}
+                placeholder="Select Exam"
+                value={testIdAdd} // testIdAdd is examId
                 onChange={(e) => setTestIdAdd(e.target.value)}
               >
                 {testOptions &&
                   testOptions.map((item: any) => (
                     <option key={item.id} value={item.id}>
-                      {item.pre_course_test_title}
+                      {item.exam_title} {/* Changed from pre_course_test_title */}
                     </option>
                   ))}
               </Select>
@@ -688,24 +691,24 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
       <Modal
         isOpen={isAddQuestionModalOpen}
         onClose={() => { resetAddQuestionForm(); onAddQuestionModalClose();}}
-        size="xl" // xl or full for more space
+        size="xl" 
       >
         <ModalOverlay />
-        <ModalContent maxW="container.md"> {/* Or larger like container.lg, container.xl */}
+        <ModalContent maxW="container.md"> 
           <ModalHeader>Add New Question</ModalHeader>
           <ModalCloseButton />
-          <ModalBody overflowY="auto" maxHeight="70vh"> {/* Make modal body scrollable */}
+          <ModalBody overflowY="auto" maxHeight="70vh"> 
             <FormControl isRequired>
-              <FormLabel>Select Test</FormLabel>
+              <FormLabel>Select Exam</FormLabel>
               <Select
-                placeholder="Select Test"
-                onChange={(e) => setNewTestId(e.target.value)}
+                placeholder="Select Exam"
+                onChange={(e) => setNewTestId(e.target.value)} // newTestId is examId
                 value={newTestId}
               >
                 {testOptions &&
                   testOptions.map((item: any) => (
                     <option key={item.id} value={item.id}>
-                      {item.pre_course_test_title}
+                      {item.exam_title} {/* Changed from pre_course_test_title */}
                     </option>
                   ))}
               </Select>
@@ -892,4 +895,4 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
   );
 };
 
-export default PrecourseQaPage; // Ensure this matches the component name
+export default PrecourseQaPage;
