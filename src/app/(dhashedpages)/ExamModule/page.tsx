@@ -26,6 +26,7 @@ import {
   Textarea,
   HStack,
 } from "@chakra-ui/react";
+import ContentFormatter from "@/app/componant/ContentFormatter";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -119,52 +120,9 @@ const ExamModule = () => {
       headerName: "Question",
       editable: false,
       flex: 2,
-      cellRenderer: (params: any) => {
-        const isJson = (str: string) => {
-          try {
-            const parsed = JSON.parse(str);
-            return typeof parsed === "object" && parsed !== null;
-          } catch (e) {
-            return false;
-          }
-        };
-
-        const questionData = params.data.question;
-
-        if (typeof questionData === "string" && isJson(questionData)) {
-          const parsedData = JSON.parse(questionData);
-          return (
-            <div
-              style={{
-                height: "400px",
-                overflow: "auto",
-                scrollbarWidth: "none",
-              }}
-            >
-              <EditorComponent
-                data={parsedData}
-                readOnly={true}
-                holder="readOnly-question-editor"
-              />
-            </div>
-          );
-        } else {
-          return (
-            <div
-              style={{
-                whiteSpace: "pre-wrap",
-                wordWrap: "break-word",
-                overflowWrap: "break-word",
-                overflow: "auto",
-                scrollbarWidth: "none",
-                padding: "8px",
-              }}
-            >
-              {questionData}
-            </div>
-          );
-        }
-      },
+        cellRenderer: (params: any) => {
+              return <ContentFormatter content={params.value} />;
+            },
       cellStyle: {
         height: "100%",
         padding: "8px",
@@ -288,25 +246,9 @@ const ExamModule = () => {
       headerName: "Solution Text",
       filter: false,
       flex: 2,
-      cellRenderer: (params: any) => {
-        const solutionText = params.data.solution_text || "";
-        return (
-          <div
-            style={{
-              whiteSpace: "pre-wrap",
-              wordWrap: "break-word",
-              overflowWrap: "break-word",
-              overflow: "auto",
-              height: "100%",
-              scrollbarWidth: "none",
-              padding: "8px",
-              backgroundColor: "transparent",
-            }}
-          >
-            {solutionText}
-          </div>
-        );
-      },
+     cellRenderer: (params: any) => {
+           return <ContentFormatter content={params.value} />;
+         },
     },
     {
       field: "question_id",
