@@ -312,15 +312,45 @@ const postcourseqa = () => {
   const handleEdit = (data: any) => {
     setquestionNo(data.question_no);
 
-    // Handle question (parse if JSON)
-    let questionValue = data.question;
+    // Parse question data
+    let questionValue;
     try {
-      const parsed = JSON.parse(data.question);
-      if (typeof parsed === "object" && parsed !== null) {
-        questionValue = parsed;
-      }
+      questionValue =
+        typeof data.question === "string"
+          ? JSON.parse(data.question)
+          : data.question;
     } catch {
-      // If parsing fails, keep as string
+      // If parsing fails or it's plain text, convert to EditorJS format
+      questionValue = {
+        blocks: [
+          {
+            type: "paragraph",
+            data: {
+              text: data.question || "",
+            },
+          },
+        ],
+      };
+    }
+
+    // Parse solution data
+    let solutionValue;
+    try {
+      solutionValue =
+        typeof data.solution_text === "string"
+          ? JSON.parse(data.solution_text)
+          : data.solution_text;
+    } catch {
+      solutionValue = {
+        blocks: [
+          {
+            type: "paragraph",
+            data: {
+              text: data.solution_text || "",
+            },
+          },
+        ],
+      };
     }
     setEditQuestion(questionValue);
 
@@ -331,15 +361,15 @@ const postcourseqa = () => {
     setOption4(data.options[3].option_text);
 
     // Handle solution_text (parse if JSON)
-    let solutionValue = data.solution_text;
-    try {
-      const parsedSolution = JSON.parse(data.solution_text);
-      if (typeof parsedSolution === "object" && parsedSolution !== null) {
-        solutionValue = parsedSolution;
-      }
-    } catch {
-      // If parsing fails, keep as string
-    }
+    // let solutionValue = data.solution_text;
+    // try {
+    //   const parsedSolution = JSON.parse(data.solution_text);
+    //   if (typeof parsedSolution === "object" && parsedSolution !== null) {
+    //     solutionValue = parsedSolution;
+    //   }
+    // } catch {
+    //   // If parsing fails, keep as string
+    // }
     setSolutionText(solutionValue);
 
     onEditModalOpen();

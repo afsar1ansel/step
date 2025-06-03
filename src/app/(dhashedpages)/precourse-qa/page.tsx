@@ -361,9 +361,9 @@ const precourseqa = () => {
     setOption4(data.options[3]?.option_text || "");
 
     // Find which option is correct
-    const correctOption = data.options.find(
-      (opt: any) => opt.correct_option === 1
-    );
+    // const correctOption = data.options.find(
+    //   (opt: any) => opt.correct_option === 1
+    // );
     // setCorrectOption(correctOption ? correctOption.option_no.toString() : "");
 
     setSolutionText(solutionValue);
