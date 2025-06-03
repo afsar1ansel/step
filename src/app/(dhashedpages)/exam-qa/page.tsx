@@ -25,6 +25,7 @@ import {
   Textarea,
   HStack,
 } from "@chakra-ui/react";
+import ContentFormatter from "@/app/componant/ContentFormatter";
 // import styles from "./page.module.css"; // If you create a corresponding CSS module
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -132,57 +133,9 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
       headerName: "Question",
       editable: false,
       flex: 2,
-      cellRenderer: (params: any) => {
-        const isJson = (str: string) => {
-          try {
-            const parsed = JSON.parse(str);
-            return typeof parsed === "object" && parsed !== null;
-          } catch (e) {
-            return false;
-          }
-        };
-
-        const questionData = params.data.question;
-
-        if (typeof questionData === "string" && isJson(questionData)) {
-          const parsedData = JSON.parse(questionData);
-          const header = `Questioneditor: ${params.data.question_no}`;
-          return (
-            <div
-              style={{
-                height: "100%", // Adjusted for better fit
-                maxHeight: "280px", // Max height before scroll
-                overflowY: "auto",
-                scrollbarWidth: "thin", // For FF
-                padding: "2px",
-              }}
-            >
-              <EditorComponent
-                data={parsedData}
-                readOnly={true}
-                holder={header}
-              />
-            </div>
-          );
-        } else {
-          return (
-            <div
-              style={{
-                whiteSpace: "pre-wrap",
-                wordWrap: "break-word",
-                overflowWrap: "break-word",
-                overflowY: "auto", // Changed to auto
-                maxHeight: "280px", // Consistent max height
-                scrollbarWidth: "thin",
-                padding: "8px",
-                height: "100%",
-              }}
-            >
-              {questionData}
-            </div>
-          );
-        }
-      },
+       cellRenderer: (params: any) => {
+             return <ContentFormatter content={params.value} />;
+           },
       cellStyle: {
         height: "100%",
         padding: "0px", // Cell padding handled by renderer
@@ -322,57 +275,8 @@ const PrecourseQaPage = () => { // Renamed component for clarity, ensure export 
       filter: false,
       flex: 2,
       cellRenderer: (params: any) => {
-        const isJson = (str: string) => {
-          try {
-            const parsed = JSON.parse(str);
-            return typeof parsed === "object" && parsed !== null;
-          } catch (e) {
-            return false;
-          }
-        };
-
-        const solutionData = params.data.solution_text;
-
-        if (typeof solutionData === "string" && isJson(solutionData)) {
-          const parsedData = JSON.parse(solutionData);
-          const header = `SolutionEditor: ${params.data.question_no}`;
-          return (
-            <div
-              style={{
-                height: "100%", // Adjusted
-                maxHeight: "280px", // Max height before scroll
-                overflowY: "auto",
-                scrollbarWidth: "thin",
-                padding: "2px",
-              }}
-            >
-              <EditorComponent
-                data={parsedData}
-                readOnly={true}
-                holder={header}
-              />
-            </div>
-          );
-        } else {
-          return (
-            <div
-              style={{
-                whiteSpace: "pre-wrap",
-                wordWrap: "break-word",
-                overflowWrap: "break-word",
-                overflowY: "auto",
-                maxHeight: "280px",
-                scrollbarWidth: "thin",
-                padding: "8px",
-                backgroundColor: "transparent",
-                height: "100%",
-              }}
-            >
-              {solutionData}
-            </div>
-          );
-        }
-      },
+            return <ContentFormatter content={params.value} />;
+          },
       cellStyle: { height: "100%", padding: "0px", display: 'flex', alignItems: 'center' },
       autoHeight: true,
     },
