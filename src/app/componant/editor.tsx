@@ -3,13 +3,13 @@
 
 import { useEffect, useRef } from "react";
 import EditorJS from "@editorjs/editorjs";
-import Header from "@editorjs/header";
-import List from "@editorjs/list";
 import ImageTool from "@editorjs/image";
-import Table from "@editorjs/table";
-import Quote from "@editorjs/quote";
-import InlineCode from "@editorjs/inline-code";
 import Paragraph from "@editorjs/paragraph";
+// import Header from "@editorjs/header";
+// import List from "@editorjs/list";
+// import Table from "@editorjs/table";
+// import Quote from "@editorjs/quote";
+// import InlineCode from "@editorjs/inline-code";
 
 interface EditorComponentProps {
   data?: any;
@@ -36,18 +36,18 @@ const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
     const editor = new EditorJS({
       holder: holder,
       tools: {
-        header: {
-          class: Header as any,
-          config: {
-            placeholder: "Enter a header",
-            levels: [1, 2, 3, 4],
-            defaultLevel: 3,
-          },
-        },
-        list: {
-          class: List as any,
-          inlineToolbar: true,
-        },
+        // header: {
+        //   class: Header as any,
+        //   config: {
+        //     placeholder: "Enter a header",
+        //     levels: [1, 2, 3, 4],
+        //     defaultLevel: 3,
+        //   },
+        // },
+        // list: {
+        //   class: List as any,
+        //   inlineToolbar: true,
+        // },
         image: {
           class: ImageTool,
           config: {
@@ -90,17 +90,17 @@ const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
             },
           },
         },
-        table: {
-          class: Table as any,
-          inlineToolbar: true,
-        },
-        quote: {
-          class: Quote,
-          inlineToolbar: true,
-        },
-        inlineCode: {
-          class: InlineCode,
-        },
+        // table: {
+        //   class: Table as any,
+        //   inlineToolbar: true,
+        // },
+        // quote: {
+        //   class: Quote,
+        //   inlineToolbar: true,
+        // },
+        // inlineCode: {
+        //   class: InlineCode,
+        // },
         paragraph: {
           class: Paragraph as any,
           inlineToolbar: true,
