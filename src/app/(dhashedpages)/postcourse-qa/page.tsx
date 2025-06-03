@@ -1,6 +1,9 @@
 "use client";
+import dynamic from "next/dynamic";
+const EditorComponent = dynamic(() => import("@/app/componant/editor"), {
+  ssr: false,
+});
 
-import EditorComponent from "@/app/componant/editor";
 import { AgGridReact } from "ag-grid-react";
 import React, { useEffect, useState } from "react";
 import type { ColDef } from "ag-grid-community";
@@ -128,8 +131,8 @@ const postcourseqa = () => {
       editable: false,
       flex: 2,
       cellRenderer: (params: any) => {
-              return <ContentFormatter content={params.value} />;
-            },
+        return <ContentFormatter content={params.value} />;
+      },
       cellStyle: {
         height: "100%",
         padding: "8px",
@@ -253,10 +256,9 @@ const postcourseqa = () => {
       headerName: "Solution",
       filter: false,
       cellRenderer: (params: any) => {
-              return <ContentFormatter content={params.value} />;
-            },
+        return <ContentFormatter content={params.value} />;
+      },
       flex: 2,
-    
     },
     {
       field: "question_id",
