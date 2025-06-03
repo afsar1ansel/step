@@ -1,6 +1,9 @@
 "use client";
+import dynamic from "next/dynamic";
+const EditorComponent = dynamic(() => import("@/app/componant/editor"), {
+  ssr: false,
+});
 
-import EditorComponent from "@/app/componant/editor";
 import { AgGridReact } from "ag-grid-react";
 import React, { useEffect, useState } from "react";
 import type { ColDef } from "ag-grid-community";
