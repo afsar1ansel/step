@@ -62,6 +62,15 @@ const ContentFormatter: React.FC<ContentFormatterProps> = ({ content }) => {
               );
             case "image":
               return <ImageBlock key={index} url={block.data.file?.url} />;
+            case "table":
+              return (
+                <TableBlock
+                  key={index}
+                  withHeadings={block.data.withHeadings}
+                  content={block.data.content}
+                  stretched={block.data.stretched}
+                />
+              );
             default:
               return (
                 <div key={index} className="unknown-block">
@@ -224,6 +233,73 @@ const ImageBlock: React.FC<{ url?: string }> = ({ url }) => {
         }}
       />
       <br />
+    </div>
+  );
+};
+
+// Component for table blocks
+const TableBlock: React.FC<{
+  withHeadings: boolean;
+  content: string[][];
+  stretched: boolean;
+}> = ({ withHeadings, content, stretched }) => {
+  if (!content || !Array.isArray(content)) return null;
+
+  return (
+    <div
+      style={{
+        overflowX: "auto",
+        width: stretched ? "100%" : "fit-content",
+        margin: "12px 0",
+      }}
+    >
+      <table
+        style={{
+          borderCollapse: "collapse",
+          width: "100%",
+          maxWidth: "100%",
+          overflowX: "auto",
+          display: "block",
+        }}
+      >
+        {withHeadings && content.length > 0 && (
+          <thead>
+            <tr>
+              {content[0].map((cell, cellIndex) => (
+                <th
+                  key={`th-${cellIndex}`}
+                  style={{
+                    border: "1px solid #ddd",
+                    padding: "8px",
+                    textAlign: "left",
+                    backgroundColor: "#f2f2f2",
+                  }}
+                >
+                  {cell}
+                </th>
+              ))}
+            </tr>
+          </thead>
+        )}
+        <tbody>
+          {content.slice(withHeadings ? 1 : 0).map((row, rowIndex) => (
+            <tr key={`row-${rowIndex}`}>
+              {row.map((cell, cellIndex) => (
+                <td
+                  key={`td-${rowIndex}-${cellIndex}`}
+                  style={{
+                    border: "1px solid #ddd",
+                    padding: "8px",
+                    textAlign: "left",
+                  }}
+                >
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
