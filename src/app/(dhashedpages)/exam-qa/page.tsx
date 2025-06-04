@@ -724,7 +724,7 @@ const PrecourseQaPage = () => {
             </FormControl>
             <FormControl mt={4} isRequired>
               <FormLabel>Question</FormLabel>
-              <div style={{ border: "1px solid #E2E8F0", borderRadius:"md", padding: "10px", minHeight:"150px" }}>
+              <div style={{ border: "1px solid #ccc", padding: "10px" }}>
                 <EditorComponent
                   data={newQuestionData}
                   onChange={setNewQuestionData}
@@ -779,7 +779,7 @@ const PrecourseQaPage = () => {
             </FormControl>
             <FormControl mt={4}> {/* Solution is optional */}
               <FormLabel>Solution</FormLabel>
-              <div style={{ border: "1px solid #E2E8F0", borderRadius:"md", padding: "10px", minHeight:"150px" }}>
+              <div style={{ border: "1px solid #ccc", padding: "10px" }}>
                 <EditorComponent
                   data={newSolutionText}
                   onChange={setNewSolutionText}
@@ -817,7 +817,7 @@ const PrecourseQaPage = () => {
             </FormControl>
             <FormControl mt={4} isRequired>
               <FormLabel>Question</FormLabel>
-              <div style={{ border: "1px solid #E2E8F0", borderRadius:"md", padding: "10px", minHeight:"150px" }}>
+              <div style={{ border: "1px solid #ccc", padding: "10px" }}>
                 <EditorComponent
                   data={editQuestion}
                   onChange={setEditQuestion}
@@ -872,7 +872,7 @@ const PrecourseQaPage = () => {
             </FormControl>
             <FormControl mt={4}>
               <FormLabel>Solution</FormLabel>
-              <div style={{ border: "1px solid #E2E8F0", borderRadius:"md", padding: "10px", minHeight:"150px" }}>
+              <div style={{ border: "1px solid #ccc", padding: "10px" }}>
                 <EditorComponent
                   data={solutionText}
                   onChange={setSolutionText}
@@ -885,7 +885,7 @@ const PrecourseQaPage = () => {
             <Button colorScheme="gray" mr={3} onClick={() => { /* resetEditForm(); */ onEditModalClose();}}>
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleUpdateCourse} isDisabled={!questionNo || !correctOption || !option1 || !option2 || !option3 || !option4}>
+            <Button colorScheme="green" onClick={handleUpdateCourse}>
               Update
             </Button>
           </ModalFooter>
