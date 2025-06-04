@@ -5,9 +5,9 @@ import { useEffect, useRef } from "react";
 import EditorJS from "@editorjs/editorjs";
 import ImageTool from "@editorjs/image";
 import Paragraph from "@editorjs/paragraph";
+import Table from "@editorjs/table";
 // import Header from "@editorjs/header";
 // import List from "@editorjs/list";
-// import Table from "@editorjs/table";
 // import Quote from "@editorjs/quote";
 // import InlineCode from "@editorjs/inline-code";
 
@@ -90,10 +90,10 @@ const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
             },
           },
         },
-        // table: {
-        //   class: Table as any,
-        //   inlineToolbar: true,
-        // },
+        table: {
+          class: Table as any,
+          inlineToolbar: true,
+        },
         // quote: {
         //   class: Quote,
         //   inlineToolbar: true,
