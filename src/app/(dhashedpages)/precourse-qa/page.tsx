@@ -642,6 +642,7 @@ const precourseqa = () => {
             // }
           }}
           suppressCellFocus={true}
+          enableCellTextSelection={true}
         />
       </div>
 

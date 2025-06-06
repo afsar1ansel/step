@@ -245,6 +245,100 @@ const TableBlock: React.FC<{
 }> = ({ withHeadings, content, stretched }) => {
   if (!content || !Array.isArray(content)) return null;
 
+  // Function to render cell content with anchor-wrapped images
+  const renderCellContent = (cell: string) => {
+    if (!cell) return null;
+
+    // Create a temporary DOM element to parse the HTML
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = cell;
+
+    // Extract all anchor tags
+    const anchors = tempDiv.querySelectorAll("a");
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let hasTextBefore = false;
+
+    // Process each anchor tag
+    anchors.forEach((anchor, index) => {
+      const href = anchor.getAttribute("href");
+      const textContent = anchor.textContent;
+
+      // Add text before this anchor
+      const anchorStart = cell.indexOf(anchor.outerHTML, lastIndex);
+      if (anchorStart > lastIndex) {
+        const textBefore = cell.substring(lastIndex, anchorStart);
+        if (textBefore.trim().length > 0) {
+          parts.push(
+            <span
+              key={`text-${index}`}
+              dangerouslySetInnerHTML={{
+                __html: textBefore,
+              }}
+            />
+          );
+          hasTextBefore = true;
+        }
+      }
+
+      // Check if this is an image URL
+      if (href && /(\.png|\.jpg|\.jpeg|\.gif)$/i.test(href)) {
+        // Add line break if there was text before
+        if (hasTextBefore) {
+          parts.push(<br />);
+          hasTextBefore = false; // Reset for next items
+        }
+
+        parts.push(
+          <div
+            key={`img-${index}`}
+            style={{ display: "block", margin: "4px 0" }}
+          >
+            <img
+              src={href}
+              alt=""
+              style={{ maxWidth: "150px", maxHeight: "150px", height: "auto" }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/fallback-image.png";
+              }}
+            />
+          </div>
+        );
+      } else {
+        // For non-image links, keep them as links
+        parts.push(
+          <a
+            key={`link-${index}`}
+            href={href || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {textContent}
+          </a>
+        );
+      }
+
+      lastIndex = anchorStart + anchor.outerHTML.length;
+    });
+
+    // Add remaining text after last anchor
+    if (lastIndex < cell.length) {
+      const remainingText = cell.substring(lastIndex);
+      if (remainingText.trim().length > 0) {
+        parts.push(
+          <span
+            key="text-end"
+            dangerouslySetInnerHTML={{
+              __html: remainingText,
+            }}
+          />
+        );
+      }
+    }
+
+    return <div style={{ lineHeight: "1.5" }}>{parts}</div>;
+  };
+
   return (
     <div
       style={{
@@ -275,7 +369,7 @@ const TableBlock: React.FC<{
                     backgroundColor: "#f2f2f2",
                   }}
                 >
-                  {cell}
+                  {renderCellContent(cell)}
                 </th>
               ))}
             </tr>
@@ -291,9 +385,10 @@ const TableBlock: React.FC<{
                     border: "1px solid #ddd",
                     padding: "8px",
                     textAlign: "left",
+                    verticalAlign: "top",
                   }}
                 >
-                  {cell}
+                  {renderCellContent(cell)}
                 </td>
               ))}
             </tr>
