@@ -6,10 +6,7 @@ import EditorJS from "@editorjs/editorjs";
 import ImageTool from "@editorjs/image";
 import Paragraph from "@editorjs/paragraph";
 import Table from "@editorjs/table";
-// import Header from "@editorjs/header";
-// import List from "@editorjs/list";
-// import Quote from "@editorjs/quote";
-// import InlineCode from "@editorjs/inline-code";
+import { useToast } from "@chakra-ui/react";
 
 interface EditorComponentProps {
   data?: any;
@@ -19,6 +16,7 @@ interface EditorComponentProps {
 
 const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
   const editorRef = useRef<EditorJS | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     if (!editorRef.current) {
@@ -67,12 +65,28 @@ const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
 
                 const result = await response.json();
                 if (response.ok && result.success === 1) {
+                  console.log("Image URL upload:", result.file.url);
+                  toast({
+                    title: "Image upload",
+                    description: `URL: ${result.file.url}`,
+                    status: "info",
+                    duration: null,
+                    isClosable: true,
+                  });
                   return result;
                 } else {
                   throw new Error(result.message || "Image upload failed");
                 }
               },
               async uploadByUrl(url: string) {
+                console.log("Image URL upload:", url);
+                toast({
+                  title: "Image upload",
+                  description: `URL: ${url}`,
+                  status: "info",
+                  duration: null,
+                  isClosable: true,
+                });
                 return {
                   success: 1,
                   file: {
