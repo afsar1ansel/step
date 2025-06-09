@@ -309,6 +309,24 @@ export default function RootLayout({
                                   </p>
                                 </Link>
                               </li>
+                              <li>
+                                <Link href="/Course_price">
+                                  <p
+                                    className={
+                                      basePath === "Course_price"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Course Price
+                                  </p>
+                                </Link>
+                              </li>
                             </ul>
                           </AccordionPanel>
                         </AccordionItem>
