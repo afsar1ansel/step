@@ -25,6 +25,7 @@ import {
   Image,
   Center,
   Spinner,
+  Select,
 } from "@chakra-ui/react";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -32,6 +33,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 const CourseMaster = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const [rowData, setRowData] = useState<any[]>([]);
+  const [allCourses, setAllCourses] = useState<any[]>([]);
   const toast = useToast();
 
   // Image upload states
@@ -55,6 +57,7 @@ const CourseMaster = () => {
 
   useEffect(() => {
     fetcherData();
+    fetchAllCourses();
   }, []);
 
   async function fetcherData() {
@@ -76,6 +79,39 @@ const CourseMaster = () => {
     }
   }
 
+  const fetchAllCourses = async () => {
+    const token = localStorage.getItem("token") ?? "";
+    try {
+      const response = await fetch(
+        `${baseUrl}/masters/courses/get-all-courses/${token}`,
+        { method: "GET" }
+      );
+      const data = await response.json();
+      console.log(data, "All Courses Data");
+      setAllCourses(data);
+    } catch (error) {
+      console.error("Error fetching all courses:", error);
+    }
+  };
+
+  // [
+  //   {
+  //     actual_price_inr: "30000.00",
+  //     course_id: 1,
+  //     course_name: "NEET PG",
+  //     created_admin_user_id: 5,
+  //     created_date: "Mon, 09 Jun 2025 00:00:00 GMT",
+  //     created_time: "19:00:49",
+  //     id: 1,
+  //     priceName: "plan 1 for course",
+  //     selling_price_inr: "25000.00",
+  //     status: 1,
+  //     updated_admin_user_id: null,
+  //     updated_date: null,
+  //     updated_time: null,
+  //   },
+  // ];
+
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     {
       headerName: "Sl. No",
@@ -85,29 +121,21 @@ const CourseMaster = () => {
       suppressAutoSize: true,
     },
     {
-      headerName: "Course Name",
-      field: "course_name",
+      headerName: "Plan Description",
+      field: "price_description",
       minWidth: 180,
     },
     {
-      headerName: "Course Image",
-      field: "course_image",
-      cellRenderer: (params: any) => (
-        <Button
-          variant="link"
-          colorScheme="blue"
-          onClick={() => fetchImage(params.value)}
-        >
-          View Image
-        </Button>
-      ),
+      headerName: "Course Name",
+      field: "course_name",
     },
     {
-      headerName: "Course Created By",
-      field: "created_admin_user_id",
-      cellRenderer: (params: any) => {
-        return params.value == 1 ? "Admin" : "Sub Admin";
-      },
+      headerName: "Price in INR",
+      field: "actual_price_inr",
+    },
+    {
+      headerName: "Discount Price in INR",
+      field: "selling_price_inr",
     },
     {
       field: "status",
@@ -144,7 +172,10 @@ const CourseMaster = () => {
             <Button
               colorScheme="blue"
               size="sm"
-              onClick={() => handleEdit(params.data)}
+              onClick={() => {
+                handleEdit(params.data);
+                handleEditModalOpen();
+              }}
               variant="outline"
             >
               Edit
@@ -179,29 +210,32 @@ const CourseMaster = () => {
   const [discount, setDiscount] = useState<string | number>("");
 
   const [editRowId, setEditRowId] = useState("");
+  const [selectedCourseId, setSelectedCourseId] = useState("");
 
-  const fetchImage = async (imageName: string) => {
-    console.log(imageName);
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${baseUrl}/masters/courses/course-image/view/${token}/${imageName}`,
-        {
-          method: "GET",
-        }
-      );
-      console.log(response);
-      setCurrentImageUrl(response.url);
-      onImageModalOpen();
-    } catch (error) {
-      console.log(error);
-    }
-  };
+//   {
+//     "actual_price_inr": "30000.00",
+//     "course_id": 1,
+//     "course_name": "NEET PG",
+//     "created_admin_user_id": 5,
+//     "created_date": "Mon, 09 Jun 2025 00:00:00 GMT",
+//     "created_time": "19:00:49",
+//     "id": 1,
+//     "price_description": "plan 1 for course",
+//     "selling_price_inr": "25000.00",
+//     "status": 1,
+//     "updated_admin_user_id": null,
+//     "updated_date": null,
+//     "updated_time": null
+// }
 
   const handleEdit = (data: any) => {
+    console.log(data);
     setEditRowId(data.id);
-    setpriceName(data.course_name);
-    setCurrentCourse(data);
+    setpriceName(data.price_description);
+    // setCurrentCourse(data.course_id);
+    setSelectedCourseId(data.course_id);
+    setPrice(data.actual_price_inr);
+    setDiscount(data.selling_price_inr);
     onEditModalOpen();
   };
 
@@ -211,7 +245,7 @@ const CourseMaster = () => {
       const token = localStorage.getItem("token") ?? "";
       const status = data.status ? 0 : 1;
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/courses/change-course-status/${status}/${data.id}/${token}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/admin/app-purchase/change-status/${status}/${data.id}/${token}`,
         {
           method: "GET",
         }
@@ -223,14 +257,17 @@ const CourseMaster = () => {
     }
   };
 
+  // token, courseId, priceDescription, actualPrice, sellingPrice;
   const handleAddCourse = async () => {
     setLoading(true);
     try {
       const form = new FormData();
-      form.append("moduleName", priceName);
+      form.append("priceDescription", priceName);
       form.append("actualPrice", price.toString());
       form.append("sellingPrice", discount.toString());
+      form.append("courseId", selectedCourseId);
       form.append("token", localStorage.getItem("token") ?? "");
+      console.log(Object.fromEntries(form.entries()));
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/admin/app-purchase/add`,
         {
@@ -266,23 +303,24 @@ const CourseMaster = () => {
       console.error("Error adding course:", error);
     } finally {
       setLoading(false);
-      resetForm();
+      // resetForm();
     }
   };
 
+  // token, courseId, priceDescription, actualPrice, sellingPrice, appPurchaseId;
   const handleUpdateCourse = async () => {
     setLoading(true);
     try {
       const form = new FormData();
-      form.append("priceName", priceName);
-      form.append("courseId", editRowId);
+      form.append("priceDescription", priceName);
+      form.append("actualPrice", price.toString());
+      form.append("sellingPrice", discount.toString());
+      form.append("courseId", selectedCourseId);
+      form.append("appPurchaseId", editRowId);
       form.append("token", localStorage.getItem("token") ?? "");
-      if (selectedImage) {
-        form.append("courseImage", selectedImage);
-      }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/courses/update-course`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/admin/app-purchase/update`,
         {
           method: "POST",
           body: form,
@@ -327,6 +365,17 @@ const CourseMaster = () => {
     setCurrentCourse(null);
   };
 
+  const handleAddModalOpen = () => {
+    fetchAllCourses();
+    onAddModalOpen();
+  };
+
+  const handleEditModalOpen = () => {
+    fetchAllCourses();
+    onEditModalOpen();
+
+  };
+
   return (
     <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
       <div
@@ -342,7 +391,7 @@ const CourseMaster = () => {
         }}
       >
         <p style={{ fontSize: "16px", fontWeight: "600" }}>Course Price</p>
-        <Button onClick={onAddModalOpen} colorScheme="green">
+        <Button onClick={handleAddModalOpen} colorScheme="green">
           Add Course Price
         </Button>
       </div>
@@ -376,6 +425,109 @@ const CourseMaster = () => {
           <ModalBody>
             <FormControl>
               <FormLabel>Name</FormLabel>
+              <Input
+                placeholder="Enter Course Price Name"
+                value={priceName}
+                onChange={(e) => setpriceName(e.target.value)}
+              />
+
+              <FormLabel mt={4}>Select Course</FormLabel>
+              <Select
+                placeholder="Select Course"
+                value={selectedCourseId}
+                onChange={(e) => setSelectedCourseId(e.target.value)}
+              >
+                {allCourses.map((course: any) => (
+                  <option key={course.id} value={course.id}>
+                    {course.course_name}
+                  </option>
+                ))}
+              </Select>
+
+              {/* <FormLabel mt={4}>Course Image</FormLabel>
+              <Box
+                {...getRootProps()}
+                border="2px dashed"
+                borderColor={isDragActive ? "green.500" : "gray.300"}
+                borderRadius="md"
+                p={4}
+                textAlign="center"
+                cursor="pointer"
+                _hover={{ borderColor: "green.400" }}
+              >
+                <input {...getInputProps()} />
+                {isDragActive ? (
+                  <p>Drop the image here...</p>
+                ) : (
+                  <p>Drag & drop an image here, or click to select</p>
+                )}
+              </Box>
+
+              {preview && (
+                <Box mt={4}>
+                  <Image
+                    src={preview}
+                    alt="Preview"
+                    maxH="200px"
+                    mx="auto"
+                    borderRadius="md"
+                  />
+                  <Button
+                    size="sm"
+                    mt={2}
+                    colorScheme="red"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedImage(null);
+                      setPreview(null);
+                    }}
+                  >
+                    Remove Image
+                  </Button>
+                </Box>
+              )} */}
+
+              <FormLabel mt={4}>Price</FormLabel>
+              <Input
+                type="number"
+                placeholder="Enter Price"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+
+              <FormLabel mt={4}>Discount Price</FormLabel>
+              <Input
+                type="number"
+                placeholder="Enter Discount Price"
+                value={discount}
+                onChange={(e) => setDiscount(e.target.value)}
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="gray" mr={3} onClick={onAddModalClose}>
+              Cancel
+            </Button>
+            <Button
+              colorScheme="green"
+              onClick={handleAddCourse}
+              isLoading={loading}
+            >
+              Add
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Edit Course Modal */}
+      <Modal isOpen={isEditModalOpen} onClose={onEditModalClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Edit </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <FormLabel>Price name</FormLabel>
               <Input
                 placeholder="Enter Course Price Name"
                 value={priceName}
@@ -424,7 +576,20 @@ const CourseMaster = () => {
                   </Button>
                 </Box>
               )} */}
-              <FormLabel>Price</FormLabel>
+              <FormLabel mt={4}>Select Course</FormLabel>
+              <Select
+                placeholder="Select Course"
+                value={selectedCourseId}
+                onChange={(e) => setSelectedCourseId(e.target.value)}
+              >
+                {allCourses.map((course: any) => (
+                  <option key={course.id} value={course.id}>
+                    {course.course_name}
+                  </option>
+                ))}
+              </Select>
+
+              <FormLabel mt={4}>Price</FormLabel>
               <Input
                 type="number"
                 placeholder="Enter Price"
@@ -432,87 +597,13 @@ const CourseMaster = () => {
                 onChange={(e) => setPrice(e.target.value)}
               />
 
-              <FormLabel>Discount Price</FormLabel>
+              <FormLabel mt={4}>Discount Price</FormLabel>
               <Input
                 type="number"
                 placeholder="Enter Discount Price"
                 value={discount}
                 onChange={(e) => setDiscount(e.target.value)}
               />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="gray" mr={3} onClick={onAddModalClose}>
-              Cancel
-            </Button>
-            <Button
-              colorScheme="green"
-              onClick={handleAddCourse}
-              isLoading={loading}
-            >
-              Add
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-
-      {/* Edit Course Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={onEditModalClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Course</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Course Name</FormLabel>
-              <Input
-                placeholder="Enter Course Name"
-                value={priceName}
-                onChange={(e) => setpriceName(e.target.value)}
-              />
-
-              <FormLabel mt={4}>Course Image</FormLabel>
-              <Box
-                {...getRootProps()}
-                border="2px dashed"
-                borderColor={isDragActive ? "green.500" : "gray.300"}
-                borderRadius="md"
-                p={4}
-                textAlign="center"
-                cursor="pointer"
-                _hover={{ borderColor: "green.400" }}
-              >
-                <input {...getInputProps()} />
-                {isDragActive ? (
-                  <p>Drop the image here...</p>
-                ) : (
-                  <p>Drag & drop an image here, or click to select</p>
-                )}
-              </Box>
-
-              {preview && (
-                <Box mt={4}>
-                  <Image
-                    src={preview}
-                    alt="Preview"
-                    maxH="200px"
-                    mx="auto"
-                    borderRadius="md"
-                  />
-                  <Button
-                    size="sm"
-                    mt={2}
-                    colorScheme="red"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedImage(null);
-                      setPreview(null);
-                    }}
-                  >
-                    Remove Image
-                  </Button>
-                </Box>
-              )}
             </FormControl>
           </ModalBody>
           <ModalFooter>
