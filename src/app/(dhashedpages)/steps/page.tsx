@@ -233,7 +233,12 @@ const StepsTab = () => {
 
       const data = await response.json();
       if (data.errFlag === 1) {
-        toast({ title: data.message, status: "error", duration: 3000, isClosable: true });
+        toast({
+          title: data.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
       }
       setRowData(data);
       console.log(data);
@@ -555,7 +560,7 @@ const StepsTab = () => {
       });
     } finally {
       setIsSubmitting(false);
-        onAddModalClose();
+      // onAddModalClose();
     }
   };
 
@@ -629,8 +634,8 @@ const StepsTab = () => {
       setIsSubmitting(false);
     }
 
-    resetForm();
-    onEditModalClose();
+    // resetForm();
+    // onEditModalClose();
   };
 
   const resetForm = () => {
@@ -683,7 +688,7 @@ const StepsTab = () => {
   useEffect(() => {
     fetchCource();
     fetchData();
-    fetchSubjects(); 
+    fetchSubjects();
   }, []);
 
   useEffect(() => {
@@ -771,7 +776,7 @@ const StepsTab = () => {
       );
       const data = await response.json();
       setSubject(data);
-       console.log(data);
+      console.log(data);
     } catch (error) {
       console.log(error);
     }
