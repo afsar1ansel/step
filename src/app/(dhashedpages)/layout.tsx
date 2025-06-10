@@ -20,6 +20,7 @@ import { FaUserEdit } from "react-icons/fa";
 import { GrNotes } from "react-icons/gr";
 import { CiBoxList } from "react-icons/ci";
 import { FaRegImages } from "react-icons/fa6";
+import { FaUsersViewfinder } from "react-icons/fa6";
 import { GrTestDesktop } from "react-icons/gr";
 
 import { MdLogout } from "react-icons/md";
@@ -70,8 +71,9 @@ type NavItem =
   | "precourse-qa"
   | "postcourse-test"
   | "postcourse-qa"
-  | "ExamModule"
-  | "exam-test"
+  | "appUserPurchase" 
+  | "ExamModule" 
+  | "exam-test" 
   | "exam-qa";
 
 export default function RootLayout({
@@ -461,12 +463,19 @@ export default function RootLayout({
                     <li
                       style={{ padding: 0, margin: 0 }}
                       className={
-                        ["ExamModule", "exam-test", "exam-qa"].includes(active) || ["exam-test", "exam-qa"].includes(basePath)
+                        ["ExamModule", "exam-test", "exam-qa"].includes(
+                          active
+                        ) || ["exam-test", "exam-qa"].includes(basePath)
                           ? "active"
                           : ""
                       }
                     >
-                      <Accordion allowToggle defaultIndex={["exam-test", "exam-qa"].includes(basePath) ? [0] : []}>
+                      <Accordion
+                        allowToggle
+                        defaultIndex={
+                          ["exam-test", "exam-qa"].includes(basePath) ? [0] : []
+                        }
+                      >
                         <AccordionItem border="none">
                           <AccordionButton
                             style={{
@@ -565,6 +574,14 @@ export default function RootLayout({
                       <FaUsers />
                       <Link href="/AppUser">
                         <p className="linkname">App User</p>
+                      </Link>
+                    </li>
+                    <li
+                      className={active === "appUserPurchase" ? "active" : ""}
+                    >
+                      <FaUsersViewfinder />
+                      <Link href="/appUserPurchase">
+                        <p className="linkname">App User Purchase</p>
                       </Link>
                     </li>
                     {/* <li className={active === "Settings" ? "active" : ""}>
