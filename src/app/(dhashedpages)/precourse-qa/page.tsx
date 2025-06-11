@@ -695,7 +695,7 @@ const precourseqa = () => {
       <Modal
         isOpen={isAddQuestionModalOpen}
         onClose={onAddQuestionModalClose}
-        size="xl"
+        size="4xl"
       >
         <ModalOverlay />
         <ModalContent>
@@ -808,7 +808,7 @@ const precourseqa = () => {
       </Modal>
 
       {/* Edit Question Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={onEditModalClose} size="xl">
+      <Modal isOpen={isEditModalOpen} onClose={onEditModalClose} size="4xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Question</ModalHeader>

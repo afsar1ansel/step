@@ -18,6 +18,41 @@ const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
   const editorRef = useRef<EditorJS | null>(null);
   const toast = useToast();
 
+  // Function to clean empty blocks before saving
+  const cleanEditorData = (content: any) => {
+    if (!content || !content.blocks) return content;
+
+    const cleanedBlocks = content.blocks
+      .map((block: any) => {
+        if (block.type === "paragraph") {
+          let text = block.data?.text || "";
+          // Replace all &nbsp; with a space, then trim
+          text = text.replace(/&nbsp;/g, " ").trim();
+          return {
+            ...block,
+            data: {
+              ...block.data,
+              text,
+            },
+          };
+        }
+        return block;
+      })
+      .filter((block: any) => {
+        if (block.type === "paragraph") {
+          const text = block.data?.text || "";
+          // Remove if empty or only contains whitespace
+          return text.replace(/\s/g, "") !== "";
+        }
+        return true;
+      });
+
+    return {
+      ...content,
+      blocks: cleanedBlocks,
+    };
+  };
+
   useEffect(() => {
     if (!editorRef.current) {
       initEditor();
@@ -116,7 +151,10 @@ const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
       data: data || { blocks: [] },
       async onChange(api) {
         const content = await api.saver.save();
-        onChange(content);
+        // Clean the content before passing to onChange
+        const cleanedContent = cleanEditorData(content);
+        console.log("Editor content changed:", cleanedContent);
+        onChange(cleanedContent);
       },
     });
 
