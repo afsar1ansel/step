@@ -149,25 +149,23 @@ const ContentFormatter: React.FC<ContentFormatterProps> = ({ content }) => {
 };
 
 // Component for paragraph blocks
+// Simpler ParagraphBlock component using dangerouslySetInnerHTML
 const ParagraphBlock: React.FC<{ text: string }> = ({ text }) => {
   if (!text) return null;
 
-  // Replace all variations of line breaks
-  const processedText = text
-    .replace(/<br\s*\/?>/g, "\n")
-    .split("\n")
-    .map((line, i, arr) => (
-      <React.Fragment key={i}>
-        {line}
-        {i < arr.length - 1 && <br />}
-      </React.Fragment>
-    ));
+  // Only allow certain HTML tags
+  const sanitizedHtml = text
+    .replace(/<br\s*\/?>/g, "\n") // Convert <br> to newlines first
+    .replace(/<(\/?(b|i|u|strong|em))>/g, "<$1>"); // Only allow basic formatting tags
+
+  // Convert newlines back to <br> tags
+  const htmlWithBreaks = sanitizedHtml.replace(/\n/g, "<br />");
 
   return (
-    <p className="editorjs-paragraph">
-      {processedText}
-      <br />
-    </p>
+    <p
+      className="editorjs-paragraph"
+      dangerouslySetInnerHTML={{ __html: htmlWithBreaks }}
+    />
   );
 };
 
@@ -253,86 +251,101 @@ const TableBlock: React.FC<{
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = cell;
 
-    // Extract all anchor tags
-    const anchors = tempDiv.querySelectorAll("a");
+    // Extract all anchor and bold tags
+    const anchors = Array.from(
+      tempDiv.querySelectorAll("a")
+    ) as HTMLAnchorElement[];
+    const boldTags = Array.from(
+      tempDiv.querySelectorAll("b, strong")
+    ) as HTMLElement[];
+    const allTags = ([] as Element[]).concat(anchors, boldTags);
+
+    // Sort tags by their position in the HTML
+    allTags.sort((a, b) => {
+      const positionA = cell.indexOf(a.outerHTML);
+      const positionB = cell.indexOf(b.outerHTML);
+      return positionA - positionB;
+    });
+
     const parts: React.ReactNode[] = [];
     let lastIndex = 0;
     let hasTextBefore = false;
 
-    // Process each anchor tag
-    anchors.forEach((anchor, index) => {
-      const href = anchor.getAttribute("href");
-      const textContent = anchor.textContent;
+    // Process each tag
+    allTags.forEach((tag, index) => {
+      const tagStart = cell.indexOf(tag.outerHTML, lastIndex);
 
-      // Add text before this anchor
-      const anchorStart = cell.indexOf(anchor.outerHTML, lastIndex);
-      if (anchorStart > lastIndex) {
-        const textBefore = cell.substring(lastIndex, anchorStart);
+      // Add text before this tag
+      if (tagStart > lastIndex) {
+        const textBefore = cell.substring(lastIndex, tagStart);
         if (textBefore.trim().length > 0) {
-          parts.push(
-            <span
-              key={`text-${index}`}
-              dangerouslySetInnerHTML={{
-                __html: textBefore,
-              }}
-            />
-          );
+          parts.push(<span key={`text-before-${index}`}>{textBefore}</span>);
           hasTextBefore = true;
         }
       }
 
-      // Check if this is an image URL
-      if (href && /(\.png|\.jpg|\.jpeg|\.gif)$/i.test(href)) {
-        // Add line break if there was text before
-        if (hasTextBefore) {
-          parts.push(<br />);
-          hasTextBefore = false; // Reset for next items
-        }
+      // Handle anchor tags (images and links)
+      if (tag.tagName.toLowerCase() === "a") {
+        const href = tag.getAttribute("href");
+        const textContent = tag.textContent || "";
 
-        parts.push(
-          <div
-            key={`img-${index}`}
-            style={{ display: "block", margin: "4px 0" }}
-          >
-            <img
-              src={href}
-              alt=""
-              style={{ maxWidth: "150px", maxHeight: "150px", height: "auto" }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = "/fallback-image.png";
-              }}
-            />
-          </div>
-        );
-      } else {
-        // For non-image links, keep them as links
-        parts.push(
-          <a
-            key={`link-${index}`}
-            href={href || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {textContent}
-          </a>
-        );
+        // Check if this is an image URL
+        if (href && /(\.png|\.jpg|\.jpeg|\.gif)$/i.test(href)) {
+          // Add line break if there was text before
+          if (hasTextBefore) {
+            parts.push(<br key={`br-before-img-${index}`} />);
+            hasTextBefore = false;
+          }
+
+          parts.push(
+            <div
+              key={`img-${index}`}
+              style={{ display: "block", margin: "4px 0" }}
+            >
+              <img
+                src={href}
+                alt=""
+                style={{
+                  maxWidth: "150px",
+                  maxHeight: "150px",
+                  height: "auto",
+                }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/fallback-image.png";
+                }}
+              />
+            </div>
+          );
+        } else {
+          // For non-image links
+          parts.push(
+            <a
+              key={`link-${index}`}
+              href={href || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {textContent}
+            </a>
+          );
+        }
+      }
+      // Handle bold tags
+      else if (
+        tag.tagName.toLowerCase() === "b" ||
+        tag.tagName.toLowerCase() === "strong"
+      ) {
+        parts.push(<strong key={`bold-${index}`}>{tag.textContent}</strong>);
       }
 
-      lastIndex = anchorStart + anchor.outerHTML.length;
+      lastIndex = tagStart + tag.outerHTML.length;
     });
 
-    // Add remaining text after last anchor
+    // Add remaining text after last tag
     if (lastIndex < cell.length) {
       const remainingText = cell.substring(lastIndex);
       if (remainingText.trim().length > 0) {
-        parts.push(
-          <span
-            key="text-end"
-            dangerouslySetInnerHTML={{
-              __html: remainingText,
-            }}
-          />
-        );
+        parts.push(<span key="text-end">{remainingText}</span>);
       }
     }
 
