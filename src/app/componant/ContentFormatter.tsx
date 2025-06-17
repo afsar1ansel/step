@@ -149,14 +149,13 @@ const ContentFormatter: React.FC<ContentFormatterProps> = ({ content }) => {
 };
 
 // Component for paragraph blocks
-// Simpler ParagraphBlock component using dangerouslySetInnerHTML
 const ParagraphBlock: React.FC<{ text: string }> = ({ text }) => {
   if (!text) return null;
 
   // Only allow certain HTML tags
   const sanitizedHtml = text
     .replace(/<br\s*\/?>/g, "\n") // Convert <br> to newlines first
-    .replace(/<(\/?(b|i|u|strong|em))>/g, "<$1>"); // Only allow basic formatting tags
+    .replace(/<(\/?(b|i|u|strong|em|a))>/g, "<$1>"); // Only allow basic formatting tags
 
   // Convert newlines back to <br> tags
   const htmlWithBreaks = sanitizedHtml.replace(/\n/g, "<br />");
@@ -235,7 +234,47 @@ const ImageBlock: React.FC<{ url?: string }> = ({ url }) => {
   );
 };
 
-// Component for table blocks
+// Improved HTML escaping function
+const escapeHtml = (unsafe: string) => {
+  return unsafe
+    .replace(/&(?!(amp|lt|gt|quot|#039);)/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
+// Function to clean HTML by removing unwanted attributes
+const cleanHtml = (html: string) => {
+  // Remove unwanted attributes
+  return html.replace(/<([a-zA-Z][a-zA-Z0-9]*)[^>]*>/g, (match, tag) => {
+    const allowedAttributes: Record<string, string[]> = {
+      a: ["href", "target", "rel"],
+      img: ["src", "alt", "style"],
+      b: [],
+      strong: [],
+      i: [],
+      em: [],
+      u: [],
+    };
+
+    const allowed = allowedAttributes[tag.toLowerCase()] || [];
+
+    if (allowed.length === 0) {
+      return `<${tag}>`;
+    }
+
+    const attributes = match.match(/(\w+)=["']([^"']*)["']/g) || [];
+    const keptAttributes = attributes.filter((attr) => {
+      const name = attr.split("=")[0];
+      return allowed.includes(name);
+    });
+
+    return `<${tag} ${keptAttributes.join(" ")}>`;
+  });
+};
+
+// Component for table blocks with improved HTML handling
 const TableBlock: React.FC<{
   withHeadings: boolean;
   content: string[][];
@@ -243,113 +282,123 @@ const TableBlock: React.FC<{
 }> = ({ withHeadings, content, stretched }) => {
   if (!content || !Array.isArray(content)) return null;
 
-  // Function to render cell content with anchor-wrapped images
   const renderCellContent = (cell: string) => {
     if (!cell) return null;
 
-    // Create a temporary DOM element to parse the HTML
+    // First clean the HTML
+    const cleanedCell = cleanHtml(cell);
+
+    // Then escape HTML except allowed tags
+    const withEscapedTags = cleanedCell.replace(
+      /<(?!\/?(b|strong|i|em|u|a)(?=>|\s.*>))\/?.*?>/g,
+      (match) => escapeHtml(match)
+    );
+
+    // Create a DOM element to parse the content
     const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = cell;
+    tempDiv.innerHTML = withEscapedTags;
 
-    // Extract all anchor and bold tags
-    const anchors = Array.from(
-      tempDiv.querySelectorAll("a")
-    ) as HTMLAnchorElement[];
-    const boldTags = Array.from(
-      tempDiv.querySelectorAll("b, strong")
-    ) as HTMLElement[];
-    const allTags = ([] as Element[]).concat(anchors, boldTags);
-
-    // Sort tags by their position in the HTML
-    allTags.sort((a, b) => {
-      const positionA = cell.indexOf(a.outerHTML);
-      const positionB = cell.indexOf(b.outerHTML);
-      return positionA - positionB;
-    });
-
-    const parts: React.ReactNode[] = [];
-    let lastIndex = 0;
-    let hasTextBefore = false;
-
-    // Process each tag
-    allTags.forEach((tag, index) => {
-      const tagStart = cell.indexOf(tag.outerHTML, lastIndex);
-
-      // Add text before this tag
-      if (tagStart > lastIndex) {
-        const textBefore = cell.substring(lastIndex, tagStart);
-        if (textBefore.trim().length > 0) {
-          parts.push(<span key={`text-before-${index}`}>{textBefore}</span>);
-          hasTextBefore = true;
-        }
+    // Process each node recursively
+    const processNode = (node: Node): React.ReactNode => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent;
       }
 
-      // Handle anchor tags (images and links)
-      if (tag.tagName.toLowerCase() === "a") {
-        const href = tag.getAttribute("href");
-        const textContent = tag.textContent || "";
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as HTMLElement;
 
-        // Check if this is an image URL
-        if (href && /(\.png|\.jpg|\.jpeg|\.gif)$/i.test(href)) {
-          // Add line break if there was text before
-          if (hasTextBefore) {
-            parts.push(<br key={`br-before-img-${index}`} />);
-            hasTextBefore = false;
+        // Handle anchor tags
+        if (element.tagName.toLowerCase() === "a") {
+          const href = element.getAttribute("href") || "#";
+          const isImage = /(\.png|\.jpg|\.jpeg|\.gif)$/i.test(href);
+
+          if (isImage) {
+            return (
+              <div
+                key={Math.random()}
+                style={{ display: "block", margin: "4px 0" }}
+              >
+                <img
+                  src={href}
+                  alt=""
+                  style={{
+                    maxWidth: "150px",
+                    maxHeight: "150px",
+                    height: "auto",
+                  }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/fallback-image.png";
+                  }}
+                />
+              </div>
+            );
           }
 
-          parts.push(
-            <div
-              key={`img-${index}`}
-              style={{ display: "block", margin: "4px 0" }}
-            >
-              <img
-                src={href}
-                alt=""
-                style={{
-                  maxWidth: "150px",
-                  maxHeight: "150px",
-                  height: "auto",
-                }}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/fallback-image.png";
-                }}
-              />
-            </div>
-          );
-        } else {
-          // For non-image links
-          parts.push(
+          return (
             <a
-              key={`link-${index}`}
-              href={href || "#"}
+              key={Math.random()}
+              href={href}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {textContent}
+              {Array.from(element.childNodes).map((child, i) =>
+                processNode(child)
+              )}
             </a>
           );
         }
-      }
-      // Handle bold tags
-      else if (
-        tag.tagName.toLowerCase() === "b" ||
-        tag.tagName.toLowerCase() === "strong"
-      ) {
-        parts.push(<strong key={`bold-${index}`}>{tag.textContent}</strong>);
+
+        // Handle bold/strong tags
+        if (
+          element.tagName.toLowerCase() === "b" ||
+          element.tagName.toLowerCase() === "strong"
+        ) {
+          return (
+            <strong key={Math.random()}>
+              {Array.from(element.childNodes).map((child, i) =>
+                processNode(child)
+              )}
+            </strong>
+          );
+        }
+
+        // Handle italic/emphasis tags
+        if (
+          element.tagName.toLowerCase() === "i" ||
+          element.tagName.toLowerCase() === "em"
+        ) {
+          return (
+            <em key={Math.random()}>
+              {Array.from(element.childNodes).map((child, i) =>
+                processNode(child)
+              )}
+            </em>
+          );
+        }
+
+        // Handle underline tags
+        if (element.tagName.toLowerCase() === "u") {
+          return (
+            <u key={Math.random()}>
+              {Array.from(element.childNodes).map((child, i) =>
+                processNode(child)
+              )}
+            </u>
+          );
+        }
       }
 
-      lastIndex = tagStart + tag.outerHTML.length;
-    });
+      // For any other nodes, return their text content
+      return Array.from(node.childNodes).map((child, i) => processNode(child));
+    };
 
-    // Add remaining text after last tag
-    if (lastIndex < cell.length) {
-      const remainingText = cell.substring(lastIndex);
-      if (remainingText.trim().length > 0) {
-        parts.push(<span key="text-end">{remainingText}</span>);
-      }
-    }
-
-    return <div style={{ lineHeight: "1.5" }}>{parts}</div>;
+    return (
+      <div style={{ lineHeight: "1.5" }}>
+        {Array.from(tempDiv.childNodes).map((node, i) => (
+          <React.Fragment key={i}>{processNode(node)}</React.Fragment>
+        ))}
+      </div>
+    );
   };
 
   return (
