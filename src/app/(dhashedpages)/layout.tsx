@@ -22,6 +22,7 @@ import { CiBoxList } from "react-icons/ci";
 import { FaRegImages } from "react-icons/fa6";
 import { FaUsersViewfinder } from "react-icons/fa6";
 import { GrTestDesktop } from "react-icons/gr";
+import { RiSecurePaymentLine } from "react-icons/ri";
 
 import { MdLogout } from "react-icons/md";
 
@@ -62,6 +63,7 @@ type NavItem =
   | "Masters"
   | "College"
   | "teacher"
+  | "PaymentsLogs"
   | "subject"
   | "course"
   | "Support"
@@ -71,9 +73,9 @@ type NavItem =
   | "precourse-qa"
   | "postcourse-test"
   | "postcourse-qa"
-  | "appUserPurchase" 
-  | "ExamModule" 
-  | "exam-test" 
+  | "appUserPurchase"
+  | "ExamModule"
+  | "exam-test"
   | "exam-qa";
 
 export default function RootLayout({
@@ -211,12 +213,12 @@ export default function RootLayout({
                         <p className="linkname">Admin Users</p>
                       </Link>
                     </li>
-                    {/* <li className={active === "Doctors" ? "active" : ""}>
-                      <FaUserDoctor />
-                      <Link href="/Doctors">
-                        <p className="linkname">Doctors</p>
+                    <li className={active === "PaymentsLogs" ? "active" : ""}>
+                      <RiSecurePaymentLine />
+                      <Link href="/PaymentsLogs">
+                        <p className="linkname">Payments Logs</p>
                       </Link>
-                    </li> */}
+                    </li>
                     <li className={active === "steps" ? "active" : ""}>
                       <TbDeviceAnalytics />
                       <Link href="/steps">
@@ -576,14 +578,14 @@ export default function RootLayout({
                         <p className="linkname">App User</p>
                       </Link>
                     </li>
-                    <li
+                    {/* <li
                       className={active === "appUserPurchase" ? "active" : ""}
                     >
                       <FaUsersViewfinder />
                       <Link href="/appUserPurchase">
                         <p className="linkname">App User Purchase</p>
                       </Link>
-                    </li>
+                    </li> */}
                     {/* <li className={active === "Settings" ? "active" : ""}>
                       <RiUserSettingsFill />
                       <Link href="/Settings">
