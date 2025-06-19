@@ -849,7 +849,7 @@ const StepsTab = () => {
             >
               {subject &&
                 subject.map((item: any, index: number) => (
-                  <option key={item.id} value={item.subject_id}>
+                  <option key={index} value={item.subject_id}>
                     {item.subject_name}
                   </option>
                 ))}

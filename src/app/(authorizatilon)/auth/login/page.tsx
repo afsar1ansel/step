@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import style from "./page.module.css";
 import Image from "next/image";
@@ -11,27 +11,41 @@ import { useRouter } from "next/navigation";
 
 export default function Login() {
   const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
-  // console.log(baseURL);
   const toast = useToast();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    
+    // Prevent double submission
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
 
-    if (!isStrongPassword(password)) return;
+    if (!isStrongPassword(password)) {
+      setIsSubmitting(false);
+      return;
+    }
 
-    await fetcher();
+    try {
+      await fetcher();
+    } catch (error) {
+      console.error("Login error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   async function fetcher() {
     const form = new FormData();
     form.append("email", email);
     form.append("password", password);
-    // console.log(Object.fromEntries(form));
-    // console.log(baseURL);
+
     try {
       const response = await fetch(`${baseURL}/admin-users/validate-user`, {
         method: "POST",
@@ -39,33 +53,28 @@ export default function Login() {
       });
 
       const responseData = await response.json();
-      console.log(responseData);
+      
       if (responseData.errFlag == 1) {
-        // const responseData = await response.json();
         throw new Error(responseData.message || "Login failed");
       }
 
-      // const data = await response.json();
-      // console.log("Login successful:", responseData);
       if (responseData.errFlag == 0) {
         localStorage.setItem("token", responseData.token.trim());
         localStorage.setItem("user", JSON.stringify(responseData.username));
+        
+        toast({
+          title: "Login successful.",
+          description: "You have logged in successfully!",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+          position: "bottom",
+        });
+
         router.push("/dashboard");
       }
-
-      toast({
-        title: "Login successful.",
-        description: "You have logged in successfully!",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-        position: "bottom",
-      });
-
-      // TODO: Redirect to dashboard or set auth state
     } catch (error: any) {
       console.error("Error:", error.message);
-
       toast({
         title: "Login failed.",
         description: error.message || "Something went wrong.",
@@ -74,6 +83,7 @@ export default function Login() {
         isClosable: true,
         position: "top",
       });
+      throw error; // Re-throw for the calling function to handle
     }
   }
 
@@ -81,7 +91,6 @@ export default function Login() {
     const errors: string[] = [];
 
     if (password.length < 8) errors.push("at least 8 characters");
-    // if (!/[A-Z]/.test(password)) errors.push("an uppercase letter");
     if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password))
       errors.push("a special character");
 
@@ -107,7 +116,7 @@ export default function Login() {
   return (
     <div className={style.logbody}>
       <div className={style.logo}>
-        <Image src={photo} alt="Logo" width={200} height={75} />
+        <Image src={photo} alt="Logo" width={200} height={75} priority />
       </div>
       <div className={style.form}>
         <div style={{ backgroundColor: "white" }}></div>
@@ -115,7 +124,7 @@ export default function Login() {
           <Heading mt={"20px"} size={"md"}>
             Login to your account
           </Heading>
-          <form className={style.formbox} onSubmit={handleSubmit}>
+          <form className={style.formbox} onSubmit={handleSubmit} ref={formRef}>
             <label htmlFor="email">Email</label>
             <input
               id="email"
@@ -126,12 +135,10 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={isSubmitting}
             />
             <div className={style.password}>
               <label htmlFor="password">Password</label>
-              {/* <Link className={style.forgotLink} href="/auth/forgotpassword">
-                Forgot Password ?
-              </Link> */}
             </div>
             <div>
               <input
@@ -142,13 +149,18 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={isSubmitting}
               />
               <div className={style.forgot} onClick={togglePasswordVisibility}>
                 {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
               </div>
             </div>
-            <button type="submit" className={style.btn}>
-              Login
+            <button 
+              type="submit" 
+              className={style.btn}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Logging in..." : "Login"}
             </button>
           </form>
         </div>

@@ -83,6 +83,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const pathname = usePathname();
   const cleanedPathname = pathname.replace(/^\/+/, ""); // Remove leading slashes
   const basePath = cleanedPathname.split("/")[0]; // Extract the base path
@@ -93,10 +94,13 @@ export default function RootLayout({
   const [active, setActive] = useState<NavItem>(basePath as NavItem);
 
 
-
+  useEffect(() => {
+    checkvalidate();
+  }, []);
 
   useEffect(() => {
 
+    checkvalidate();
     const token =
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
     if (!token) {
@@ -126,6 +130,37 @@ export default function RootLayout({
       setActive(basePath as NavItem);
     }
   }, [pathname]);
+
+ 
+
+  async function checkvalidate() {
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+    const form = new FormData();
+    form.append("token", token ?? "");
+
+    fetch(`${baseUrl}/admin-users/token/validate`, {
+      method: "POST",
+      body: form,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        //{"adminId": 5,"errFlag": 0,"message": "Authorization successful"}
+        if (data.errFlag === 1) {
+          console.warn("Session expired, redirecting to login...");
+          localStorage.removeItem("token");
+          localStorage.removeItem("permits");
+          localStorage.removeItem("user");
+          window.location.href = "/auth/login";
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }
+    
 
   const handleLogout = () => {
     const token =
