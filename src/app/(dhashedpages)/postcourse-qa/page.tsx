@@ -709,7 +709,7 @@ const postcourseqa = () => {
       </Modal>
 
       {/* Edit Course Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={onEditModalClose} size={"xl"}>
+      <Modal isOpen={isEditModalOpen} onClose={onEditModalClose} size={"4xl"}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Course</ModalHeader>
@@ -803,7 +803,7 @@ const postcourseqa = () => {
       <Modal
         isOpen={isAddQuestionModalOpen}
         onClose={handleAddQuestionModalClose}
-        size="xl"
+        size="4xl"
       >
         <ModalOverlay />
         <ModalContent>

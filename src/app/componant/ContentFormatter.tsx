@@ -152,22 +152,19 @@ const ContentFormatter: React.FC<ContentFormatterProps> = ({ content }) => {
 const ParagraphBlock: React.FC<{ text: string }> = ({ text }) => {
   if (!text) return null;
 
-  // Replace all variations of line breaks
-  const processedText = text
-    .replace(/<br\s*\/?>/g, "\n")
-    .split("\n")
-    .map((line, i, arr) => (
-      <React.Fragment key={i}>
-        {line}
-        {i < arr.length - 1 && <br />}
-      </React.Fragment>
-    ));
+  // Only allow certain HTML tags
+  const sanitizedHtml = text
+    .replace(/<br\s*\/?>/g, "\n") // Convert <br> to newlines first
+    .replace(/<(\/?(b|i|u|strong|em|a))>/g, "<$1>"); // Only allow basic formatting tags
+
+  // Convert newlines back to <br> tags
+  const htmlWithBreaks = sanitizedHtml.replace(/\n/g, "<br />");
 
   return (
-    <p className="editorjs-paragraph">
-      {processedText}
-      <br />
-    </p>
+    <p
+      className="editorjs-paragraph"
+      dangerouslySetInnerHTML={{ __html: htmlWithBreaks }}
+    />
   );
 };
 
@@ -237,7 +234,47 @@ const ImageBlock: React.FC<{ url?: string }> = ({ url }) => {
   );
 };
 
-// Component for table blocks
+// Improved HTML escaping function
+const escapeHtml = (unsafe: string) => {
+  return unsafe
+    .replace(/&(?!(amp|lt|gt|quot|#039);)/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
+// Function to clean HTML by removing unwanted attributes
+const cleanHtml = (html: string) => {
+  // Remove unwanted attributes
+  return html.replace(/<([a-zA-Z][a-zA-Z0-9]*)[^>]*>/g, (match, tag) => {
+    const allowedAttributes: Record<string, string[]> = {
+      a: ["href", "target", "rel"],
+      img: ["src", "alt", "style"],
+      b: [],
+      strong: [],
+      i: [],
+      em: [],
+      u: [],
+    };
+
+    const allowed = allowedAttributes[tag.toLowerCase()] || [];
+
+    if (allowed.length === 0) {
+      return `<${tag}>`;
+    }
+
+    const attributes = match.match(/(\w+)=["']([^"']*)["']/g) || [];
+    const keptAttributes = attributes.filter((attr) => {
+      const name = attr.split("=")[0];
+      return allowed.includes(name);
+    });
+
+    return `<${tag} ${keptAttributes.join(" ")}>`;
+  });
+};
+
+// Component for table blocks with improved HTML handling
 const TableBlock: React.FC<{
   withHeadings: boolean;
   content: string[][];
@@ -245,98 +282,123 @@ const TableBlock: React.FC<{
 }> = ({ withHeadings, content, stretched }) => {
   if (!content || !Array.isArray(content)) return null;
 
-  // Function to render cell content with anchor-wrapped images
   const renderCellContent = (cell: string) => {
     if (!cell) return null;
 
-    // Create a temporary DOM element to parse the HTML
+    // First clean the HTML
+    const cleanedCell = cleanHtml(cell);
+
+    // Then escape HTML except allowed tags
+    const withEscapedTags = cleanedCell.replace(
+      /<(?!\/?(b|strong|i|em|u|a)(?=>|\s.*>))\/?.*?>/g,
+      (match) => escapeHtml(match)
+    );
+
+    // Create a DOM element to parse the content
     const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = cell;
+    tempDiv.innerHTML = withEscapedTags;
 
-    // Extract all anchor tags
-    const anchors = tempDiv.querySelectorAll("a");
-    const parts: React.ReactNode[] = [];
-    let lastIndex = 0;
-    let hasTextBefore = false;
+    // Process each node recursively
+    const processNode = (node: Node): React.ReactNode => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent;
+      }
 
-    // Process each anchor tag
-    anchors.forEach((anchor, index) => {
-      const href = anchor.getAttribute("href");
-      const textContent = anchor.textContent;
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as HTMLElement;
 
-      // Add text before this anchor
-      const anchorStart = cell.indexOf(anchor.outerHTML, lastIndex);
-      if (anchorStart > lastIndex) {
-        const textBefore = cell.substring(lastIndex, anchorStart);
-        if (textBefore.trim().length > 0) {
-          parts.push(
-            <span
-              key={`text-${index}`}
-              dangerouslySetInnerHTML={{
-                __html: textBefore,
-              }}
-            />
+        // Handle anchor tags
+        if (element.tagName.toLowerCase() === "a") {
+          const href = element.getAttribute("href") || "#";
+          const isImage = /(\.png|\.jpg|\.jpeg|\.gif)$/i.test(href);
+
+          if (isImage) {
+            return (
+              <div
+                key={Math.random()}
+                style={{ display: "block", margin: "4px 0" }}
+              >
+                <img
+                  src={href}
+                  alt=""
+                  style={{
+                    maxWidth: "150px",
+                    maxHeight: "150px",
+                    height: "auto",
+                  }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/fallback-image.png";
+                  }}
+                />
+              </div>
+            );
+          }
+
+          return (
+            <a
+              key={Math.random()}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {Array.from(element.childNodes).map((child, i) =>
+                processNode(child)
+              )}
+            </a>
           );
-          hasTextBefore = true;
+        }
+
+        // Handle bold/strong tags
+        if (
+          element.tagName.toLowerCase() === "b" ||
+          element.tagName.toLowerCase() === "strong"
+        ) {
+          return (
+            <strong key={Math.random()}>
+              {Array.from(element.childNodes).map((child, i) =>
+                processNode(child)
+              )}
+            </strong>
+          );
+        }
+
+        // Handle italic/emphasis tags
+        if (
+          element.tagName.toLowerCase() === "i" ||
+          element.tagName.toLowerCase() === "em"
+        ) {
+          return (
+            <em key={Math.random()}>
+              {Array.from(element.childNodes).map((child, i) =>
+                processNode(child)
+              )}
+            </em>
+          );
+        }
+
+        // Handle underline tags
+        if (element.tagName.toLowerCase() === "u") {
+          return (
+            <u key={Math.random()}>
+              {Array.from(element.childNodes).map((child, i) =>
+                processNode(child)
+              )}
+            </u>
+          );
         }
       }
 
-      // Check if this is an image URL
-      if (href && /(\.png|\.jpg|\.jpeg|\.gif)$/i.test(href)) {
-        // Add line break if there was text before
-        if (hasTextBefore) {
-          parts.push(<br />);
-          hasTextBefore = false; // Reset for next items
-        }
+      // For any other nodes, return their text content
+      return Array.from(node.childNodes).map((child, i) => processNode(child));
+    };
 
-        parts.push(
-          <div
-            key={`img-${index}`}
-            style={{ display: "block", margin: "4px 0" }}
-          >
-            <img
-              src={href}
-              alt=""
-              style={{ maxWidth: "150px", maxHeight: "150px", height: "auto" }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = "/fallback-image.png";
-              }}
-            />
-          </div>
-        );
-      } else {
-        // For non-image links, keep them as links
-        parts.push(
-          <a
-            key={`link-${index}`}
-            href={href || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {textContent}
-          </a>
-        );
-      }
-
-      lastIndex = anchorStart + anchor.outerHTML.length;
-    });
-
-    // Add remaining text after last anchor
-    if (lastIndex < cell.length) {
-      const remainingText = cell.substring(lastIndex);
-      if (remainingText.trim().length > 0) {
-        parts.push(
-          <span
-            key="text-end"
-            dangerouslySetInnerHTML={{
-              __html: remainingText,
-            }}
-          />
-        );
-      }
-    }
-
-    return <div style={{ lineHeight: "1.5" }}>{parts}</div>;
+    return (
+      <div style={{ lineHeight: "1.5" }}>
+        {Array.from(tempDiv.childNodes).map((node, i) => (
+          <React.Fragment key={i}>{processNode(node)}</React.Fragment>
+        ))}
+      </div>
+    );
   };
 
   return (
