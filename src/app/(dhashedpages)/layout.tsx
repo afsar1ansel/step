@@ -20,7 +20,7 @@ import { FaUserEdit } from "react-icons/fa";
 import { GrNotes } from "react-icons/gr";
 import { CiBoxList } from "react-icons/ci";
 import { FaRegImages } from "react-icons/fa6";
-import { FaUsersViewfinder } from "react-icons/fa6";
+import { IoGameControllerOutline } from "react-icons/io5";
 import { GrTestDesktop } from "react-icons/gr";
 import { RiSecurePaymentLine } from "react-icons/ri";
 
@@ -73,7 +73,10 @@ type NavItem =
   | "precourse-qa"
   | "postcourse-test"
   | "postcourse-qa"
-  | "appUserPurchase"
+  // | "appUserPurchase"
+  | "levels"
+  | "tagSubjectGame"
+  | "addQuestionToGame"
   | "ExamModule"
   | "exam-test"
   | "exam-qa";
@@ -146,7 +149,7 @@ export default function RootLayout({
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         //{"adminId": 5,"errFlag": 0,"message": "Authorization successful"}
         if (data.errFlag === 1) {
           console.warn("Session expired, redirecting to login...");
@@ -578,6 +581,121 @@ export default function RootLayout({
                                   </p>
                                 </Link>
                               </li>
+                            </ul>
+                          </AccordionPanel>
+                        </AccordionItem>
+                      </Accordion>
+                    </li>
+                    <li
+                      style={{ padding: 0, margin: 0 }}
+                      className={
+                        [
+                          "tagSubjectGame",
+                          "levels",
+                          "addQuestionToGame",
+                        ].includes(basePath)
+                          ? "active"
+                          : ""
+                      }
+                    >
+                      <Accordion allowToggle>
+                        <AccordionItem border="none">
+                          <AccordionButton
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              width: "100%",
+                              padding: "0.5rem 20px",
+                            }}
+                          >
+                            <IoGameControllerOutline />
+                            <p
+                              style={{
+                                flex: 1,
+                                textAlign: "left",
+                                marginLeft: "0.5rem",
+                              }}
+                            >
+                              Game
+                            </p>
+                            <AccordionIcon />
+                          </AccordionButton>
+                          <AccordionPanel pb={0} pl={1} margin={0} padding={0}>
+                            <ul style={{ listStyle: "none", padding: 0 }}>
+                              <li>
+                                <Link href="/levels">
+                                  <p
+                                    className={
+                                      basePath === "levels"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Levels
+                                  </p>
+                                </Link>
+                              </li>
+
+                              <li>
+                                <Link href="/tagSubjectGame">
+                                  <p
+                                    className={
+                                      basePath === "tagSubjectGame"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Tag Subject
+                                  </p>
+                                </Link>
+                              </li>
+
+                              <li>
+                                <Link href="/addQuestionToGame">
+                                  <p
+                                    className={
+                                      basePath === "addQuestionToGame"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Add questions
+                                  </p>
+                                </Link>
+                              </li>
+                              {/* <li>
+                                <Link href="/Course_price">
+                                  <p
+                                    className={
+                                      basePath === "Course_price"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Course Price
+                                  </p>
+                                </Link>
+                              </li> */}
                             </ul>
                           </AccordionPanel>
                         </AccordionItem>
