@@ -641,7 +641,7 @@ export default function RootLayout({
                                 </Link>
                               </li>
 
-                              <li>
+                              {/* <li>
                                 <Link href="/tagSubjectGame">
                                   <p
                                     className={
@@ -658,9 +658,9 @@ export default function RootLayout({
                                     Tag Subject
                                   </p>
                                 </Link>
-                              </li>
+                              </li> */}
 
-                              <li>
+                              {/* <li>
                                 <Link href="/addQuestionToGame">
                                   <p
                                     className={
@@ -675,24 +675,6 @@ export default function RootLayout({
                                     }}
                                   >
                                     Add questions
-                                  </p>
-                                </Link>
-                              </li>
-                              {/* <li>
-                                <Link href="/Course_price">
-                                  <p
-                                    className={
-                                      basePath === "Course_price"
-                                        ? "active-sub-option"
-                                        : ""
-                                    }
-                                    style={{
-                                      margin: 0,
-                                      marginLeft: "1rem",
-                                      padding: "0",
-                                    }}
-                                  >
-                                    Course Price
                                   </p>
                                 </Link>
                               </li> */}

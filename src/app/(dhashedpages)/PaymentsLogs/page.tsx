@@ -74,19 +74,15 @@ const PaymentsLogs = () => {
         const isSuccess = status === 0;
 
         const labelStyle = {
-          padding: "1px 16px",
-          borderRadius: "12px",
           fontWeight: 500,
-          fontSize: "12px",
-          color: "white",
-          backgroundColor: isSuccess ? "#38A169" : "#E53E3E",
-          display: "inline-block",
+          fontSize: "16px",
+          color: isSuccess ? "#E53E3E" : "#38A169" ,
           textAlign: "center" as any,
           maxWidth: "fit-content",
         };
 
         return (
-          <span style={labelStyle}>{isSuccess ? "Success" : "Failed"}</span>
+          <span style={labelStyle}>{isSuccess ? "Failed" : "Success"}</span>
         );
       },
     },
