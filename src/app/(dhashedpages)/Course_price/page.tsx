@@ -114,13 +114,6 @@ const CourseMaster = () => {
 
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     {
-      headerName: "Sl. No",
-      field: "id",
-      maxWidth: 80,
-      filter: false,
-      suppressAutoSize: true,
-    },
-    {
       headerName: "Plan Description",
       field: "price_description",
       minWidth: 180,
@@ -208,7 +201,7 @@ const CourseMaster = () => {
   const [priceName, setpriceName] = useState("");
   const [price, setPrice] = useState<string | number>("");
   const [discount, setDiscount] = useState<string | number>("");
-
+  const [days, setDays] = useState<string | number>("");
   const [editRowId, setEditRowId] = useState("");
   const [selectedCourseId, setSelectedCourseId] = useState("");
 
@@ -266,6 +259,7 @@ const CourseMaster = () => {
       form.append("actualPrice", price.toString());
       form.append("sellingPrice", discount.toString());
       form.append("courseId", selectedCourseId);
+      form.append("noOfDays", days.toString());
       form.append("token", localStorage.getItem("token") ?? "");
       console.log(Object.fromEntries(form.entries()));
       const response = await fetch(
@@ -317,8 +311,9 @@ const CourseMaster = () => {
       form.append("sellingPrice", discount.toString());
       form.append("courseId", selectedCourseId);
       form.append("appPurchaseId", editRowId);
+      form.append("noOfDays", days.toString());
       form.append("token", localStorage.getItem("token") ?? "");
-
+      console.log(Object.fromEntries(form.entries()));
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/admin/app-purchase/update`,
         {
@@ -363,6 +358,7 @@ const CourseMaster = () => {
     setSelectedImage(null);
     setPreview(null);
     setCurrentCourse(null);
+    setDays("");
   };
 
   const handleAddModalOpen = () => {
@@ -487,6 +483,14 @@ const CourseMaster = () => {
                 </Box>
               )} */}
 
+              <FormLabel mt={4}>No. days</FormLabel>
+              <Input
+                type="number"
+                placeholder="Enter No. days"
+                value={days}
+                onChange={(e) => setDays(e.target.value)}
+              />
+
               <FormLabel mt={4}>Price</FormLabel>
               <Input
                 type="number"
@@ -588,6 +592,13 @@ const CourseMaster = () => {
                   </option>
                 ))}
               </Select>
+              <FormLabel mt={4}>No. days</FormLabel>
+              <Input
+                type="number"
+                placeholder="Enter No. days"
+                value={days}
+                onChange={(e) => setDays(e.target.value)}
+              />
 
               <FormLabel mt={4}>Price</FormLabel>
               <Input
