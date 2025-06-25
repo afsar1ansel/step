@@ -437,7 +437,7 @@ const postcourseqa = () => {
       form.append("option3", option3);
       form.append("option4", option4);
       form.append("questionId", questionid);
-      form.append("solutionText", solutionText);
+      form.append("solutionText", JSON.stringify(solutionText));
       form.append("correctOption", correctOption);
 
       console.log(Object.fromEntries(form));
