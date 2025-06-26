@@ -540,6 +540,7 @@ const precourseqa = () => {
           isClosable: true,
           position: "top",
         });
+        onEditModalClose();
       } else {
         toast({
           title: "Error updating question.",
@@ -554,7 +555,7 @@ const precourseqa = () => {
       console.error("Error updating question:", error);
     } finally {
       resetForm();
-      onEditModalClose();
+      // onEditModalClose();
     }
   };
 
@@ -618,8 +619,8 @@ const precourseqa = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={10}
-          paginationPageSizeSelector={[10, 20, 30]}
+          paginationPageSize={5}
+          paginationPageSizeSelector={[5, 10, 15]}
           defaultColDef={{
             sortable: true,
             filter: true,

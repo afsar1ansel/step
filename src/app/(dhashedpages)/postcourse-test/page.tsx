@@ -325,9 +325,10 @@ const TestsTab = () => {
   };
 
   const handleEdit = (data: any) => {
+    console.log("Edit clicked for:", data);
     setIsEditMode(true);
     setCurrentTestId(data.id);
-    setSelectedCourse(data.course_id); // Assuming course_id is available in the data
+    setSelectedCourse(data.subject_id); 
     setSelectedStep(data.course_step_details_master_id);
     setPostCourseTestTitle(data.post_course_test_title);
     setPostCourseTestDuration(data.post_course_test_duration_minutes);
@@ -395,8 +396,9 @@ const TestsTab = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={10}
-          paginationAutoPageSize={true}
+          // paginationPageSize={10}
+          paginationPageSize={5}
+          paginationPageSizeSelector={[5, 10, 15]}
           defaultColDef={{
             sortable: true,
             filter: true,

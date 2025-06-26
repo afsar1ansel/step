@@ -464,6 +464,7 @@ const postcourseqa = () => {
           isClosable: true,
           position: "top",
         });
+        onEditModalClose();
       } else {
         toast({
           title: "Error updating course.",
@@ -482,7 +483,7 @@ const postcourseqa = () => {
       onAddModalClose();
     }
     resetForm();
-    onEditModalClose();
+    // onEditModalClose();
   };
 
   const resetForm = () => {
@@ -636,8 +637,8 @@ const postcourseqa = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={10}
-          paginationPageSizeSelector={[10, 20, 30]}
+          paginationPageSize={5}
+          paginationPageSizeSelector={[5, 10, 15]}
           defaultColDef={{
             sortable: true,
             filter: true,
