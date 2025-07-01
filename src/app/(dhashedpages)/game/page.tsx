@@ -32,7 +32,7 @@ const Levels = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   useEffect(() => {
-    fetchData();
+    // fetchData();
   }, []);
 
 
@@ -40,7 +40,7 @@ const Levels = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${baseUrl}/admin/game/get-all-levels/${token}`,
+        `${baseUrl}//${token}`,
         {
           method: "GET",
         }
@@ -61,20 +61,10 @@ const Levels = () => {
 
   const [rowData, setRowData] = useState<any[]>();
 
-  // [
-  //   {
-  //     created_admin_user_id: 5,
-  //     created_date: "Tue, 01 Jul 2025 00:00:00 GMT",
-  //     description: "Leve 1 for 1st year all subjects ",
-  //     id: 1,
-  //     level_name: "LEVEL 1",
-  //     status: 1,
-  //   },
-  // ];
-
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     {
       headerName: "Sl. No",
+      field: "id",
       maxWidth: 80,
       filter: false,
       suppressAutoSize: true,
@@ -84,14 +74,9 @@ const Levels = () => {
       cellStyle: { textAlign: "center" },
     },
     {
-      headerName: "Level",
-      field: "level_name",
+      headerName: "Levels",
+      field: "levels",
       // minWidth: 180,
-    },{
-      headerName: "Description",
-      field: "description",
-      minWidth: 200,
-      cellStyle: { textAlign: "left" },
     },
     {
       field: "status",
@@ -152,14 +137,13 @@ const Levels = () => {
 
   //toggle function for switch button
   const handleToggle = async (data: any) => {
-    console.log(data);
      setLoading(true);
     try {
       const token = localStorage.getItem("token") ?? "";
       const status = data.status == 1 ? 0 : 1;
       console.log(status);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/admin/game/levels/change-status/${data.id}/${status}/${token}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}//${status}/${data.id}/${token}`,
         {
           method: "GET",
         }
@@ -187,16 +171,12 @@ const Levels = () => {
   } = useDisclosure();
 
   const [levelName, setlevelName] = useState("");
-  const [discription, setDescription] = useState("");
-  const [levelId, setLevelId] = useState("");
   const [loading, setLoading] = useState(false);
   // const [allCourse, setallCourse] = useState<any>([]);
 
   const handleEdit = (data: any) => {
     // console.log(data);
-    setlevelName(data.level_name);
-    setDescription(data.description);
-    setLevelId(data.id);
+    setlevelName(data.username);
     onEditModalOpen(); // Open Edit Modal
   };
 
@@ -205,38 +185,37 @@ const Levels = () => {
   };
 
   const handleAddLevel = async () => {
-    //  levelName,  description
+    // console.log(name, email, role , password);
     setLoading(true);
     try {
       const token = localStorage.getItem("token") ?? "";
       const form = new FormData();
-      form.append("levelName", levelName);
-      form.append("description", discription);
+      form.append("username", levelName);
       form.append("token", token);
       console.log(Object.fromEntries(form.entries()));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/admin/game/add-level`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/admin-users/add`,
         {
           method: "POST",
           body: form,
         }
       );
       const responseData = await response.json();
-      console.log(responseData);
+       console.log(responseData);
       fetchData();
 
       if (responseData.errFlag === 0) {
         toast({
           title: "Success",
-          description: "Level added successfully",
+          description: "Subject added successfully",
           status: "success",
           duration: 3000,
           isClosable: true,
         });
         fetchData();
-        resetForm();
-        onAddModalClose();
+         resetForm();
+         onAddModalClose();
       } else {
         toast({
           title: "Error",
@@ -257,14 +236,12 @@ const Levels = () => {
     try {
       const token = localStorage.getItem("token") ?? "";
       const form = new FormData();
-      form.append("levelName", levelName);
-      form.append("description", discription);
-      form.append("levelId", levelId);
+      form.append("username", levelName);
       form.append("token", token);
        console.log(Object.fromEntries(form.entries()));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/admin/game/levels/update`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/admin-users/update-admin-user`,
         {
           method: "POST",
           body: form,
@@ -311,7 +288,7 @@ const Levels = () => {
   ];
 
   return (
-    <div style={{ width: "80vw", height: "60vh" }}>
+    <div style={{ width: "80vw", height: "60vh", }}>
       <div
         style={{
           height: "60px",
@@ -376,24 +353,12 @@ const Levels = () => {
                 onChange={(e) => setlevelName(e.target.value)}
               />
             </FormControl>
-            <FormControl>
-              <FormLabel>Discription</FormLabel>
-              <Input
-                placeholder="Enter Discription"
-                value={discription}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </FormControl>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="gray" mr={3} onClick={onAddModalClose}>
               Cancel
             </Button>
-            <Button
-              colorScheme="green"
-              onClick={handleAddLevel}
-              isLoading={loading}
-            >
+            <Button colorScheme="green" onClick={handleAddLevel} isLoading={loading}>
               Add
             </Button>
           </ModalFooter>
@@ -414,26 +379,14 @@ const Levels = () => {
                 value={levelName}
                 onChange={(e) => setlevelName(e.target.value)}
               />
-            </FormControl>
 
-            <FormControl>
-              <FormLabel>Level</FormLabel>
-              <Input
-                placeholder="Enter Discription"
-                value={discription}
-                onChange={(e) => setDescription(e.target.value)}
-              />
             </FormControl>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="gray" mr={3} onClick={onEditModalClose}>
               Cancel
             </Button>
-            <Button
-              colorScheme="green"
-              onClick={handleUpdateSubject}
-              isLoading={loading}
-            >
+            <Button colorScheme="green" onClick={handleUpdateSubject} isLoading={loading}>
               Update
             </Button>
           </ModalFooter>
