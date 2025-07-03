@@ -185,7 +185,7 @@ const TestsTab = () => {
   const handleAddOrUpdateTest = () => {
     if (
       !selectedCourse ||
-      !selectedStep ||
+      // !selectedStep ||
       !examTitle || // Changed from preCourseTestTitle
       !examDurationMinutes || // Changed from preCourseTestDuration
       !syllabusTextLine1 ||
@@ -204,7 +204,7 @@ const TestsTab = () => {
 
     const formData = new FormData();
     // formData.append("token", token || ""); // Token will be sent in header
-    formData.append("courseStepDetailsMasterId", selectedStep);
+    formData.append("courseStepDetailsMasterId", selectedCourse);
     formData.append("examTitle", examTitle); // Changed from preCourseTestTitle
     formData.append(
       "examDurationMinutes", // Changed from preCourseTestDurationMinutes
@@ -313,7 +313,7 @@ const TestsTab = () => {
     setIsEditMode(true);
     setCurrentExamId(data.id); // Renamed state variable
     setSelectedCourse(data.course_id); 
-    setSelectedStep(data.course_step_details_master_id);
+    // setSelectedStep(data.course_step_details_master_id);
     setExamTitle(data.exam_title); // Changed from pre_course_test_title
     setExamDurationMinutes(data.exam_duration_minutes); // Changed from pre_course_test_duration_minutes
     setSyllabusTextLine1(data.syllabus_text_line_1);
@@ -418,7 +418,7 @@ const TestsTab = () => {
                 ))}
               </Select>
             </FormControl>
-            <FormControl mb={4}>
+            {/* <FormControl mb={4}>
               <FormLabel>Step</FormLabel>
               <Select
                 placeholder="Select Step"
@@ -438,7 +438,7 @@ const TestsTab = () => {
                   </option>
                 )}
               </Select>
-            </FormControl>
+            </FormControl> */}
             <FormControl mb={4}>
               <FormLabel>Exam Title</FormLabel> 
               <Input
