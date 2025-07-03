@@ -87,7 +87,13 @@ const PrecourseQaPage = () => {
       );
       if (response.ok) {
         const responseData = await response.json();
-        setRowData(responseData || []); // API returns array directly
+        // Parse the JSON strings into objects before setting the row data
+        const parsedData = responseData.map((row: any) => ({
+          ...row,
+          question_text: typeof row.question_text === 'string' ? JSON.parse(row.question_text) : row.question_text,
+          solution_text: typeof row.solution_text === 'string' ? JSON.parse(row.solution_text) : row.solution_text,
+        }));
+        setRowData(parsedData || []);
       } else {
         const errorData = await response.json().catch(() => ({ message: "Failed to fetch exam questions." }));
         setRowData([]);
@@ -137,15 +143,8 @@ const PrecourseQaPage = () => {
       editable: false,
       flex: 2,
        cellRenderer: (params: any) => {
-            let content = params.value;
-            try {
-              if (typeof content === 'string') {
-                content = JSON.parse(content);
-              }
-            } catch (e) {
-              // If it's not valid JSON, display as is.
-            }
-             return <ContentFormatter content={content} />;
+            // The data is now pre-parsed, so we can pass it directly
+            return <ContentFormatter content={params.value} />;
            },
       cellStyle: {
         height: "100%",
@@ -286,15 +285,8 @@ const PrecourseQaPage = () => {
       filter: false,
       flex: 2,
       cellRenderer: (params: any) => {
-            let content = params.value;
-            try {
-              if (typeof content === 'string') {
-                content = JSON.parse(content);
-              }
-            } catch (e) {
-              // If it's not valid JSON, display as is.
-            }
-            return <ContentFormatter content={content} />;
+            // The data is now pre-parsed, so we can pass it directly
+            return <ContentFormatter content={params.value} />;
           },
       cellStyle: { height: "100%", padding: "0px", display: 'flex', alignItems: 'center' },
       autoHeight: true,
@@ -361,16 +353,9 @@ const PrecourseQaPage = () => {
   const handleEdit = (data: any) => {
     setQuestionNo(data.question_no);
 
-    let questionValue;
-    try {
-      // Assuming question_text is the field from API for EditorJS JSON
-      questionValue = typeof data.question_text === "string" ? JSON.parse(data.question_text) : data.question_text;
-      if (typeof questionValue !== 'object' || !questionValue.blocks) { 
-        questionValue = { blocks: [{ type: "paragraph", data: { text: data.question_text || "" } }] };
-      }
-    } catch {
-      questionValue = { blocks: [{ type: "paragraph", data: { text: data.question_text || "" } }] };
-    }
+    // The data from the grid row is already a parsed object.
+    // No need for try-catch parsing here anymore.
+    const questionValue = data.question_text || { blocks: [] };
     setEditQuestion(questionValue);
 
     setQuestionId(data.question_id);
@@ -383,15 +368,8 @@ const PrecourseQaPage = () => {
     setCorrectOption(correctOpt ? (data.options.indexOf(correctOpt) + 1).toString() : "");
 
 
-    let solutionValue;
-    try {
-      solutionValue = typeof data.solution_text === "string" ? JSON.parse(data.solution_text) : data.solution_text;
-       if (typeof solutionValue !== 'object' || !solutionValue.blocks) { // Ensure it's valid EditorJS structure
-        solutionValue = { blocks: [{ type: "paragraph", data: { text: data.solution_text || "" } }] };
-      }
-    } catch {
-      solutionValue = { blocks: [{ type: "paragraph", data: { text: data.solution_text || "" } }] };
-    }
+    // The data from the grid row is already a parsed object.
+    const solutionValue = data.solution_text || { blocks: [] };
     setSolutionText(solutionValue);
     onEditModalOpen();
   };
