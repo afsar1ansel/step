@@ -137,7 +137,15 @@ const PrecourseQaPage = () => {
       editable: false,
       flex: 2,
        cellRenderer: (params: any) => {
-             return <ContentFormatter content={params.value} />;
+            let content = params.value;
+            try {
+              if (typeof content === 'string') {
+                content = JSON.parse(content);
+              }
+            } catch (e) {
+              // If it's not valid JSON, display as is.
+            }
+             return <ContentFormatter content={content} />;
            },
       cellStyle: {
         height: "100%",
@@ -278,7 +286,15 @@ const PrecourseQaPage = () => {
       filter: false,
       flex: 2,
       cellRenderer: (params: any) => {
-            return <ContentFormatter content={params.value} />;
+            let content = params.value;
+            try {
+              if (typeof content === 'string') {
+                content = JSON.parse(content);
+              }
+            } catch (e) {
+              // If it's not valid JSON, display as is.
+            }
+            return <ContentFormatter content={content} />;
           },
       cellStyle: { height: "100%", padding: "0px", display: 'flex', alignItems: 'center' },
       autoHeight: true,
