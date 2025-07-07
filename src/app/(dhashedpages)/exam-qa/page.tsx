@@ -121,6 +121,10 @@ const PrecourseQaPage = () => {
       const responseData = await response.json();
       if (responseData && responseData.length > 0) {
         settestOptions(responseData);
+        // Set the first exam as the default selection
+        if (!testId) {
+          setTestId(responseData[0].id);
+        }
       } else {
         settestOptions([]);
       }
