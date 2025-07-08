@@ -87,7 +87,13 @@ const PrecourseQaPage = () => {
       );
       if (response.ok) {
         const responseData = await response.json();
-        setRowData(responseData || []); // API returns array directly
+        // Parse the JSON strings into objects before setting the row data
+        const parsedData = responseData.map((row: any) => ({
+          ...row,
+          question_text: typeof row.question_text === 'string' ? JSON.parse(row.question_text) : row.question_text,
+          solution_text: typeof row.solution_text === 'string' ? JSON.parse(row.solution_text) : row.solution_text,
+        }));
+        setRowData(parsedData || []);
       } else {
         const errorData = await response.json().catch(() => ({ message: "Failed to fetch exam questions." }));
         setRowData([]);
@@ -115,6 +121,10 @@ const PrecourseQaPage = () => {
       const responseData = await response.json();
       if (responseData && responseData.length > 0) {
         settestOptions(responseData);
+        // Set the first exam as the default selection
+        if (!testId) {
+          setTestId(responseData[0].id);
+        }
       } else {
         settestOptions([]);
       }
@@ -137,7 +147,8 @@ const PrecourseQaPage = () => {
       editable: false,
       flex: 2,
        cellRenderer: (params: any) => {
-             return <ContentFormatter content={params.value} />;
+            // The data is now pre-parsed, so we can pass it directly
+            return <ContentFormatter content={params.value} />;
            },
       cellStyle: {
         height: "100%",
@@ -278,6 +289,7 @@ const PrecourseQaPage = () => {
       filter: false,
       flex: 2,
       cellRenderer: (params: any) => {
+            // The data is now pre-parsed, so we can pass it directly
             return <ContentFormatter content={params.value} />;
           },
       cellStyle: { height: "100%", padding: "0px", display: 'flex', alignItems: 'center' },
@@ -345,16 +357,9 @@ const PrecourseQaPage = () => {
   const handleEdit = (data: any) => {
     setQuestionNo(data.question_no);
 
-    let questionValue;
-    try {
-      // Assuming question_text is the field from API for EditorJS JSON
-      questionValue = typeof data.question_text === "string" ? JSON.parse(data.question_text) : data.question_text;
-      if (typeof questionValue !== 'object' || !questionValue.blocks) { 
-        questionValue = { blocks: [{ type: "paragraph", data: { text: data.question_text || "" } }] };
-      }
-    } catch {
-      questionValue = { blocks: [{ type: "paragraph", data: { text: data.question_text || "" } }] };
-    }
+    // The data from the grid row is already a parsed object.
+    // No need for try-catch parsing here anymore.
+    const questionValue = data.question_text || { blocks: [] };
     setEditQuestion(questionValue);
 
     setQuestionId(data.question_id);
@@ -367,15 +372,8 @@ const PrecourseQaPage = () => {
     setCorrectOption(correctOpt ? (data.options.indexOf(correctOpt) + 1).toString() : "");
 
 
-    let solutionValue;
-    try {
-      solutionValue = typeof data.solution_text === "string" ? JSON.parse(data.solution_text) : data.solution_text;
-       if (typeof solutionValue !== 'object' || !solutionValue.blocks) { // Ensure it's valid EditorJS structure
-        solutionValue = { blocks: [{ type: "paragraph", data: { text: data.solution_text || "" } }] };
-      }
-    } catch {
-      solutionValue = { blocks: [{ type: "paragraph", data: { text: data.solution_text || "" } }] };
-    }
+    // The data from the grid row is already a parsed object.
+    const solutionValue = data.solution_text || { blocks: [] };
     setSolutionText(solutionValue);
     onEditModalOpen();
   };
@@ -573,7 +571,12 @@ const PrecourseQaPage = () => {
 
 
   return (
-    <div style={{ width: "80vw", height: "calc(100vh - 120px)" /* Adjust height as needed */ }}>
+    <div
+      style={{
+        width: "80vw",
+        height: "calc(100vh - 120px)" /* Adjust height as needed */,
+      }}
+    >
       <div
         style={{
           height: "60px",
@@ -584,7 +587,7 @@ const PrecourseQaPage = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: "1px solid #eee" 
+          marginBottom: "1px solid #eee",
         }}
       >
         <p style={{ fontSize: "16px", fontWeight: "600" }}>Exam Q/A Data</p>
@@ -593,32 +596,57 @@ const PrecourseQaPage = () => {
             placeholder="Select Exam" // Changed from Test
             value={testId} // testId here is examId
             onChange={(e) => setTestId(e.target.value)}
-            minW="200px" 
+            minW="200px"
           >
             {testOptions &&
-              testOptions.map((item: any) => ( 
+              testOptions.map((item: any) => (
                 <option key={item.id} value={item.id}>
                   {item.exam_title} {/* Changed from pre_course_test_title */}
                 </option>
               ))}
           </Select>
           <HStack spacing={4}>
-            <Button onClick={() => { resetAddQuestionForm(); if(testOptions.length > 0 && !newTestId) setNewTestId(testId || testOptions[0].id); onAddQuestionModalOpen();}} colorScheme="blue" px={6} isDisabled={testOptions.length === 0}>
+            <Button
+              onClick={() => {
+                resetAddQuestionForm();
+                if (testOptions.length > 0 && !newTestId)
+                  setNewTestId(testId || testOptions[0].id);
+                onAddQuestionModalOpen();
+              }}
+              colorScheme="blue"
+              px={6}
+              isDisabled={testOptions.length === 0}
+            >
               Add Question
             </Button>
-            <Button onClick={() => { resetSheetForm(); if(testOptions.length > 0 && !testIdAdd) setTestIdAdd(testId || testOptions[0].id); onAddModalOpen();}} colorScheme="green" px={6} isDisabled={testOptions.length === 0}>
+            <Button
+              onClick={() => {
+                resetSheetForm();
+                if (testOptions.length > 0 && !testIdAdd)
+                  setTestIdAdd(testId || testOptions[0].id);
+                onAddModalOpen();
+              }}
+              colorScheme="green"
+              px={6}
+              isDisabled={testOptions.length === 0}
+            >
               Add From Sheet
             </Button>
           </HStack>
         </div>
       </div>
-      <div style={{ height: "calc(100% - 60px)", width: "100%" }} className="ag-theme-alpine"> {/* Ensure ag-grid theme class */}
+      <div
+        style={{ height: "calc(100% - 60px)", width: "100%" }}
+        className="ag-theme-alpine"
+      >
+        {" "}
+        {/* Ensure ag-grid theme class */}
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={5} // Adjust as needed
-          paginationPageSizeSelector={[5, 10, 20]}
+          paginationPageSize={5}
+          paginationPageSizeSelector={[5, 10, 20, 30]}
           defaultColDef={{
             sortable: true,
             filter: true,
@@ -630,6 +658,7 @@ const PrecourseQaPage = () => {
               buttons: ["reset"], // Show reset button in filter
             },
           }}
+          domLayout="autoHeight"
           // domLayout="autoHeight" // autoHeight can be slow with many rows/complex renderers. Consider 'normal' or 'print'.
           getRowHeight={(params: any) => 300} // Fixed row height for EditorJS content
           suppressCellFocus={true} // Improves UX by not highlighting cell on click
@@ -638,7 +667,13 @@ const PrecourseQaPage = () => {
       </div>
 
       {/* Add Test Modal (from Google Sheet) */}
-      <Modal isOpen={isAddModalOpen} onClose={() => { resetSheetForm(); onAddModalClose();}}>
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => {
+          resetSheetForm();
+          onAddModalClose();
+        }}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Insert Exam Questions from Google Sheet</ModalHeader>
@@ -654,7 +689,8 @@ const PrecourseQaPage = () => {
                 {testOptions &&
                   testOptions.map((item: any) => (
                     <option key={item.id} value={item.id}>
-                      {item.exam_title} {/* Changed from pre_course_test_title */}
+                      {item.exam_title}{" "}
+                      {/* Changed from pre_course_test_title */}
                     </option>
                   ))}
               </Select>
@@ -677,10 +713,21 @@ const PrecourseQaPage = () => {
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="gray" mr={3} onClick={() => { resetSheetForm(); onAddModalClose();}}>
+            <Button
+              colorScheme="gray"
+              mr={3}
+              onClick={() => {
+                resetSheetForm();
+                onAddModalClose();
+              }}
+            >
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleAddCourse} isDisabled={!sheetId || !SheetName || !testIdAdd}>
+            <Button
+              colorScheme="green"
+              onClick={handleAddCourse}
+              isDisabled={!sheetId || !SheetName || !testIdAdd}
+            >
               Add
             </Button>
           </ModalFooter>
@@ -690,14 +737,17 @@ const PrecourseQaPage = () => {
       {/* Add Question Modal */}
       <Modal
         isOpen={isAddQuestionModalOpen}
-        onClose={() => { resetAddQuestionForm(); onAddQuestionModalClose();}}
-        size="xl" 
+        onClose={() => {
+          resetAddQuestionForm();
+          onAddQuestionModalClose();
+        }}
+        size="xl"
       >
         <ModalOverlay />
-        <ModalContent maxW="container.md"> 
+        <ModalContent maxW="container.md">
           <ModalHeader>Add New Question</ModalHeader>
           <ModalCloseButton />
-          <ModalBody overflowY="auto" maxHeight="70vh"> 
+          <ModalBody overflowY="auto" maxHeight="70vh">
             <FormControl isRequired>
               <FormLabel>Select Exam</FormLabel>
               <Select
@@ -708,7 +758,8 @@ const PrecourseQaPage = () => {
                 {testOptions &&
                   testOptions.map((item: any) => (
                     <option key={item.id} value={item.id}>
-                      {item.exam_title} {/* Changed from pre_course_test_title */}
+                      {item.exam_title}{" "}
+                      {/* Changed from pre_course_test_title */}
                     </option>
                   ))}
               </Select>
@@ -777,7 +828,9 @@ const PrecourseQaPage = () => {
                 <option value="4">Option 4</option>
               </Select>
             </FormControl>
-            <FormControl mt={4}> {/* Solution is optional */}
+            <FormControl mt={4}>
+              {" "}
+              {/* Solution is optional */}
               <FormLabel>Solution</FormLabel>
               <div style={{ border: "1px solid #ccc", padding: "10px" }}>
                 <EditorComponent
@@ -789,10 +842,29 @@ const PrecourseQaPage = () => {
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="gray" mr={3} onClick={() => { resetAddQuestionForm(); onAddQuestionModalClose();}}>
+            <Button
+              colorScheme="gray"
+              mr={3}
+              onClick={() => {
+                resetAddQuestionForm();
+                onAddQuestionModalClose();
+              }}
+            >
               Cancel
             </Button>
-            <Button colorScheme="blue" onClick={handleAddQuestion} isDisabled={!newTestId || !newQuestionNo || !newCorrectOption || !newOption1 || !newOption2 || !newOption3 || !newOption4}>
+            <Button
+              colorScheme="blue"
+              onClick={handleAddQuestion}
+              isDisabled={
+                !newTestId ||
+                !newQuestionNo ||
+                !newCorrectOption ||
+                !newOption1 ||
+                !newOption2 ||
+                !newOption3 ||
+                !newOption4
+              }
+            >
               Add Question
             </Button>
           </ModalFooter>
@@ -800,8 +872,14 @@ const PrecourseQaPage = () => {
       </Modal>
 
       {/* Edit Question Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={() => { /* resetEditForm(); */ onEditModalClose();}} size="xl">
-         <ModalOverlay />
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          /* resetEditForm(); */ onEditModalClose();
+        }}
+        size="xl"
+      >
+        <ModalOverlay />
         <ModalContent maxW="container.md">
           <ModalHeader>Edit Question</ModalHeader>
           <ModalCloseButton />
@@ -882,7 +960,13 @@ const PrecourseQaPage = () => {
             </FormControl>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="gray" mr={3} onClick={() => { /* resetEditForm(); */ onEditModalClose();}}>
+            <Button
+              colorScheme="gray"
+              mr={3}
+              onClick={() => {
+                /* resetEditForm(); */ onEditModalClose();
+              }}
+            >
               Cancel
             </Button>
             <Button colorScheme="green" onClick={handleUpdateCourse}>

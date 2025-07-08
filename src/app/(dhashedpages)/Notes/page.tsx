@@ -454,7 +454,7 @@ const fetchDetail = async (url: string) => {
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 15]}
+          paginationPageSizeSelector={[5, 10, 20, 30]}
           // paginationAutoPageSize={true}
           defaultColDef={{
             sortable: true,
@@ -476,6 +476,7 @@ const fetchDetail = async (url: string) => {
             const calculatedHeight = baseHeight + words * heightPerWord;
             return Math.max(minHeight, calculatedHeight);
           }}
+          domLayout="autoHeight"
           suppressCellFocus={true}
         />
       </div>

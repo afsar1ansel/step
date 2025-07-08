@@ -409,6 +409,8 @@ const TestsTab = () => {
               buttons: ["reset"],
             },
           }}
+          domLayout="autoHeight"
+          suppressCellFocus={true}
         />
       </div>
 

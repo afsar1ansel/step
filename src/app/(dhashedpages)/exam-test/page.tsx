@@ -185,7 +185,7 @@ const TestsTab = () => {
   const handleAddOrUpdateTest = () => {
     if (
       !selectedCourse ||
-      !selectedStep ||
+      // !selectedStep ||
       !examTitle || // Changed from preCourseTestTitle
       !examDurationMinutes || // Changed from preCourseTestDuration
       !syllabusTextLine1 ||
@@ -204,7 +204,7 @@ const TestsTab = () => {
 
     const formData = new FormData();
     // formData.append("token", token || ""); // Token will be sent in header
-    formData.append("courseStepDetailsMasterId", selectedStep);
+    formData.append("courseStepDetailsMasterId", selectedCourse);
     formData.append("examTitle", examTitle); // Changed from preCourseTestTitle
     formData.append(
       "examDurationMinutes", // Changed from preCourseTestDurationMinutes
@@ -313,7 +313,7 @@ const TestsTab = () => {
     setIsEditMode(true);
     setCurrentExamId(data.id); // Renamed state variable
     setSelectedCourse(data.course_id); 
-    setSelectedStep(data.course_step_details_master_id);
+    // setSelectedStep(data.course_step_details_master_id);
     setExamTitle(data.exam_title); // Changed from pre_course_test_title
     setExamDurationMinutes(data.exam_duration_minutes); // Changed from pre_course_test_duration_minutes
     setSyllabusTextLine1(data.syllabus_text_line_1);
@@ -368,17 +368,26 @@ const TestsTab = () => {
         }}
       >
         <p style={{ fontSize: "16px", fontWeight: "600" }}>Exam Tests Data</p>
-        <Button onClick={() => { setIsEditMode(false); resetForm(); onModalOpen(); }} colorScheme="green">
+        <Button
+          onClick={() => {
+            setIsEditMode(false);
+            resetForm();
+            onModalOpen();
+          }}
+          colorScheme="green"
+        >
           Add Test
         </Button>
       </div>
-      <div style={{ height: "100%", width: "100%" }}> {/* Changed from 80vw to 100% */}
+      <div style={{ height: "100%", width: "100%" }}>
+        {" "}
+        {/* Changed from 80vw to 100% */}
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={10}
-          // paginationAutoPageSize={true} // Consider removing if causing issues, or ensure it works as expected
+          paginationPageSize={5}
+          paginationPageSizeSelector={[5, 10, 20, 30]} // Consider removing if causing issues, or ensure it works as expected
           defaultColDef={{
             sortable: true,
             filter: true,
@@ -390,6 +399,8 @@ const TestsTab = () => {
               buttons: ["reset"],
             },
           }}
+          domLayout="autoHeight"
+          suppressCellFocus={true}
         />
       </div>
 
@@ -418,7 +429,7 @@ const TestsTab = () => {
                 ))}
               </Select>
             </FormControl>
-            <FormControl mb={4}>
+            {/* <FormControl mb={4}>
               <FormLabel>Step</FormLabel>
               <Select
                 placeholder="Select Step"
@@ -438,9 +449,9 @@ const TestsTab = () => {
                   </option>
                 )}
               </Select>
-            </FormControl>
+            </FormControl> */}
             <FormControl mb={4}>
-              <FormLabel>Exam Title</FormLabel> 
+              <FormLabel>Exam Title</FormLabel>
               <Input
                 placeholder="Enter Exam Title"
                 value={examTitle} // Changed from preCourseTestTitle
@@ -453,8 +464,8 @@ const TestsTab = () => {
                 type="number"
                 placeholder="Enter Exam Duration"
                 value={examDurationMinutes} // Changed from preCourseTestDuration
-                onChange={(e) =>
-                  setExamDurationMinutes(Number(e.target.value)) // Changed from setPreCourseTestDuration
+                onChange={
+                  (e) => setExamDurationMinutes(Number(e.target.value)) // Changed from setPreCourseTestDuration
                 }
               />
             </FormControl>

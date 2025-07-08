@@ -9,9 +9,10 @@ import { IoMdPaper } from "react-icons/io";
 import { VscFileSymlinkDirectory } from "react-icons/vsc";
 
 import { AgGridReact } from "ag-grid-react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import { ClientSideRowModelModule, CsvExportModule } from "ag-grid-community";
 import {
   Button,
   FormControl,
@@ -33,14 +34,24 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { useDropzone } from "react-dropzone";
+import { IoMdDownload } from "react-icons/io";
 
-ModuleRegistry.registerModules([AllCommunityModule]);
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  CsvExportModule,
+  AllCommunityModule,
+]);
 
 export default function Home() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const toast = useToast();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const gridRef = useRef<AgGridReact>(null);
+
+  const onExportClick = useCallback(() => {
+    gridRef.current?.api.exportDataAsCsv();
+  }, []);
 
   // Dropzone for image upload
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -80,8 +91,7 @@ export default function Home() {
           isClosable: true,
         });
         window.location.href = "/auth/login";
-      } 
-      
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -454,16 +464,21 @@ export default function Home() {
           }}
         >
           <p style={{ fontSize: "16px", fontWeight: "600" }}>App Users</p>
-          {/* <Button onClick={onAddModalOpen} colorScheme="green">
-                     Add New User
-                   </Button> */}
+          <Button
+            onClick={onExportClick}
+            colorScheme="blue"
+            size="sm"
+            leftIcon={<IoMdDownload />}
+          >
+            Export CSV
+          </Button>
         </div>
         <div style={{ height: "100%", width: "100%" }}>
           <AgGridReact
+            ref={gridRef}
             rowData={rowData}
             columnDefs={columnDefs}
             pagination={true}
-            // paginationPageSize={10}
             paginationPageSize={5}
             paginationPageSizeSelector={[5, 10, 20, 30]}
             // paginationAutoPageSize={true}

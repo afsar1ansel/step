@@ -315,7 +315,7 @@ const BannerMaster = () => {
   });
 
   return (
-    <div style={{ width: "80vw", height: "60vh", }}>
+    <div style={{ width: "80vw", height: "60vh" }}>
       <div
         style={{
           height: "60px",
@@ -339,6 +339,7 @@ const BannerMaster = () => {
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={5}
+          paginationPageSizeSelector={[5, 10, 20, 30]}
           defaultColDef={{
             sortable: true,
             filter: true,
@@ -346,6 +347,8 @@ const BannerMaster = () => {
             resizable: true,
             flex: 1,
           }}
+          domLayout="autoHeight"
+          suppressCellFocus={true}
         />
       </div>
 
