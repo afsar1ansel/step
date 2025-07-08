@@ -864,7 +864,9 @@ const StepsTab = () => {
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
-          // pagination={true}
+          pagination={true}
+          paginationPageSize={5}
+          paginationPageSizeSelector={[5, 10, 20, 30]}
           defaultColDef={{
             sortable: true,
             resizable: true,
@@ -882,6 +884,7 @@ const StepsTab = () => {
             const calculatedHeight = baseHeight + words * heightPerWord;
             return Math.max(120, calculatedHeight); // minimum height of 120px
           }}
+          domLayout="autoHeight"
           suppressCellFocus={true}
         />
       </div>

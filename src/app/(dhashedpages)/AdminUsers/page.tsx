@@ -310,7 +310,7 @@ const AdminUsers = () => {
   ];
 
   return (
-    <div style={{ width: "80vw", height: "60vh", }}>
+    <div style={{ width: "80vw", height: "60vh" }}>
       <div
         style={{
           height: "60px",
@@ -334,7 +334,7 @@ const AdminUsers = () => {
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 15]}
+          paginationPageSizeSelector={[5, 10, 20, 30]}
           // paginationAutoPageSize={true}
           defaultColDef={{
             sortable: true,
@@ -347,15 +347,16 @@ const AdminUsers = () => {
               buttons: ["reset"],
             },
           }}
-          getRowHeight={function (params) {
-            const description = params.data?.banner_description || "";
-            const words = description.split(" ").length;
-            const baseHeight = 50;
-            const heightPerWord = 6;
-            const minHeight = 50;
-            const calculatedHeight = baseHeight + words * heightPerWord;
-            return Math.max(minHeight, calculatedHeight);
-          }}
+          // getRowHeight={function (params) {
+          //   const description = params.data?.banner_description || "";
+          //   const words = description.split(" ").length;
+          //   const baseHeight = 50;
+          //   const heightPerWord = 6;
+          //   const minHeight = 50;
+          //   const calculatedHeight = baseHeight + words * heightPerWord;
+          //   return Math.max(minHeight, calculatedHeight);
+          // }}
+          domLayout="autoHeight"
           suppressCellFocus={true}
         />
       </div>
@@ -406,7 +407,11 @@ const AdminUsers = () => {
             <Button colorScheme="gray" mr={3} onClick={onAddModalClose}>
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleAddSubject} isLoading={loading}>
+            <Button
+              colorScheme="green"
+              onClick={handleAddSubject}
+              isLoading={loading}
+            >
               Add
             </Button>
           </ModalFooter>
@@ -459,7 +464,11 @@ const AdminUsers = () => {
             <Button colorScheme="gray" mr={3} onClick={onEditModalClose}>
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleUpdateSubject} isLoading={loading}>
+            <Button
+              colorScheme="green"
+              onClick={handleUpdateSubject}
+              isLoading={loading}
+            >
               Update
             </Button>
           </ModalFooter>

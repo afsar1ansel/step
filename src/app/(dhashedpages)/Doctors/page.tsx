@@ -417,7 +417,7 @@ const Doctors = () => {
           pagination={true}
           // paginationPageSize={10}
           paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 15]}
+          paginationPageSizeSelector={[5, 10, 20, 30]}
           // paginationAutoPageSize={true}
           defaultColDef={{
             sortable: true,
@@ -439,6 +439,7 @@ const Doctors = () => {
             const calculatedHeight = baseHeight + words * heightPerWord;
             return Math.max(minHeight, calculatedHeight);
           }}
+          domLayout="autoHeight"
           suppressCellFocus={true}
         />
       </div>

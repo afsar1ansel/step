@@ -367,8 +367,8 @@ const SubjectMaster = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={10}
-          paginationAutoPageSize={true}
+          paginationPageSize={5}
+          paginationPageSizeSelector={[5, 10, 20, 30]}
           defaultColDef={{
             sortable: true,
             filter: true,
@@ -380,6 +380,7 @@ const SubjectMaster = () => {
               buttons: ["reset"],
             },
           }}
+          domLayout="autoHeight"
           suppressCellFocus={true}
         />
       </div>

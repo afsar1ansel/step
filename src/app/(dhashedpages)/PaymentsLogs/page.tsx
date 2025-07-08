@@ -353,7 +353,7 @@ const PaymentsLogs = () => {
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 15]}
+          paginationPageSizeSelector={[5, 10, 20, 30]}
           // paginationAutoPageSize={true}
           defaultColDef={{
             sortable: true,
@@ -375,6 +375,7 @@ const PaymentsLogs = () => {
             const calculatedHeight = baseHeight + words * heightPerWord;
             return Math.max(minHeight, calculatedHeight);
           }}
+          domLayout="autoHeight"
           suppressCellFocus={true}
         />
       </div>

@@ -408,7 +408,7 @@ const TestsTab = () => {
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={10}
-          paginationPageSizeSelector={[5, 10, 15]}
+          paginationPageSizeSelector={[5, 10, 20, 30]}
           defaultColDef={{
             sortable: true,
             filter: true,
@@ -420,6 +420,17 @@ const TestsTab = () => {
               buttons: ["reset"],
             },
           }}
+          domLayout="autoHeight"
+          getRowHeight={(params: any) => {
+            // console.log({ params });
+            return 300;
+            // if (params?.data.sub_category_data.length > 1) {
+            //   return params.data.sub_category_data.length * 45;
+            // } else {
+            //   return 80;
+            // }
+          }}
+          suppressCellFocus={true}
         />
       </div>
 

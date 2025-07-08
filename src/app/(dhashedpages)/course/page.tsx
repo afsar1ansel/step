@@ -350,7 +350,8 @@ const CourseMaster = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={10}
+          paginationPageSize={5}
+          paginationPageSizeSelector={[5, 10, 20, 30]}
           defaultColDef={{
             sortable: true,
             filter: true,
@@ -362,6 +363,7 @@ const CourseMaster = () => {
               buttons: ["reset"],
             },
           }}
+          domLayout="autoHeight"
           suppressCellFocus={true}
         />
       </div>
