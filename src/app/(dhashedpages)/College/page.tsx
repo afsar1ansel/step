@@ -1,9 +1,10 @@
 "use client";
 
 import { AgGridReact } from "ag-grid-react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import { ClientSideRowModelModule, CsvExportModule } from "ag-grid-community";
 import {
   Button,
   FormControl,
@@ -22,13 +23,23 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { useDropzone } from "react-dropzone"; // Add this import
+import { IoMdDownload } from "react-icons/io";
 
-ModuleRegistry.registerModules([AllCommunityModule]);
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  CsvExportModule,
+  AllCommunityModule,
+]);
 
 const College = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const [rowData, setRowData] = useState<any[]>([]);
   const toast = useToast();
+  const gridRef = useRef<AgGridReact>(null);
+
+  const onExportClick = useCallback(() => {
+    gridRef.current?.api.exportDataAsCsv();
+  }, []);
 
   // [
   //   {
@@ -393,12 +404,22 @@ const College = () => {
         }}
       >
         <p style={{ fontSize: "16px", fontWeight: "600" }}>College</p>
-        <Button onClick={onAddModalOpenWithReset} colorScheme="green">
-          Add College
-        </Button>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Button
+            onClick={onExportClick}
+            colorScheme="blue"
+            leftIcon={<IoMdDownload />}
+          >
+            Export CSV
+          </Button>
+          <Button onClick={onAddModalOpenWithReset} colorScheme="green">
+            Add College
+          </Button>
+        </div>
       </div>
       <div style={{ height: "100%", width: "100%" }}>
         <AgGridReact
+          ref={gridRef}
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
@@ -647,7 +668,6 @@ const College = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-
     </div>
   );
 };
