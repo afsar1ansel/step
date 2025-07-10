@@ -78,6 +78,41 @@ const GameQuestionsPage = () => {
       { id: 2, name: "Physics" },
       { id: 3, name: "Chemistry" },
     ]);
+
+    // Dummy data for the grid on initial load
+    const initialDummyQuestions = [
+      {
+        id: 1,
+        question_no: 1,
+        question: JSON.stringify({
+          blocks: [{ type: "paragraph", data: { text: "What is 2 + 2?" } }],
+        }),
+        options: [
+          { option_text: "3" },
+          { option_text: "4" },
+          { option_text: "5" },
+          { option_text: "6" },
+        ],
+        correct_option: "2",
+      },
+      {
+        id: 2,
+        question_no: 2,
+        question: JSON.stringify({
+          blocks: [
+            { type: "paragraph", data: { text: "What is the capital of France?" } },
+          ],
+        }),
+        options: [
+          { option_text: "Berlin" },
+          { option_text: "Madrid" },
+          { option_text: "Paris" },
+          { option_text: "Rome" },
+        ],
+        correct_option: "3",
+      },
+    ];
+    setRowData(initialDummyQuestions);
   }, []);
 
   const handleSearch = () => {
@@ -222,7 +257,7 @@ const GameQuestionsPage = () => {
         headerName: "Actions",
         cellRenderer: actionsCellRenderer,
         flex: 1,
-        minWidth: 180,
+        minWidth: 240,
       },
     ]);
   }, [selectedModule, onQuestionModalOpen, toast]);

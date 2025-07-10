@@ -628,24 +628,7 @@ export default function RootLayout({
                                 </Link>
                               </li>
 
-                              <li>
-                                <Link href="/game-questions">
-                                  <p
-                                    className={
-                                      basePath === "game-questions"
-                                        ? "active-sub-option"
-                                        : ""
-                                    }
-                                    style={{
-                                      margin: 0,
-                                      marginLeft: "1rem",
-                                      padding: "0",
-                                    }}
-                                  >
-                                    Questions
-                                  </p>
-                                </Link>
-                              </li>
+
 
                               <li>
                                 <Link href="/tagSubjectGame">
@@ -665,7 +648,24 @@ export default function RootLayout({
                                   </p>
                                 </Link>
                               </li>
-
+                              <li>
+                                <Link href="/game-questions">
+                                  <p
+                                    className={
+                                      basePath === "game-questions"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Questions
+                                  </p>
+                                </Link>
+                              </li>
                               {/* <li>
                                 <Link href="/addQuestionToGame">
                                   <p
