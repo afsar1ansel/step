@@ -87,7 +87,12 @@ const Levels = () => {
       headerName: "Level",
       field: "level_name",
       // minWidth: 180,
-    },{
+    },
+    {
+      headerName: "Priority",
+      field: "id",
+    },
+    {
       headerName: "Description",
       field: "description",
       minWidth: 200,
@@ -188,6 +193,7 @@ const Levels = () => {
 
   const [levelName, setlevelName] = useState("");
   const [discription, setDescription] = useState("");
+  const [Priority, setPriority] = useState("");
   const [levelId, setLevelId] = useState("");
   const [loading, setLoading] = useState(false);
   // const [allCourse, setallCourse] = useState<any>([]);
@@ -197,6 +203,7 @@ const Levels = () => {
     setlevelName(data.level_name);
     setDescription(data.description);
     setLevelId(data.id);
+    setPriority(data.id);
     onEditModalOpen(); // Open Edit Modal
   };
 
@@ -297,11 +304,15 @@ const Levels = () => {
     } catch (error) {
       console.log(error);
     } 
+
    
   };
 
   const resetForm = () => {
     setlevelName("");
+    setDescription("");
+    setPriority("");
+    setLevelId("");
   };
 
   const allRole = [
@@ -363,7 +374,13 @@ const Levels = () => {
       </div>
 
       {/* Add Subject Modal */}
-      <Modal isOpen={isAddModalOpen} onClose={onAddModalClose}>
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => {
+          onAddModalClose();
+          resetForm(); // Reset when closing
+        }}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Add New Level</ModalHeader>
@@ -375,6 +392,14 @@ const Levels = () => {
                 placeholder="Enter Name"
                 value={levelName}
                 onChange={(e) => setlevelName(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Priority</FormLabel>
+              <Input
+                placeholder="Enter Priority"
+                value={Priority}
+                onChange={(e) => setPriority(e.target.value)}
               />
             </FormControl>
             <FormControl>
@@ -402,7 +427,13 @@ const Levels = () => {
       </Modal>
 
       {/* Edit Subject Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={onEditModalClose}>
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          onEditModalClose();
+          resetForm(); // Reset when closing
+        }}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Level</ModalHeader>
@@ -416,9 +447,16 @@ const Levels = () => {
                 onChange={(e) => setlevelName(e.target.value)}
               />
             </FormControl>
-
             <FormControl>
-              <FormLabel>Level</FormLabel>
+              <FormLabel>Priority</FormLabel>
+              <Input
+                placeholder="Enter Priority"
+                value={Priority}
+                onChange={(e) => setPriority(e.target.value)}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Discription</FormLabel>
               <Input
                 placeholder="Enter Discription"
                 value={discription}
