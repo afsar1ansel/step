@@ -96,13 +96,11 @@ export default function RootLayout({
 
   const [active, setActive] = useState<NavItem>(basePath as NavItem);
 
-
   useEffect(() => {
     checkvalidate();
   }, []);
 
   useEffect(() => {
-
     checkvalidate();
     const token =
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -114,27 +112,17 @@ export default function RootLayout({
     if (["teacher", "subject", "course"].includes(basePath)) {
       setActive("Masters");
     } else if (
-      [
-        "test",
-        "precourse-qa",
-        "postcourse-test",
-        "postcourse-qa",
-      ].includes(basePath)
+      ["test", "precourse-qa", "postcourse-test", "postcourse-qa"].includes(
+        basePath
+      )
     ) {
       setActive("test");
-    } else if (
-      [
-        "exam-test",
-        "exam-qa",
-      ].includes(basePath)
-    ) {
+    } else if (["exam-test", "exam-qa"].includes(basePath)) {
       setActive("ExamModule");
     } else {
       setActive(basePath as NavItem);
     }
   }, [pathname]);
-
- 
 
   async function checkvalidate() {
     const token =
@@ -163,19 +151,18 @@ export default function RootLayout({
         console.error("Error fetching data:", error);
       });
   }
-    
 
   const handleLogout = () => {
     const token =
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
     // if (!token) {
-      console.warn("No token found, redirecting to login...");
-      localStorage.removeItem("token");
-      localStorage.removeItem("permits");
-      localStorage.removeItem("user");
-      window.location.href = "/auth/login";
-      // return;
+    console.warn("No token found, redirecting to login...");
+    localStorage.removeItem("token");
+    localStorage.removeItem("permits");
+    localStorage.removeItem("user");
+    window.location.href = "/auth/login";
+    // return;
     // }
 
     // fetch(`${baseURL}/app-users/logout/${token}`, {
@@ -641,7 +628,7 @@ export default function RootLayout({
                                 </Link>
                               </li>
 
-                              {/* <li>
+                              <li>
                                 <Link href="/tagSubjectGame">
                                   <p
                                     className={
@@ -658,7 +645,7 @@ export default function RootLayout({
                                     Tag Subject
                                   </p>
                                 </Link>
-                              </li> */}
+                              </li>
 
                               {/* <li>
                                 <Link href="/addQuestionToGame">
