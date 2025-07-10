@@ -629,6 +629,25 @@ export default function RootLayout({
                               </li>
 
                               <li>
+                                <Link href="/game-questions">
+                                  <p
+                                    className={
+                                      basePath === "game-questions"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Questions
+                                  </p>
+                                </Link>
+                              </li>
+
+                              <li>
                                 <Link href="/tagSubjectGame">
                                   <p
                                     className={
@@ -642,7 +661,7 @@ export default function RootLayout({
                                       padding: "0",
                                     }}
                                   >
-                                    Tag Subject
+                                    Tag Subject to Game
                                   </p>
                                 </Link>
                               </li>
