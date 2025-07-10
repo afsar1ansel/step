@@ -24,6 +24,7 @@ import {
   Box,
   Text,
   Select,
+  Badge,
 } from "@chakra-ui/react";
 import { Spinner, Center } from "@chakra-ui/react";
 
@@ -62,6 +63,7 @@ const LevelSubjectManagement = () => {
   const [levels, setLevels] = useState<Level[]>([]);
   const levelsRef = useRef<Level[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const subjectsRef = useRef<Subject[]>([]);
   const [mappings, setMappings] = useState<LevelSubjectMapping[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
@@ -80,6 +82,9 @@ const LevelSubjectManagement = () => {
   useEffect(() => {
     levelsRef.current = levels;
   }, [levels]);
+  useEffect(() => {
+    subjectsRef.current = subjects;
+  }, [subjects]);
 
   // Get token on client side
   useEffect(() => {
@@ -138,7 +143,31 @@ const LevelSubjectManagement = () => {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 300));
-      const dummyMappings: LevelSubjectMapping[] = [];
+      const dummyMappings: LevelSubjectMapping[] = [
+        {
+          id: 1,
+          level_id: 1,
+          level_name: "Level 1",
+          subjects_tagged: [1, 2, 3],
+          status: 1,
+        },
+        {
+          id: 2,
+          level_id: 2,
+          level_name: "Level 2",
+          subjects_tagged: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          status: 1,
+        },
+        {
+          id: 3,
+          level_id: 3,
+          level_name: "Level 3",
+          subjects_tagged: [
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+          ],
+          status: 0,
+        },
+      ];
       setMappings(dummyMappings);
     } catch (error) {
       toast({
@@ -350,11 +379,11 @@ const LevelSubjectManagement = () => {
   };
 
   const getSubjectNames = (subjectIds: number[]) => {
-      if (subjectIds.length === 0) return "No subjects tagged";
-      console.log("subjectIds", subjectIds);
-      console.log("subjects", subjects);
+    if (subjectIds.length === 0) return "No subjects tagged";
+    // console.log("subjectIds", subjectIds);
+    // console.log("subjects", subjects, subjectsRef.current);
 
-    return subjects
+    return subjectsRef.current
       .filter((subject) => subjectIds.includes(subject.subject_id))
       .map((subject) => subject.subject_name)
       .join(", ");
@@ -368,24 +397,66 @@ const LevelSubjectManagement = () => {
       filter: false,
       suppressAutoSize: true,
       cellRenderer: (params: any) => params.node.rowIndex + 1,
-      cellStyle: { textAlign: "center" },
+      cellStyle: { textAlign: "center", display: "flex", alignItems: "center" },
     },
     {
       headerName: "Level Name",
       field: "level_name",
+      cellStyle: { display: "flex", alignItems: "center" },
     },
     {
       headerName: "Subjects",
       field: "subjects_tagged",
       flex: 3,
-      cellRenderer: (params: any) => getSubjectNames(params.value),
+      cellRenderer: (params: any) => {
+        const subjectNames = getSubjectNames(params.value);
+        if (!params.value || params.value.length === 0) {
+          return (
+            <Badge colorScheme="gray" display="flex" alignItems="center">
+              No subjects tagged
+            </Badge>
+          );
+        }
+        return (
+          <HStack wrap="wrap" spacing={1} align="center">
+            {params.value.map((subjectId: number) => {
+              const subject = subjectsRef.current.find(
+                (s) => s.subject_id === subjectId
+              );
+              return subject ? (
+                <Badge
+                  key={subjectId}
+                  colorScheme="teal"
+                  size="xs"
+                  px={2}
+                  py={0.5}
+                  lineHeight="normal"
+                  fontSize="xs"
+                  display="inline-flex"
+                  alignItems="center"
+                >
+                  {subject.subject_name}
+                </Badge>
+              ) : null;
+            })}
+          </HStack>
+        );
+      },
+      cellStyle: { display: "flex", alignItems: "center" },
     },
     {
       headerName: "Status",
       field: "status",
       maxWidth: 120,
       cellRenderer: (params: any) => (
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
           <Switch
             colorScheme="green"
             isChecked={params.value === 1}
@@ -395,13 +466,18 @@ const LevelSubjectManagement = () => {
           />
         </div>
       ),
+      cellStyle: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      },
     },
     {
       headerName: "Actions",
       field: "actions",
       maxWidth: 150,
       cellRenderer: (params: any) => (
-        <HStack spacing={2}>
+        <HStack spacing={2} align="center">
           <Button
             colorScheme="blue"
             size="sm"
@@ -412,6 +488,11 @@ const LevelSubjectManagement = () => {
           </Button>
         </HStack>
       ),
+      cellStyle: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      },
     },
   ]);
 
@@ -469,6 +550,15 @@ const LevelSubjectManagement = () => {
             },
           }}
           domLayout="autoHeight"
+          getRowHeight={(params: any) => {
+            console.log("params.node.level", params);
+            if (params.data.subjects_tagged.length > 5) {
+              return params.data.subjects_tagged.length * 8; // Height for header row
+            } else if (params.data.subjects_tagged.length > 10) {
+              return params.data.subjects_tagged.length * 4; // Height for header row
+            }
+            return 40;
+          }}
           suppressCellFocus={true}
         />
       </div>
