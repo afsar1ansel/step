@@ -1,7 +1,7 @@
 "use client";
 
 import { AgGridReact } from "ag-grid-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import {
@@ -60,6 +60,7 @@ const LevelSubjectManagement = () => {
   const [token, setToken] = useState<string | null>(null);
 
   const [levels, setLevels] = useState<Level[]>([]);
+  const levelsRef = useRef<Level[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [mappings, setMappings] = useState<LevelSubjectMapping[]>([]);
   const [loading, setLoading] = useState(false);
@@ -74,6 +75,11 @@ const LevelSubjectManagement = () => {
     onOpen: onMappingModalOpen,
     onClose: onMappingModalClose,
   } = useDisclosure();
+
+  // Update ref when levels change
+  useEffect(() => {
+    levelsRef.current = levels;
+  }, [levels]);
 
   // Get token on client side
   useEffect(() => {
@@ -92,8 +98,6 @@ const LevelSubjectManagement = () => {
       );
       if (!response.ok) throw new Error("Failed to fetch levels");
       const data = await response.json();
-      console.log("Fetched Levels:", data);
-
       setLevels(data);
     } catch (error) {
       toast({
@@ -181,25 +185,14 @@ const LevelSubjectManagement = () => {
   };
 
   const handleEditMapping = (mapping: LevelSubjectMapping) => {
-    console.log("Editing mapping:", mapping, levels);
-
-    if (!levels || levels.length === 0) {
-      toast({
-        title: "Error",
-        description: "Levels data not loaded yet",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    const level = levels.find((l) => l.id === mapping.level_id);
+    // Use ref to get current levels instead of state
+    const currentLevels = levelsRef.current;
+    const level = currentLevels.find((l) => l.id === mapping.level_id);
 
     if (!level) {
       toast({
         title: "Error",
-        description: "Level not found",
+        description: "Level not found in current data",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -224,29 +217,35 @@ const LevelSubjectManagement = () => {
   };
 
   // Get subjects from previous level only
-  const getSubjectsFromPreviousLevel = (levelId: number): number[] => {
+  const getSubjectsFromPreviousLevels = (levelId: number): number[] => {
     const currentLevelIndex = levels.findIndex((l) => l.id === levelId);
     if (currentLevelIndex <= 0) return [];
 
-    const previousLevel = levels[currentLevelIndex - 1];
-    const previousMapping = mappings.find(
-      (m) => m.level_id === previousLevel.id
-    );
+    const previousLevels = levels.slice(0, currentLevelIndex);
+    const previousSubjects = new Set<number>();
 
-    return previousMapping?.subjects_tagged || [];
+    previousLevels.forEach((level) => {
+      const mapping = mappings.find((m) => m.level_id === level.id);
+      if (mapping) {
+        mapping.subjects_tagged.forEach((subjectId) =>
+          previousSubjects.add(subjectId)
+        );
+      }
+    });
+
+    return Array.from(previousSubjects);
   };
 
   // Handle level selection change
   const handleLevelChange = (levelId: number) => {
-    const level = levels.find((l) => l.id === levelId);
+    const currentLevels = levelsRef.current;
+    const level = currentLevels.find((l) => l.id === levelId);
     setSelectedLevel(level || null);
 
     if (selectedMapping) {
-      // For edit mode, use existing subjects
       setSelectedSubjects(selectedMapping.subjects_tagged);
     } else {
-      // For add mode, get subjects from previous level
-      const previousLevelSubjects = getSubjectsFromPreviousLevel(levelId);
+      const previousLevelSubjects = getSubjectsFromPreviousLevels(levelId);
       setSelectedSubjects(previousLevelSubjects);
     }
   };
@@ -276,7 +275,7 @@ const LevelSubjectManagement = () => {
       if (existingIndex >= 0) {
         newMappings[existingIndex] = {
           ...newMappings[existingIndex],
-          level_name: selectedLevel.level_name, // Update level name if changed
+          level_name: selectedLevel.level_name,
           subjects_tagged: [...selectedSubjects],
         };
       } else {
@@ -436,7 +435,20 @@ const LevelSubjectManagement = () => {
         </Button>
       </div>
 
-      <div style={{ height: "100%", width: "100%" }}>
+      <div style={{ height: "100%", width: "100%", position: "relative" }}>
+        {loading && (
+          <Center
+            position="absolute"
+            top={0}
+            left={0}
+            right={0}
+            bottom={0}
+            bg="whiteAlpha.700"
+            zIndex={10}
+          >
+            <Spinner size="xl" />
+          </Center>
+        )}
         <AgGridReact
           rowData={mappings}
           columnDefs={columnDefs}
@@ -548,24 +560,6 @@ const LevelSubjectManagement = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-
-      {loading && (
-        <Center
-          position="absolute"
-          top="50%"
-          left="50%"
-          transform="translate(-50%, -50%)"
-          zIndex={10}
-        >
-          <Spinner
-            size="xl"
-            color="blue.500"
-            thickness="4px"
-            emptyColor="gray.200"
-            speed="0.65s"
-          />
-        </Center>
-      )}
     </div>
   );
 };
