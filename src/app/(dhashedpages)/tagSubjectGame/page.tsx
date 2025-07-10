@@ -380,7 +380,6 @@ const LevelSubjectManagement = () => {
 
   const getSubjectNames = (subjectIds: number[]) => {
     if (subjectIds.length === 0) return "No subjects tagged";
-    // console.log("subjectIds", subjectIds);
     // console.log("subjects", subjects, subjectsRef.current);
 
     return subjectsRef.current
