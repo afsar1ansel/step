@@ -1,9 +1,10 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
+import { AgGridReact } from "ag-grid-react";
+import React, { useEffect, useState } from "react";
+import type { ColDef } from "ag-grid-community";
+import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import {
-  Box,
+    Box,
   Button,
   FormControl,
   FormLabel,
@@ -17,14 +18,14 @@ import {
   ModalHeader,
   ModalOverlay,
   Select,
+  Switch,
   useDisclosure,
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { AgGridReact } from "ag-grid-react";
-import { ColDef } from "ag-grid-community";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
+import { Spinner, Center, CircularProgress } from "@chakra-ui/react";
+
+import dynamic from "next/dynamic";
 import ContentFormatter from "@/app/componant/ContentFormatter";
 
 const EditorComponent = dynamic(() => import("@/app/componant/editor"), {
