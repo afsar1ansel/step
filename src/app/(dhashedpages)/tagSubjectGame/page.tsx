@@ -51,19 +51,21 @@ interface LevelSubjectMapping {
   level_id: number;
   level_name: string;
   subjects_tagged: number[];
-  status: number; // Added status field
+  status: number;
 }
 
 const LevelSubjectManagement = () => {
   const toast = useToast();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const token = localStorage.getItem("token");
+  const [token, setToken] = useState<string | null>(null);
 
   const [levels, setLevels] = useState<Level[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [mappings, setMappings] = useState<LevelSubjectMapping[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
+  const [selectedMapping, setSelectedMapping] =
+    useState<LevelSubjectMapping | null>(null);
   const [selectedSubjects, setSelectedSubjects] = useState<number[]>([]);
   const [autoTagEnabled, setAutoTagEnabled] = useState(true);
 
@@ -73,14 +75,25 @@ const LevelSubjectManagement = () => {
     onClose: onMappingModalClose,
   } = useDisclosure();
 
+  // Get token on client side
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setToken(localStorage.getItem("token"));
+    }
+  }, []);
+
   // Fetch levels from API
   const fetchLevels = async () => {
+    if (!token) return;
+
     try {
       const response = await fetch(
         `${baseUrl}/admin/game/get-all-levels/${token}`
       );
       if (!response.ok) throw new Error("Failed to fetch levels");
       const data = await response.json();
+      console.log("Fetched Levels:", data);
+
       setLevels(data);
     } catch (error) {
       toast({
@@ -95,6 +108,8 @@ const LevelSubjectManagement = () => {
 
   // Fetch subjects from API
   const fetchSubjects = async () => {
+    if (!token) return;
+
     try {
       const response = await fetch(
         `${baseUrl}/masters/subjects/get-all-subjects/${token}`
@@ -113,17 +128,13 @@ const LevelSubjectManagement = () => {
     }
   };
 
-  // Fetch mappings (using dummy data for now)
+  // Fetch mappings
   const fetchMappings = async () => {
+    if (!token) return;
+
     try {
-      // Simulate API call with dummy data
       await new Promise((resolve) => setTimeout(resolve, 300));
-
-      // Using dummy data with status field
-      const dummyMappings: LevelSubjectMapping[] = [
-        
-      ];
-
+      const dummyMappings: LevelSubjectMapping[] = [];
       setMappings(dummyMappings);
     } catch (error) {
       toast({
@@ -138,6 +149,8 @@ const LevelSubjectManagement = () => {
 
   // Fetch all data
   const fetchAllData = async () => {
+    if (!token) return;
+
     setLoading(true);
     try {
       await Promise.all([fetchLevels(), fetchSubjects(), fetchMappings()]);
@@ -155,18 +168,47 @@ const LevelSubjectManagement = () => {
   };
 
   useEffect(() => {
-    fetchAllData();
-  }, []);
+    if (token) {
+      fetchAllData();
+    }
+  }, [token]);
 
   const handleAddMapping = () => {
+    setSelectedMapping(null);
     setSelectedLevel(null);
     setSelectedSubjects([]);
     onMappingModalOpen();
   };
 
   const handleEditMapping = (mapping: LevelSubjectMapping) => {
+    console.log("Editing mapping:", mapping, levels);
+
+    if (!levels || levels.length === 0) {
+      toast({
+        title: "Error",
+        description: "Levels data not loaded yet",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
     const level = levels.find((l) => l.id === mapping.level_id);
-    setSelectedLevel(level || null);
+
+    if (!level) {
+      toast({
+        title: "Error",
+        description: "Level not found",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    setSelectedMapping(mapping);
+    setSelectedLevel(level);
     setSelectedSubjects(mapping.subjects_tagged);
     onMappingModalOpen();
   };
@@ -181,25 +223,17 @@ const LevelSubjectManagement = () => {
     });
   };
 
-  // Get subjects from lower levels
-  const getSubjectsFromLowerLevels = (levelId: number): number[] => {
+  // Get subjects from previous level only
+  const getSubjectsFromPreviousLevel = (levelId: number): number[] => {
     const currentLevelIndex = levels.findIndex((l) => l.id === levelId);
     if (currentLevelIndex <= 0) return [];
 
-    const lowerLevelSubjects = new Set<number>();
+    const previousLevel = levels[currentLevelIndex - 1];
+    const previousMapping = mappings.find(
+      (m) => m.level_id === previousLevel.id
+    );
 
-    // Get all subjects from levels below the current one
-    for (let i = 0; i < currentLevelIndex; i++) {
-      const lowerLevel = levels[i];
-      const mapping = mappings.find((m) => m.level_id === lowerLevel.id);
-      if (mapping) {
-        mapping.subjects_tagged.forEach((subjectId) =>
-          lowerLevelSubjects.add(subjectId)
-        );
-      }
-    }
-
-    return Array.from(lowerLevelSubjects);
+    return previousMapping?.subjects_tagged || [];
   };
 
   // Handle level selection change
@@ -207,20 +241,14 @@ const LevelSubjectManagement = () => {
     const level = levels.find((l) => l.id === levelId);
     setSelectedLevel(level || null);
 
-    // Find existing mappings for this level
-    const levelMapping = mappings.find((m) => m.level_id === levelId);
-
-    // Get subjects from lower levels if auto-tag is enabled
-    const lowerLevelSubjects = autoTagEnabled
-      ? getSubjectsFromLowerLevels(levelId)
-      : [];
-
-    // Combine existing mappings with lower level subjects
-    const combinedSubjects = Array.from(
-      new Set([...(levelMapping?.subjects_tagged || []), ...lowerLevelSubjects])
-    );
-
-    setSelectedSubjects(combinedSubjects);
+    if (selectedMapping) {
+      // For edit mode, use existing subjects
+      setSelectedSubjects(selectedMapping.subjects_tagged);
+    } else {
+      // For add mode, get subjects from previous level
+      const previousLevelSubjects = getSubjectsFromPreviousLevel(levelId);
+      setSelectedSubjects(previousLevelSubjects);
+    }
   };
 
   // Save mapping
@@ -238,10 +266,8 @@ const LevelSubjectManagement = () => {
 
     setLoading(true);
     try {
-      // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Update existing mapping or create new one
       const newMappings = [...mappings];
       const existingIndex = newMappings.findIndex(
         (m) => m.level_id === selectedLevel.id
@@ -250,6 +276,7 @@ const LevelSubjectManagement = () => {
       if (existingIndex >= 0) {
         newMappings[existingIndex] = {
           ...newMappings[existingIndex],
+          level_name: selectedLevel.level_name, // Update level name if changed
           subjects_tagged: [...selectedSubjects],
         };
       } else {
@@ -258,46 +285,8 @@ const LevelSubjectManagement = () => {
           level_id: selectedLevel.id,
           level_name: selectedLevel.level_name,
           subjects_tagged: [...selectedSubjects],
-          status: 1, // Default status for new mappings
+          status: 1,
         });
-      }
-
-      // If auto-tag is enabled, propagate subjects to higher levels
-      if (autoTagEnabled) {
-        const currentLevelIndex = levels.findIndex(
-          (l) => l.id === selectedLevel.id
-        );
-        if (currentLevelIndex >= 0) {
-          for (let i = currentLevelIndex + 1; i < levels.length; i++) {
-            const higherLevel = levels[i];
-            const higherLevelIndex = newMappings.findIndex(
-              (m) => m.level_id === higherLevel.id
-            );
-
-            if (higherLevelIndex >= 0) {
-              // Merge existing subjects with new ones (avoid duplicates)
-              const mergedSubjects = Array.from(
-                new Set([
-                  ...newMappings[higherLevelIndex].subjects_tagged,
-                  ...selectedSubjects,
-                ])
-              );
-
-              newMappings[higherLevelIndex] = {
-                ...newMappings[higherLevelIndex],
-                subjects_tagged: [...mergedSubjects],
-              };
-            } else {
-              newMappings.push({
-                id: Date.now() + i,
-                level_id: higherLevel.id,
-                level_name: higherLevel.level_name,
-                subjects_tagged: [...selectedSubjects],
-                status: 1, // Default status for new mappings
-              });
-            }
-          }
-        }
       }
 
       setMappings(newMappings);
@@ -449,7 +438,7 @@ const LevelSubjectManagement = () => {
 
       <div style={{ height: "100%", width: "100%" }}>
         <AgGridReact
-          rowData={mappings} // Now showing mappings data instead of levels
+          rowData={mappings}
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={10}
@@ -477,14 +466,15 @@ const LevelSubjectManagement = () => {
         size="xl"
         onCloseComplete={() => {
           setSelectedLevel(null);
+          setSelectedMapping(null);
           setSelectedSubjects([]);
         }}
       >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>
-            {selectedLevel
-              ? `Edit Subjects for ${selectedLevel.level_name}`
+            {selectedMapping
+              ? `Edit Subjects for ${selectedMapping.level_name}`
               : "Add New Level-Subject Mapping"}
           </ModalHeader>
           <ModalCloseButton />
@@ -538,15 +528,6 @@ const LevelSubjectManagement = () => {
                         ))}
                       </VStack>
                     </Box>
-                  </FormControl>
-
-                  <FormControl display="flex" alignItems="center">
-                    <FormLabel mb="0">Auto-tag to higher levels</FormLabel>
-                    <Switch
-                      isChecked={autoTagEnabled}
-                      onChange={() => setAutoTagEnabled(!autoTagEnabled)}
-                      colorScheme="green"
-                    />
                   </FormControl>
                 </>
               )}
