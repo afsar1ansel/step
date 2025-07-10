@@ -350,7 +350,9 @@ const LevelSubjectManagement = () => {
   };
 
   const getSubjectNames = (subjectIds: number[]) => {
-    if (subjectIds.length === 0) return "No subjects tagged";
+      if (subjectIds.length === 0) return "No subjects tagged";
+      console.log("subjectIds", subjectIds);
+      console.log("subjects", subjects);
 
     return subjects
       .filter((subject) => subjectIds.includes(subject.subject_id))
@@ -510,7 +512,7 @@ const LevelSubjectManagement = () => {
               {selectedLevel && (
                 <>
                   <Box>
-                    <Text fontWeight="bold">Description:</Text>
+                    <Text>Level Description:</Text>
                     <Text>{selectedLevel.description}</Text>
                   </Box>
 
