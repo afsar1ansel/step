@@ -339,18 +339,36 @@ const GameQuestionsPage = () => {
             h="400px"
             w="100%"
           >
-            <AgGridReact
-              rowData={rowData}
-              columnDefs={columnDefs}
-              defaultColDef={{
-                sortable: true,
-                filter: true,
-                resizable: true,
-              }}
-              domLayout="autoHeight"
-              pagination={true}
-              paginationPageSize={10}
-            />
+        <AgGridReact
+          rowData={rowData}
+          columnDefs={columnDefs}
+          pagination={true}
+          paginationPageSize={5}
+          paginationPageSizeSelector={[5, 10, 20, 30]}
+          // paginationAutoPageSize={true}
+          defaultColDef={{
+            sortable: true,
+            filter: true,
+            floatingFilter: true,
+            resizable: true,
+            flex: 1,
+            filterParams: {
+              debounceMs: 0,
+              buttons: ["reset"],
+            },
+          }}
+          // getRowHeight={function (params) {
+          //   const description = params.data?.banner_description || "";
+          //   const words = description.split(" ").length;
+          //   const baseHeight = 50;
+          //   const heightPerWord = 6;
+          //   const minHeight = 50;
+          //   const calculatedHeight = baseHeight + words * heightPerWord;
+          //   return Math.max(minHeight, calculatedHeight);
+          // }}
+          domLayout="autoHeight"
+          suppressCellFocus={true}
+        />
           </Box>
         </Box>
       </VStack>
