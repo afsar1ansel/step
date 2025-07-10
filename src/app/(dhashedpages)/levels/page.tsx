@@ -24,7 +24,6 @@ import {
 } from "@chakra-ui/react";
 import { Spinner, Center, CircularProgress } from "@chakra-ui/react";
 
-
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const Levels = () => {
@@ -34,7 +33,6 @@ const Levels = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
 
   async function fetchData() {
     try {
@@ -100,7 +98,7 @@ const Levels = () => {
     },
     {
       field: "status",
-      headerName: "Access",
+      headerName: "Status",
       filter: false,
       maxWidth: 150,
       cellRenderer: (params: any) => (
@@ -158,7 +156,7 @@ const Levels = () => {
   //toggle function for switch button
   const handleToggle = async (data: any) => {
     console.log(data);
-     setLoading(true);
+    setLoading(true);
     try {
       const token = localStorage.getItem("token") ?? "";
       const status = data.status == 1 ? 0 : 1;
@@ -268,7 +266,7 @@ const Levels = () => {
       form.append("description", discription);
       form.append("levelId", levelId);
       form.append("token", token);
-       console.log(Object.fromEntries(form.entries()));
+      console.log(Object.fromEntries(form.entries()));
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/admin/game/levels/update`,
@@ -289,8 +287,8 @@ const Levels = () => {
           isClosable: true,
         });
         fetchData();
-         resetForm();
-         onEditModalClose();
+        resetForm();
+        onEditModalClose();
       } else {
         toast({
           title: "Error",
@@ -299,13 +297,11 @@ const Levels = () => {
           duration: 3000,
           isClosable: true,
         });
-         resetForm();
+        resetForm();
       }
     } catch (error) {
       console.log(error);
-    } 
-
-   
+    }
   };
 
   const resetForm = () => {
