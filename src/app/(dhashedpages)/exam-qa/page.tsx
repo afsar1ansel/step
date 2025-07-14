@@ -30,8 +30,8 @@ import ContentFormatter from "@/app/componant/ContentFormatter";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const PrecourseQaPage = () => { 
-  const baseUrl = "https://step-exam-app-3utka.ondigitalocean.app"; 
+const PrecourseQaPage = () => {
+  const baseUrl = "https://step-exam-app-3utka.ondigitalocean.app";
   const [rowData, setRowData] = useState<any[]>([]);
   const [testId, setTestId] = useState(""); // This will represent examId for selecting an exam
   const [testOptions, settestOptions] = useState<any[]>([]); // To be populated by exams
@@ -61,28 +61,30 @@ const PrecourseQaPage = () => {
   const toast = useToast();
 
   useEffect(() => {
-    fetcherDrop(); 
+    fetcherDrop();
   }, []);
 
   useEffect(() => {
-    if (testId) { 
+    if (testId) {
       fetchTestQuestions(); // Renamed for clarity
     } else {
-      setRowData([]); 
+      setRowData([]);
     }
   }, [testId]);
 
-  async function fetchTestQuestions() { // Renamed from fetchTest
+  async function fetchTestQuestions() {
+    // Renamed from fetchTest
     const token = localStorage.getItem("token") ?? "";
-    if (!testId) return; 
+    if (!testId) return;
     try {
       const response = await fetch(
         `${baseUrl}/admin/masters/exam/questions/view/${testId}`, // Changed endpoint
         {
           method: "GET",
-          headers: { // Added headers for token
-            'Authorization': `Bearer ${token}`
-          }
+          headers: {
+            // Added headers for token
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       if (response.ok) {
@@ -90,32 +92,54 @@ const PrecourseQaPage = () => {
         // Parse the JSON strings into objects before setting the row data
         const parsedData = responseData.map((row: any) => ({
           ...row,
-          question_text: typeof row.question_text === 'string' ? JSON.parse(row.question_text) : row.question_text,
-          solution_text: typeof row.solution_text === 'string' ? JSON.parse(row.solution_text) : row.solution_text,
+          question_text:
+            typeof row.question_text === "string"
+              ? JSON.parse(row.question_text)
+              : row.question_text,
+          solution_text:
+            typeof row.solution_text === "string"
+              ? JSON.parse(row.solution_text)
+              : row.solution_text,
         }));
         setRowData(parsedData || []);
       } else {
-        const errorData = await response.json().catch(() => ({ message: "Failed to fetch exam questions." }));
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: "Failed to fetch exam questions." }));
         setRowData([]);
-        toast({ title: "Error", description: errorData.message || "Failed to fetch exam questions.", status: "error", duration: 3000, isClosable: true });
+        toast({
+          title: "Error",
+          description: errorData.message || "Failed to fetch exam questions.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
       }
     } catch (error) {
       console.error("Error fetching data:", error);
       setRowData([]);
-      toast({ title: "Error", description: "Failed to fetch exam questions.", status: "error", duration: 3000, isClosable: true });
+      toast({
+        title: "Error",
+        description: "Failed to fetch exam questions.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   }
 
-  async function fetcherDrop() { // Fetches exams for the dropdown
+  async function fetcherDrop() {
+    // Fetches exams for the dropdown
     const tok = localStorage.getItem("token");
     try {
       const response = await fetch(
         `${baseUrl}/masters/exam/get-all`, // Changed endpoint
         {
           method: "GET",
-          headers: { // Added headers for token
-            'Authorization': `Bearer ${tok}`
-          }
+          headers: {
+            // Added headers for token
+            Authorization: `Bearer ${tok}`,
+          },
         }
       );
       const responseData = await response.json();
@@ -146,17 +170,14 @@ const PrecourseQaPage = () => {
       headerName: "Question",
       editable: false,
       flex: 2,
-       cellRenderer: (params: any) => {
-            // The data is now pre-parsed, so we can pass it directly
-            return <ContentFormatter content={params.value} />;
-           },
+      cellRenderer: (params: any) => {
+        return <ContentFormatter content={params.value} />;
+      },
       cellStyle: {
         height: "100%",
-        padding: "0px", // Cell padding handled by renderer
-        display: 'flex',
-        alignItems: 'center'
+        padding: "8px",
       },
-      autoHeight: true, // Let ag-grid manage height based on content
+      autoHeight: true,
     },
     {
       headerName: "Option 1",
@@ -171,10 +192,9 @@ const PrecourseQaPage = () => {
               whiteSpace: "pre-wrap",
               wordWrap: "break-word",
               overflowWrap: "break-word",
-              overflowY: "auto",
+              overflow: "auto",
               height: "100%",
-              maxHeight: "280px",
-              scrollbarWidth: "thin",
+              scrollbarWidth: "none",
               padding: "8px",
               backgroundColor: params.data.options?.[0]?.correct_option
                 ? "#e6f7e6"
@@ -185,8 +205,6 @@ const PrecourseQaPage = () => {
           </div>
         );
       },
-       cellStyle: { height: "100%", padding: "0px", display: 'flex', alignItems: 'center' },
-       autoHeight: true,
     },
     {
       headerName: "Option 2",
@@ -201,10 +219,9 @@ const PrecourseQaPage = () => {
               whiteSpace: "pre-wrap",
               wordWrap: "break-word",
               overflowWrap: "break-word",
-              overflowY: "auto",
+              overflow: "auto",
               height: "100%",
-              maxHeight: "280px",
-              scrollbarWidth: "thin",
+              scrollbarWidth: "none",
               padding: "8px",
               backgroundColor: params.data.options?.[1]?.correct_option
                 ? "#e6f7e6"
@@ -215,8 +232,6 @@ const PrecourseQaPage = () => {
           </div>
         );
       },
-      cellStyle: { height: "100%", padding: "0px", display: 'flex', alignItems: 'center' },
-      autoHeight: true,
     },
     {
       headerName: "Option 3",
@@ -231,10 +246,9 @@ const PrecourseQaPage = () => {
               whiteSpace: "pre-wrap",
               wordWrap: "break-word",
               overflowWrap: "break-word",
-              overflowY: "auto",
+              overflow: "auto",
               height: "100%",
-              maxHeight: "280px",
-              scrollbarWidth: "thin",
+              scrollbarWidth: "none",
               padding: "8px",
               backgroundColor: params.data.options?.[2]?.correct_option
                 ? "#e6f7e6"
@@ -245,8 +259,6 @@ const PrecourseQaPage = () => {
           </div>
         );
       },
-      cellStyle: { height: "100%", padding: "0px", display: 'flex', alignItems: 'center' },
-      autoHeight: true,
     },
     {
       headerName: "Option 4",
@@ -261,10 +273,9 @@ const PrecourseQaPage = () => {
               whiteSpace: "pre-wrap",
               wordWrap: "break-word",
               overflowWrap: "break-word",
-              overflowY: "auto",
+              overflow: "auto",
               height: "100%",
-              maxHeight: "280px",
-              scrollbarWidth: "thin",
+              scrollbarWidth: "none",
               padding: "8px",
               backgroundColor: params.data.options?.[3]?.correct_option
                 ? "#e6f7e6"
@@ -277,26 +288,20 @@ const PrecourseQaPage = () => {
       },
       cellStyle: {
         height: "100%",
-        padding: "0px", // Cell padding handled by renderer
-        display: 'flex',
-        alignItems: 'center'
+        padding: "0px",
       },
-      autoHeight: true,
     },
     {
       field: "solution_text",
       headerName: "Solution",
       filter: false,
-      flex: 2,
       cellRenderer: (params: any) => {
-            // The data is now pre-parsed, so we can pass it directly
-            return <ContentFormatter content={params.value} />;
-          },
-      cellStyle: { height: "100%", padding: "0px", display: 'flex', alignItems: 'center' },
-      autoHeight: true,
+        return <ContentFormatter content={params.value} />;
+      },
+      flex: 2,
     },
     {
-      field: "question_id", // Assuming this is the unique ID for actions
+      field: "question_id",
       headerName: "Actions",
       maxWidth: 100,
       filter: false,
@@ -306,18 +311,16 @@ const PrecourseQaPage = () => {
             style={{
               display: "flex",
               justifyContent: "center",
-              alignItems: "center", // Align button vertically
-              height: "100%", // Ensure div takes full cell height
-              // flexDirection: "column", // If multiple buttons, otherwise not needed
-              // gap: "10px",
-              // padding: "5px",
+              flexDirection: "column",
+              gap: "10px",
+              padding: "5px",
             }}
           >
             <Button
               colorScheme="blue"
               size="sm"
               onClick={() => handleEdit(params.data)}
-              // style={{ marginRight: "10px" }} // Not needed if only one button
+              style={{ marginRight: "10px" }}
               variant="outline"
             >
               Edit
@@ -325,7 +328,6 @@ const PrecourseQaPage = () => {
           </div>
         );
       },
-      cellStyle: { padding: "0px" } // Remove padding for cell itself
     },
   ]);
 
@@ -368,9 +370,12 @@ const PrecourseQaPage = () => {
     setOption3(data.options?.[2]?.option_text || "");
     setOption4(data.options?.[3]?.option_text || "");
 
-    const correctOpt = data.options?.find((opt: any) => opt.correct_option === 1);
-    setCorrectOption(correctOpt ? (data.options.indexOf(correctOpt) + 1).toString() : "");
-
+    const correctOpt = data.options?.find(
+      (opt: any) => opt.correct_option === 1
+    );
+    setCorrectOption(
+      correctOpt ? (data.options.indexOf(correctOpt) + 1).toString() : ""
+    );
 
     // The data from the grid row is already a parsed object.
     const solutionValue = data.solution_text || { blocks: [] };
@@ -378,9 +383,18 @@ const PrecourseQaPage = () => {
     onEditModalOpen();
   };
 
-  const handleAddCourse = async () => { // This is "Add Questions from Sheet"
-    if (!testIdAdd) { // testIdAdd is the selected examId
-      toast({ title: "Error", description: "Please select an exam to add questions to.", status: "error", duration: 3000, isClosable: true, position: "top" });
+  const handleAddCourse = async () => {
+    // This is "Add Questions from Sheet"
+    if (!testIdAdd) {
+      // testIdAdd is the selected examId
+      toast({
+        title: "Error",
+        description: "Please select an exam to add questions to.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
       return;
     }
     const token = localStorage.getItem("token") ?? "";
@@ -395,8 +409,9 @@ const PrecourseQaPage = () => {
         `${baseUrl}/admin/masters/exam/questions/fetch-questions`, // Changed endpoint and used baseUrl
         {
           method: "POST",
-          headers: { // Added headers for token
-            'Authorization': `Bearer ${token}`
+          headers: {
+            // Added headers for token
+            Authorization: `Bearer ${token}`,
           },
           body: form,
         }
@@ -427,14 +442,30 @@ const PrecourseQaPage = () => {
       }
     } catch (error) {
       console.error("Error adding Test from sheet:", error);
-      toast({ title: "Error", description: "An unexpected error occurred.", status: "error", duration: 3000, isClosable: true, position: "top" });
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
     }
   };
 
   const handleAddQuestion = async () => {
-    if (!newTestId || !newQuestionNo || !newCorrectOption) { // newTestId is examId
-         toast({ title: "Validation Error", description: "Please fill all required fields (Exam, Question No, Correct Option).", status: "warning", duration: 3000, isClosable: true, position: "top" });
-         return;
+    if (!newTestId || !newQuestionNo || !newCorrectOption) {
+      // newTestId is examId
+      toast({
+        title: "Validation Error",
+        description:
+          "Please fill all required fields (Exam, Question No, Correct Option).",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
     }
     const token = localStorage.getItem("token") ?? "";
     try {
@@ -443,7 +474,7 @@ const PrecourseQaPage = () => {
       form.append("examId", newTestId); // Changed from preCourseTestId
       form.append("questionNo", newQuestionNo);
       form.append("questionText", JSON.stringify(newQuestionData)); // Changed from question
-      form.append("solutionText", JSON.stringify(newSolutionText)); 
+      form.append("solutionText", JSON.stringify(newSolutionText));
       form.append("correctOption", newCorrectOption);
       form.append("option1", newOption1);
       form.append("option2", newOption2);
@@ -454,8 +485,9 @@ const PrecourseQaPage = () => {
         `${baseUrl}/admin/masters/exam/questions/add`, // Changed endpoint and used baseUrl
         {
           method: "POST",
-          headers: { // Added headers for token
-            'Authorization': `Bearer ${token}`
+          headers: {
+            // Added headers for token
+            Authorization: `Bearer ${token}`,
           },
           body: form,
         }
@@ -486,14 +518,29 @@ const PrecourseQaPage = () => {
       }
     } catch (error) {
       console.error("Error adding question:", error);
-      toast({ title: "Error", description: "An unexpected error occurred.", status: "error", duration: 3000, isClosable: true, position: "top" });
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
     }
   };
 
-  const handleUpdateCourse = async () => { // This is "Update Question"
+  const handleUpdateCourse = async () => {
+    // This is "Update Question"
     if (!correctOption) {
-         toast({ title: "Validation Error", description: "Please select a correct option.", status: "warning", duration: 3000, isClosable: true, position: "top" });
-         return;
+      toast({
+        title: "Validation Error",
+        description: "Please select a correct option.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
     }
     const token = localStorage.getItem("token") ?? "";
     try {
@@ -502,7 +549,7 @@ const PrecourseQaPage = () => {
       form.append("examId", testId); // Changed from preCourseTestId, testId is current examId
       form.append("questionNo", questionNo);
       form.append("questionText", JSON.stringify(editQuestion)); // Changed from question
-      form.append("solutionText", JSON.stringify(solutionText)); 
+      form.append("solutionText", JSON.stringify(solutionText));
       form.append("correctOption", correctOption);
       form.append("option1", option1);
       form.append("option2", option2);
@@ -510,13 +557,13 @@ const PrecourseQaPage = () => {
       form.append("option4", option4);
       form.append("questionId", questionid);
 
-
       const response = await fetch(
         `${baseUrl}/admin/masters/exam/questions/edit`, // Changed endpoint and used baseUrl
         {
           method: "POST",
-          headers: { // Added headers for token
-            'Authorization': `Bearer ${token}`
+          headers: {
+            // Added headers for token
+            Authorization: `Bearer ${token}`,
           },
           body: form,
         }
@@ -546,7 +593,14 @@ const PrecourseQaPage = () => {
       }
     } catch (error) {
       console.error("Error updating question:", error);
-      toast({ title: "Error", description: "An unexpected error occurred.", status: "error", duration: 3000, isClosable: true, position: "top" });
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
     }
     // resetEditForm(); // Optional: if you want to clear edit form fields after closing
   };
@@ -568,7 +622,6 @@ const PrecourseQaPage = () => {
     setNewSolutionText({ blocks: [] });
     setNewTestId(""); // Reset selected exam for new question
   };
-
 
   return (
     <div
@@ -654,15 +707,21 @@ const PrecourseQaPage = () => {
             resizable: true,
             flex: 1,
             filterParams: {
-              debounceMs: 0, // Set to 0 for immediate filtering
-              buttons: ["reset"], // Show reset button in filter
+              debounceMs: 0,
+              buttons: ["reset"],
             },
           }}
           domLayout="autoHeight"
-          // domLayout="autoHeight" // autoHeight can be slow with many rows/complex renderers. Consider 'normal' or 'print'.
-          getRowHeight={(params: any) => 300} // Fixed row height for EditorJS content
-          suppressCellFocus={true} // Improves UX by not highlighting cell on click
-          onGridReady={(params) => params.api.sizeColumnsToFit()} // Example: size columns to fit
+          getRowHeight={(params: any) => {
+            // console.log({ params });
+            return 300;
+            // if (params?.data.sub_category_data.length > 1) {
+            //   return params.data.sub_category_data.length * 45;
+            // } else {
+            //   return 80;
+            // }
+          }}
+          suppressCellFocus={true}
         />
       </div>
 
