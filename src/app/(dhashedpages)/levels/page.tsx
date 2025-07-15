@@ -88,7 +88,7 @@ const Levels = () => {
     },
     {
       headerName: "Priority",
-      field: "id",
+      field: "priority",
     },
     {
       headerName: "Description",
