@@ -1,7 +1,7 @@
 "use client";
 
 import { AgGridReact } from "ag-grid-react";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import {
@@ -25,6 +25,10 @@ import {
   Text,
   Select,
   Badge,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
 } from "@chakra-ui/react";
 import { Spinner, Center } from "@chakra-ui/react";
 
@@ -34,9 +38,9 @@ interface Level {
   id: number;
   level_name: string;
   description: string;
+  priority: number;
   status: number;
-  created_admin_user_id: number;
-  created_date: string;
+  course_id: number;
 }
 
 interface Subject {
@@ -51,40 +55,33 @@ interface LevelSubjectMapping {
   id: number;
   level_id: number;
   level_name: string;
+  priority: number;
+  level_description: string;
   subjects_tagged: number[];
   status: number;
 }
 
 const LevelSubjectManagement = () => {
   const toast = useToast();
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_GAME_URL;
   const [token, setToken] = useState<string | null>(null);
 
   const [levels, setLevels] = useState<Level[]>([]);
-  const levelsRef = useRef<Level[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const subjectsRef = useRef<Subject[]>([]);
   const [mappings, setMappings] = useState<LevelSubjectMapping[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
   const [selectedMapping, setSelectedMapping] =
     useState<LevelSubjectMapping | null>(null);
   const [selectedSubjects, setSelectedSubjects] = useState<number[]>([]);
-  const [autoTagEnabled, setAutoTagEnabled] = useState(true);
+  const [canMapLevel, setCanMapLevel] = useState(true);
+  const [previousLevelError, setPreviousLevelError] = useState("");
 
   const {
     isOpen: isMappingModalOpen,
     onOpen: onMappingModalOpen,
     onClose: onMappingModalClose,
   } = useDisclosure();
-
-  // Update ref when levels change
-  useEffect(() => {
-    levelsRef.current = levels;
-  }, [levels]);
-  useEffect(() => {
-    subjectsRef.current = subjects;
-  }, [subjects]);
 
   // Get token on client side
   useEffect(() => {
@@ -95,16 +92,35 @@ const LevelSubjectManagement = () => {
 
   // Fetch levels from API
   const fetchLevels = async () => {
-    if (!token) return;
+    if (!token) {
+      console.log("No token available for fetchLevels");
+      return;
+    }
 
     try {
+      console.log("Fetching levels with token:", token);
       const response = await fetch(
-        `${baseUrl}/admin/game/get-all-levels/${token}`
+        `${baseUrl}/admin/game/levels/get-all/${token}`
       );
-      if (!response.ok) throw new Error("Failed to fetch levels");
+
+      console.log("Levels response status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch levels: ${response.status}`);
+      }
+
       const data = await response.json();
-      setLevels(data);
+      console.log("Levels API response:", data);
+
+      if (data.errFlag === 0) {
+        console.log("Setting levels:", data.data);
+        setLevels(data.data || []);
+        return data.data || [];
+      } else {
+        throw new Error(data.message || "Failed to fetch levels");
+      }
     } catch (error) {
+      console.error("Error fetching levels:", error);
       toast({
         title: "Error",
         description: "Failed to fetch levels",
@@ -112,21 +128,41 @@ const LevelSubjectManagement = () => {
         duration: 3000,
         isClosable: true,
       });
+      return [];
     }
   };
 
   // Fetch subjects from API
   const fetchSubjects = async () => {
-    if (!token) return;
+    if (!token) {
+      console.log("No token available for fetchSubjects");
+      return;
+    }
 
     try {
+      console.log("Fetching subjects with token:", token);
       const response = await fetch(
-        `${baseUrl}/masters/subjects/get-all-subjects/${token}`
+        `${baseUrl}/admin/game/subjects/get-all/${token}`
       );
-      if (!response.ok) throw new Error("Failed to fetch subjects");
+
+      console.log("Subjects response status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch subjects: ${response.status}`);
+      }
+
       const data = await response.json();
-      setSubjects(data);
+      console.log("Subjects API response:", data);
+
+      if (data.errFlag === 0) {
+        console.log("Setting subjects:", data.data);
+        setSubjects(data.data || []);
+        return data.data || [];
+      } else {
+        throw new Error(data.message || "Failed to fetch subjects");
+      }
     } catch (error) {
+      console.error("Error fetching subjects:", error);
       toast({
         title: "Error",
         description: "Failed to fetch subjects",
@@ -134,42 +170,41 @@ const LevelSubjectManagement = () => {
         duration: 3000,
         isClosable: true,
       });
+      return [];
     }
   };
 
-  // Fetch mappings
+  // Fetch mappings from API
   const fetchMappings = async () => {
-    if (!token) return;
+    if (!token) {
+      console.log("No token available for fetchMappings");
+      return;
+    }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      const dummyMappings: LevelSubjectMapping[] = [
-        {
-          id: 1,
-          level_id: 1,
-          level_name: "Level 1",
-          subjects_tagged: [1, 2, 3],
-          status: 1,
-        },
-        {
-          id: 2,
-          level_id: 2,
-          level_name: "Level 2",
-          subjects_tagged: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-          status: 1,
-        },
-        {
-          id: 3,
-          level_id: 3,
-          level_name: "Level 3",
-          subjects_tagged: [
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-          ],
-          status: 0,
-        },
-      ];
-      setMappings(dummyMappings);
+      console.log("Fetching mappings with token:", token);
+      const response = await fetch(
+        `${baseUrl}/admin/game/mappings/get-all/${token}`
+      );
+
+      console.log("Mappings response status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch mappings: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Mappings API response:", data);
+
+      if (data.errFlag === 0) {
+        console.log("Setting mappings:", data.data);
+        setMappings(data.data || []);
+        return data.data || [];
+      } else {
+        throw new Error(data.message || "Failed to fetch mappings");
+      }
     } catch (error) {
+      console.error("Error fetching mappings:", error);
       toast({
         title: "Error",
         description: "Failed to fetch level-subject mappings",
@@ -177,17 +212,39 @@ const LevelSubjectManagement = () => {
         duration: 3000,
         isClosable: true,
       });
+      return [];
     }
   };
 
   // Fetch all data
   const fetchAllData = async () => {
-    if (!token) return;
+    if (!token) {
+      console.log("No token available for fetchAllData");
+      return;
+    }
 
     setLoading(true);
     try {
-      await Promise.all([fetchLevels(), fetchSubjects(), fetchMappings()]);
+      console.log("Starting to fetch all data with token:", token);
+
+      // Fetch all data in parallel
+      const [levelsData, subjectsData, mappingsData] = await Promise.all([
+        fetchLevels(),
+        fetchSubjects(),
+        fetchMappings(),
+      ]);
+
+      console.log("All data fetched successfully");
+      console.log(
+        "Final state - Levels:",
+        levelsData?.length,
+        "Subjects:",
+        subjectsData?.length,
+        "Mappings:",
+        mappingsData?.length
+      );
     } catch (error) {
+      console.error("Error in fetchAllData:", error);
       toast({
         title: "Error",
         description: "Failed to fetch data",
@@ -201,37 +258,162 @@ const LevelSubjectManagement = () => {
   };
 
   useEffect(() => {
+    console.log("useEffect triggered. Token:", token);
     if (token) {
+      console.log("Token available, fetching data...");
       fetchAllData();
     }
   }, [token]);
+
+  // Debug state changes
+  useEffect(() => {
+    console.log("Levels state updated:", levels?.length || 0, levels);
+  }, [levels]);
+
+  useEffect(() => {
+    console.log("Subjects state updated:", subjects?.length || 0);
+  }, [subjects]);
+
+  useEffect(() => {
+    console.log("Mappings state updated:", mappings?.length || 0);
+  }, [mappings]);
+
+  // Add this temporary debug section
+  useEffect(() => {
+    console.log("=== MAPPINGS DEBUG ===");
+    console.log("Raw mappings data:", mappings);
+    mappings.forEach((mapping, index) => {
+      console.log(`Mapping ${index}:`, {
+        level_id: mapping.level_id,
+        level_name: mapping.level_name,
+        subjects_tagged: mapping.subjects_tagged,
+        subjects_tagged_type: typeof mapping.subjects_tagged,
+        subjects_tagged_length: mapping.subjects_tagged?.length,
+      });
+    });
+    console.log("=== END DEBUG ===");
+  }, [mappings]);
+
+  // Add this debug useEffect after your existing ones:
+  useEffect(() => {
+    console.log("=== SUBJECTS DEBUG ===");
+    console.log("Subjects length:", subjects.length);
+    console.log("First few subjects:", subjects.slice(0, 3));
+    if (subjects.length > 0) {
+      console.log("Subject structure:", {
+        keys: Object.keys(subjects[0]),
+        sample: subjects[0],
+      });
+    }
+    console.log("=== END SUBJECTS DEBUG ===");
+  }, [subjects]);
+
+  // Get subjects from previous priority level
+  const getPreviousLevelSubjects = (currentPriority: number): number[] => {
+    if (currentPriority <= 1) return [];
+
+    const previousMapping = mappings.find(
+      (mapping) =>
+        mapping.priority === currentPriority - 1 && mapping.status === 1
+    );
+
+    return previousMapping ? previousMapping.subjects_tagged : [];
+  };
+
+  // Replace the checkPreviousLevel function:
+  const checkPreviousLevel = async (priority: number) => {
+    // For priority 1, always allow mapping without checking previous level
+    if (!token || priority <= 1) {
+      setCanMapLevel(true);
+      setPreviousLevelError("");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${baseUrl}/admin/game/check-previous-level/${priority}/${token}`
+      );
+      const data = await response.json();
+
+      if (data.errFlag === 0) {
+        const canMap = data.data.canMap;
+        setCanMapLevel(canMap);
+        if (!canMap) {
+          setPreviousLevelError(
+            `Please enable mappings for Priority ${priority - 1} level first`
+          );
+        } else {
+          setPreviousLevelError("");
+        }
+      }
+    } catch (error) {
+      console.error("Error checking previous level:", error);
+      // For priority 1, don't block mapping even if API fails
+      if (priority === 1) {
+        setCanMapLevel(true);
+        setPreviousLevelError("");
+      } else {
+        setCanMapLevel(false);
+        setPreviousLevelError("Error checking previous level requirements");
+      }
+    }
+  };
 
   const handleAddMapping = () => {
     setSelectedMapping(null);
     setSelectedLevel(null);
     setSelectedSubjects([]);
+    setCanMapLevel(true);
+    setPreviousLevelError("");
     onMappingModalOpen();
   };
 
+  // Fixed handleEditMapping without infinite loop
   const handleEditMapping = (mapping: LevelSubjectMapping) => {
-    // Use ref to get current levels instead of state
-    const currentLevels = levelsRef.current;
-    const level = currentLevels.find((l) => l.id === mapping.level_id);
+    console.log("Edit mapping clicked:", mapping);
+    console.log("Current levels state:", levels?.length || 0);
+    console.log("Current subjects state:", subjects?.length || 0);
+    console.log("Current mappings state:", mappings?.length || 0);
 
-    if (!level) {
+    // If no data is loaded, show error and return
+    if (!levels || levels.length === 0 || !subjects || subjects.length === 0) {
       toast({
         title: "Error",
-        description: "Level not found in current data",
+        description:
+          "Data not loaded yet. Please wait for the page to load completely and try again.",
         status: "error",
-        duration: 3000,
+        duration: 5000,
         isClosable: true,
       });
       return;
     }
 
+    // Find level in the levels array
+    const level = levels.find((l) => l.id === mapping.level_id);
+
+    if (!level) {
+      console.error(
+        "Level not found. Level ID:",
+        mapping.level_id,
+        "Available levels:",
+        levels.map((l) => `${l.id}:${l.level_name}`)
+      );
+      toast({
+        title: "Error",
+        description: `Level with ID ${mapping.level_id} not found. Please refresh the page and try again.`,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    console.log("Found level:", level);
     setSelectedMapping(mapping);
     setSelectedLevel(level);
-    setSelectedSubjects(mapping.subjects_tagged);
+    setSelectedSubjects([...mapping.subjects_tagged]); // Create a copy
+    setCanMapLevel(true);
+    setPreviousLevelError("");
     onMappingModalOpen();
   };
 
@@ -245,37 +427,48 @@ const LevelSubjectManagement = () => {
     });
   };
 
-  // Get subjects from previous level only
-  const getSubjectsFromPreviousLevels = (levelId: number): number[] => {
-    const currentLevelIndex = levels.findIndex((l) => l.id === levelId);
-    if (currentLevelIndex <= 0) return [];
+  // Get available levels for new mapping
+  const getAvailableLevels = () => {
+    if (!levels || levels.length === 0) return [];
 
-    const previousLevels = levels.slice(0, currentLevelIndex);
-    const previousSubjects = new Set<number>();
-
-    previousLevels.forEach((level) => {
-      const mapping = mappings.find((m) => m.level_id === level.id);
-      if (mapping) {
-        mapping.subjects_tagged.forEach((subjectId) =>
-          previousSubjects.add(subjectId)
-        );
-      }
+    return levels.filter((level) => {
+      // Check if this level has an ACTIVE mapping (status === 1)
+      const hasActiveMapping = mappings.some(
+        (mapping) => mapping.level_id === level.id && mapping.status === 1
+      );
+      // Level is available if it has NO active mapping
+      return !hasActiveMapping;
     });
-
-    return Array.from(previousSubjects);
   };
 
   // Handle level selection change
-  const handleLevelChange = (levelId: number) => {
-    const currentLevels = levelsRef.current;
-    const level = currentLevels.find((l) => l.id === levelId);
+  const handleLevelChange = async (levelId: number) => {
+    const level = levels.find((l) => l.id === levelId);
     setSelectedLevel(level || null);
 
-    if (selectedMapping) {
-      setSelectedSubjects(selectedMapping.subjects_tagged);
-    } else {
-      const previousLevelSubjects = getSubjectsFromPreviousLevels(levelId);
-      setSelectedSubjects(previousLevelSubjects);
+    if (level) {
+      // Only check previous level if priority > 1
+      if (level.priority > 1) {
+        await checkPreviousLevel(level.priority);
+      } else {
+        // For priority 1, always allow mapping
+        setCanMapLevel(true);
+        setPreviousLevelError("");
+      }
+
+      if (selectedMapping) {
+        // If editing existing mapping, keep the current subjects
+        setSelectedSubjects([...selectedMapping.subjects_tagged]);
+      } else {
+        // If creating new mapping, start with previous level subjects (only if priority > 1)
+        if (level.priority > 1) {
+          const previousSubjects = getPreviousLevelSubjects(level.priority);
+          setSelectedSubjects([...previousSubjects]);
+        } else {
+          // For priority 1, start with empty selection
+          setSelectedSubjects([]);
+        }
+      }
     }
   };
 
@@ -292,43 +485,74 @@ const LevelSubjectManagement = () => {
       return;
     }
 
-    setLoading(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const newMappings = [...mappings];
-      const existingIndex = newMappings.findIndex(
-        (m) => m.level_id === selectedLevel.id
-      );
-
-      if (existingIndex >= 0) {
-        newMappings[existingIndex] = {
-          ...newMappings[existingIndex],
-          level_name: selectedLevel.level_name,
-          subjects_tagged: [...selectedSubjects],
-        };
-      } else {
-        newMappings.push({
-          id: Date.now(),
-          level_id: selectedLevel.id,
-          level_name: selectedLevel.level_name,
-          subjects_tagged: [...selectedSubjects],
-          status: 1,
-        });
-      }
-
-      setMappings(newMappings);
-
+    if (!canMapLevel) {
       toast({
-        title: "Success",
-        description: "Subject mapping updated successfully",
-        status: "success",
+        title: "Error",
+        description: previousLevelError,
+        status: "error",
         duration: 3000,
         isClosable: true,
       });
+      return;
+    }
 
-      onMappingModalClose();
+    if (selectedSubjects.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one subject",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("token", token!);
+      formData.append("levelId", selectedLevel.id.toString());
+      formData.append("subjectIds", selectedSubjects.join(","));
+
+      const response = await fetch(
+        `${baseUrl}/admin/game/map-subjects-to-level`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.errFlag === 0) {
+        let actionType = "created";
+
+        // Check if we're updating an existing disabled mapping
+        const existingMapping = mappings.find(
+          (mapping) => mapping.level_id === selectedLevel.id
+        );
+
+        if (existingMapping) {
+          actionType = existingMapping.status === 0 ? "re-enabled" : "updated";
+        }
+
+        toast({
+          title: "Success",
+          description:
+            data.message || `Subject mapping ${actionType} successfully`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+
+        // Refresh mappings to get the latest data
+        await fetchMappings();
+        onMappingModalClose();
+      } else {
+        throw new Error(data.message || "Failed to save mapping");
+      }
     } catch (error) {
+      console.error("Error saving mapping:", error);
       toast({
         title: "Error",
         description: "An error occurred while saving the mapping",
@@ -343,29 +567,35 @@ const LevelSubjectManagement = () => {
 
   // Toggle mapping status
   const handleToggleMappingStatus = async (
-    mappingId: number,
+    levelId: number,
     currentStatus: number
   ) => {
-    setLoading(true);
+    const newStatus = currentStatus === 1 ? 0 : 1;
+
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      const newStatus = currentStatus === 1 ? 0 : 1;
-
-      setMappings((prev) =>
-        prev.map((mapping) =>
-          mapping.id === mappingId ? { ...mapping, status: newStatus } : mapping
-        )
+      const response = await fetch(
+        `${baseUrl}/admin/game/change-mapping-status/${levelId}/${newStatus}/${token}`,
+        { method: "GET" }
       );
 
-      toast({
-        title: "Success",
-        description: "Mapping status updated successfully",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
+      const data = await response.json();
+
+      if (data.errFlag === 0) {
+        toast({
+          title: "Success",
+          description: data.message || "Mapping status updated successfully",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+
+        // Refresh mappings to ensure consistency
+        await fetchMappings();
+      } else {
+        throw new Error(data.message || "Failed to update status");
+      }
     } catch (error) {
+      console.error("Error updating status:", error);
       toast({
         title: "Error",
         description: "An error occurred while updating status",
@@ -373,127 +603,171 @@ const LevelSubjectManagement = () => {
         duration: 3000,
         isClosable: true,
       });
-    } finally {
-      setLoading(false);
     }
   };
 
-  const getSubjectNames = (subjectIds: number[]) => {
-    if (subjectIds.length === 0) return "No subjects tagged";
-    // console.log("subjects", subjects, subjectsRef.current);
+  const columnDefs = useMemo<ColDef[]>(
+    () => [
+      {
+        headerName: "S.No.",
+        maxWidth: 80,
+        filter: false,
+        valueGetter: (params: any) => {
+          const startIndex =
+            params.api.paginationGetCurrentPage() *
+            params.api.paginationGetPageSize();
+          return startIndex + params.node.rowIndex + 1;
+        },
+        cellStyle: { textAlign: "center" } as any,
+      },
+      {
+        headerName: "Level Name",
+        field: "level_name",
+        cellStyle: { display: "flex", alignItems: "center" } as any,
+        flex: 1,
+      },
+      {
+        headerName: "Priority",
+        field: "priority",
+        maxWidth: 100,
+        cellStyle: { textAlign: "center" } as any,
+        filter: false,
+      },
+      {
+        headerName: "Subjects",
+        field: "subjects_tagged",
+        flex: 3,
+        valueFormatter: (params: any) => {
+          const subjectIds = params.value || [];
+          if (!subjectIds || subjectIds.length === 0) {
+            return "No subjects tagged";
+          }
+          return `${subjectIds.length} subject(s) tagged`;
+        },
+        cellRenderer: (params: any) => {
+          const subjectIds = params.value || [];
 
-    return subjectsRef.current
-      .filter((subject) => subjectIds.includes(subject.subject_id))
-      .map((subject) => subject.subject_name)
-      .join(", ");
-  };
+          if (!subjectIds || subjectIds.length === 0) {
+            return (
+              <Badge colorScheme="gray" display="flex" alignItems="center">
+                No subjects tagged
+              </Badge>
+            );
+          }
 
-  const [columnDefs] = useState<ColDef[]>([
-    {
-      headerName: "Sl. No",
-      field: "id",
-      maxWidth: 80,
-      filter: false,
-      suppressAutoSize: true,
-      cellRenderer: (params: any) => params.node.rowIndex + 1,
-      cellStyle: { textAlign: "center", display: "flex", alignItems: "center" },
-    },
-    {
-      headerName: "Level Name",
-      field: "level_name",
-      cellStyle: { display: "flex", alignItems: "center" },
-    },
-    {
-      headerName: "Subjects",
-      field: "subjects_tagged",
-      flex: 3,
-      cellRenderer: (params: any) => {
-        const subjectNames = getSubjectNames(params.value);
-        if (!params.value || params.value.length === 0) {
+          console.log("=== CELL RENDERER DEBUG ===");
+          console.log("Subject IDs to find:", subjectIds);
+          console.log("Subjects array length:", subjects.length);
+          console.log("Current subjects:", subjects);
+
           return (
-            <Badge colorScheme="gray" display="flex" alignItems="center">
-              No subjects tagged
-            </Badge>
+            <HStack wrap="wrap" spacing={1} align="center">
+              {subjectIds.map((subjectId: number) => {
+                const numericSubjectId = Number(subjectId);
+
+                const subject = subjects.find(
+                  (s) => Number(s.subject_id) === numericSubjectId
+                );
+
+                console.log(
+                  `Looking for subject ID ${numericSubjectId}:`,
+                  subject
+                );
+
+                if (subject) {
+                  return (
+                    <Badge
+                      key={subjectId}
+                      colorScheme="teal"
+                      size="xs"
+                      px={2}
+                      py={0.5}
+                      lineHeight="normal"
+                      fontSize="xs"
+                      display="inline-flex"
+                      alignItems="center"
+                    >
+                      {subject.subject_name}
+                    </Badge>
+                  );
+                } else {
+                  return (
+                    <Badge
+                      key={subjectId}
+                      colorScheme="red"
+                      size="xs"
+                      px={2}
+                      py={0.5}
+                      lineHeight="normal"
+                      fontSize="xs"
+                      display="inline-flex"
+                      alignItems="center"
+                    >
+                      Subject ID: {subjectId}
+                    </Badge>
+                  );
+                }
+              })}
+            </HStack>
           );
-        }
-        return (
-          <HStack wrap="wrap" spacing={1} align="center">
-            {params.value.map((subjectId: number) => {
-              const subject = subjectsRef.current.find(
-                (s) => s.subject_id === subjectId
-              );
-              return subject ? (
-                <Badge
-                  key={subjectId}
-                  colorScheme="teal"
-                  size="xs"
-                  px={2}
-                  py={0.5}
-                  lineHeight="normal"
-                  fontSize="xs"
-                  display="inline-flex"
-                  alignItems="center"
-                >
-                  {subject.subject_name}
-                </Badge>
-              ) : null;
-            })}
-          </HStack>
-        );
+        },
+        cellStyle: { display: "flex", alignItems: "center" } as any,
       },
-      cellStyle: { display: "flex", alignItems: "center" },
-    },
-    {
-      headerName: "Status",
-      field: "status",
-      maxWidth: 120,
-      cellRenderer: (params: any) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-          }}
-        >
-          <Switch
-            colorScheme="green"
-            isChecked={params.value === 1}
-            onChange={() =>
-              handleToggleMappingStatus(params.data.id, params.value)
-            }
-          />
-        </div>
-      ),
-      cellStyle: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      },
-    },
-    {
-      headerName: "Actions",
-      field: "actions",
-      maxWidth: 150,
-      cellRenderer: (params: any) => (
-        <HStack spacing={2} align="center">
-          <Button
-            colorScheme="blue"
-            size="sm"
-            onClick={() => handleEditMapping(params.data)}
-            variant="outline"
+      {
+        headerName: "Status",
+        field: "status",
+        maxWidth: 120,
+        filter: false,
+        cellRenderer: (params: any) => (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
           >
-            Edit
-          </Button>
-        </HStack>
-      ),
-      cellStyle: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+            <Switch
+              colorScheme="green"
+              isChecked={params.value === 1}
+              onChange={() =>
+                handleToggleMappingStatus(params.data.level_id, params.value)
+              }
+            />
+          </div>
+        ),
+        cellStyle: {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        } as any,
       },
-    },
-  ]);
+      {
+        headerName: "Actions",
+        field: "actions",
+        maxWidth: 150,
+        filter: false,
+        cellRenderer: (params: any) => (
+          <HStack spacing={2} align="center">
+            <Button
+              colorScheme="blue"
+              size="sm"
+              onClick={() => handleEditMapping(params.data)}
+              variant="outline"
+            >
+              Edit
+            </Button>
+          </HStack>
+        ),
+        cellStyle: {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        } as any,
+      },
+    ],
+    [subjects, handleEditMapping, handleToggleMappingStatus]
+  ); // Dependencies
 
   return (
     <div style={{ width: "80vw", height: "60vh" }}>
@@ -512,9 +786,24 @@ const LevelSubjectManagement = () => {
         <p style={{ fontSize: "16px", fontWeight: "600" }}>
           Level-Subject Management
         </p>
-        <Button colorScheme="green" size="sm" onClick={handleAddMapping}>
-          Add New Mapping
-        </Button>
+        <HStack spacing={3}>
+          {/* <Text fontSize="sm" color="gray.600">
+            L:{levels?.length || 0} | S:{subjects?.length || 0} | M:
+            {mappings?.length || 0}
+          </Text>
+          <Button
+            colorScheme="blue"
+            size="sm"
+            variant="outline"
+            onClick={fetchAllData}
+            isLoading={loading}
+          >
+            Refresh
+          </Button> */}
+          <Button colorScheme="green" size="sm" onClick={handleAddMapping}>
+            Add New Mapping
+          </Button>
+        </HStack>
       </div>
 
       <div style={{ height: "100%", width: "100%", position: "relative" }}>
@@ -531,35 +820,64 @@ const LevelSubjectManagement = () => {
             <Spinner size="xl" />
           </Center>
         )}
-        <AgGridReact
-          rowData={mappings}
-          columnDefs={columnDefs}
-          pagination={true}
-          paginationPageSize={10}
-          paginationPageSizeSelector={[5, 10, 20, 30]}
-          defaultColDef={{
-            sortable: true,
-            filter: true,
-            floatingFilter: true,
-            resizable: true,
-            flex: 1,
-            filterParams: {
-              debounceMs: 0,
-              buttons: ["reset"],
-            },
-          }}
-          domLayout="autoHeight"
-          getRowHeight={(params: any) => {
-            console.log("params.node.level", params);
-            if (params.data.subjects_tagged.length > 5) {
-              return params.data.subjects_tagged.length * 8; // Height for header row
-            } else if (params.data.subjects_tagged.length > 10) {
-              return params.data.subjects_tagged.length * 4; // Height for header row
-            }
-            return 40;
-          }}
-          suppressCellFocus={true}
-        />
+
+        {/* Only render grid when we have valid data and columns */}
+        {!loading &&
+          columnDefs &&
+          columnDefs.length > 0 &&
+          Array.isArray(mappings) && (
+            <AgGridReact
+              rowData={mappings}
+              columnDefs={columnDefs}
+              pagination={true}
+              paginationPageSize={10}
+              paginationPageSizeSelector={[5, 10, 20, 30]}
+              defaultColDef={{
+                sortable: true,
+                filter: true,
+                floatingFilter: true,
+                resizable: true,
+                flex: 1,
+                filterParams: {
+                  debounceMs: 0,
+                  buttons: ["reset"],
+                },
+              }}
+              domLayout="autoHeight"
+              getRowHeight={(params: any) => {
+                if (
+                  params.data?.subjects_tagged &&
+                  params.data.subjects_tagged.length > 8
+                ) {
+                  return 80;
+                } else if (
+                  params.data?.subjects_tagged &&
+                  params.data.subjects_tagged.length > 4
+                ) {
+                  return 60;
+                }
+                return 50;
+              }}
+              suppressCellFocus={true}
+              suppressColumnVirtualisation={true}
+              // Add error handling
+              onGridReady={(params) => {
+                console.log("Grid ready:", params);
+              }}
+              onFirstDataRendered={(params) => {
+                console.log("First data rendered:", params);
+              }}
+              // Re-render grid when subjects data changes
+              key={`grid-${subjects.length}-${mappings.length}-${Date.now()}`}
+            />
+          )}
+
+        {/* Show message if no data */}
+        {!loading && (!mappings || mappings.length === 0) && (
+          <Center h="200px">
+            <Text color="gray.500">No level-subject mappings found</Text>
+          </Center>
+        )}
       </div>
 
       {/* Mapping Modal */}
@@ -571,6 +889,8 @@ const LevelSubjectManagement = () => {
           setSelectedLevel(null);
           setSelectedMapping(null);
           setSelectedSubjects([]);
+          setCanMapLevel(true);
+          setPreviousLevelError("");
         }}
       >
         <ModalOverlay />
@@ -589,20 +909,65 @@ const LevelSubjectManagement = () => {
                   placeholder="Select a level"
                   value={selectedLevel?.id || ""}
                   onChange={(e) => handleLevelChange(parseInt(e.target.value))}
+                  isDisabled={!!selectedMapping}
                 >
-                  {levels.map((level) => (
-                    <option key={level.id} value={level.id}>
-                      {level.level_name}
-                    </option>
-                  ))}
+                  {(selectedMapping ? levels : getAvailableLevels()).map(
+                    (level) => (
+                      <option key={level.id} value={level.id}>
+                        {level.level_name} (Priority: {level.priority})
+                      </option>
+                    )
+                  )}
                 </Select>
+                {!selectedMapping && getAvailableLevels().length === 0 && (
+                  <Text fontSize="sm" color="orange.600" mt={2}>
+                    All levels already have active mappings. Use Edit to modify
+                    existing mappings.
+                  </Text>
+                )}
               </FormControl>
+
+              {previousLevelError && !canMapLevel && (
+                <Alert status="warning">
+                  <AlertIcon />
+                  <Box>
+                    <AlertTitle>Cannot Map Level!</AlertTitle>
+                    <AlertDescription>{previousLevelError}</AlertDescription>
+                  </Box>
+                </Alert>
+              )}
 
               {selectedLevel && (
                 <>
                   <Box>
-                    <Text>Level Description:</Text>
+                    <Text fontWeight="semibold">Level Description:</Text>
                     <Text>{selectedLevel.description}</Text>
+                    <Text fontWeight="semibold" mt={2}>
+                      Priority:
+                    </Text>
+                    <Text>{selectedLevel.priority}</Text>
+
+                    {!selectedMapping && selectedLevel.priority > 1 && (
+                      <Box mt={2} p={2} bg="blue.50" borderRadius="md">
+                        <Text
+                          fontSize="sm"
+                          color="blue.600"
+                          fontWeight="semibold"
+                        >
+                          Previous Level Subjects (Priority{" "}
+                          {selectedLevel.priority - 1}):
+                        </Text>
+                        <Text fontSize="sm" color="blue.600">
+                          {getPreviousLevelSubjects(selectedLevel.priority)
+                            .length > 0
+                            ? `${
+                                getPreviousLevelSubjects(selectedLevel.priority)
+                                  .length
+                              } subjects pre-selected from previous level`
+                            : "No subjects from previous level"}
+                        </Text>
+                      </Box>
+                    )}
                   </Box>
 
                   <FormControl>
@@ -616,19 +981,41 @@ const LevelSubjectManagement = () => {
                       overflowY="auto"
                     >
                       <VStack align="start" spacing={2}>
-                        {subjects.map((subject) => (
-                          <Checkbox
-                            key={subject.subject_id}
-                            isChecked={selectedSubjects.includes(
-                              subject.subject_id
-                            )}
-                            onChange={() =>
-                              toggleSubjectSelection(subject.subject_id)
-                            }
-                          >
-                            {subject.subject_name} ({subject.course_name})
-                          </Checkbox>
-                        ))}
+                        {subjects.map((subject) => {
+                          const isFromPreviousLevel =
+                            !selectedMapping &&
+                            selectedLevel &&
+                            selectedLevel.priority > 1 &&
+                            getPreviousLevelSubjects(
+                              selectedLevel.priority
+                            ).includes(subject.subject_id);
+
+                          return (
+                            <Box key={subject.subject_id} w="100%">
+                              <Checkbox
+                                isChecked={selectedSubjects.includes(
+                                  subject.subject_id
+                                )}
+                                onChange={() =>
+                                  toggleSubjectSelection(subject.subject_id)
+                                }
+                                isDisabled={!canMapLevel}
+                              >
+                                <HStack spacing={2}>
+                                  <Text>
+                                    {subject.subject_name} (
+                                    {subject.course_name})
+                                  </Text>
+                                  {isFromPreviousLevel && (
+                                    <Badge colorScheme="blue" size="sm">
+                                      From Previous Level
+                                    </Badge>
+                                  )}
+                                </HStack>
+                              </Checkbox>
+                            </Box>
+                          );
+                        })}
                       </VStack>
                     </Box>
                   </FormControl>
@@ -644,7 +1031,9 @@ const LevelSubjectManagement = () => {
               colorScheme="green"
               onClick={handleSaveMapping}
               isLoading={loading}
-              isDisabled={!selectedLevel || selectedSubjects.length === 0}
+              isDisabled={
+                !selectedLevel || selectedSubjects.length === 0 || !canMapLevel
+              }
             >
               Save
             </Button>
