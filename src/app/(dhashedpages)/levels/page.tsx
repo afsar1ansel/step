@@ -28,7 +28,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 const Levels = () => {
   const toast = useToast();
-  const baseUrl = process.env.NEXT_PUBLIC_GAME_URL;
+  const baseUrl = 'https://step-game-app-jvzwm.ondigitalocean.app/api';
 
   useEffect(() => {
     fetchData();
