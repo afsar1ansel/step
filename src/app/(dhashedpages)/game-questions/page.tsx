@@ -74,6 +74,9 @@ const GameQuestionsPage = () => {
 
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
+  const [createBtnLoading, setCreateBtnLoading] = useState(false); // NEW
+  const [editBtnLoadingId, setEditBtnLoadingId] = useState<string | null>(null); // NEW
+  const [addAsIsLoadingId, setAddAsIsLoadingId] = useState<string | null>(null); // NEW
 
   // Data loading
   useEffect(() => {
@@ -508,6 +511,7 @@ const GameQuestionsPage = () => {
   useEffect(() => {
     const actionsCellRenderer = (params: any) => {
       const handleEdit = () => {
+        setEditBtnLoadingId(params.data.id); // NEW
         setIsEditMode(true);
         setModalTitle("Edit Question");
         setQuestionNo(params.data.question_no);
@@ -561,6 +565,7 @@ const GameQuestionsPage = () => {
         setQuestionId(params.data.id);
         setModalSelectedSubject(selectedSubject);
         onQuestionModalOpen();
+        setTimeout(() => setEditBtnLoadingId(null), 500); // NEW
       };
 
       const handleEditAndAddClick = () => {
@@ -620,14 +625,27 @@ const GameQuestionsPage = () => {
       };
 
       const handleAddAsIs = () => {
+        setAddAsIsLoadingId(params.data.id); // NEW
         handleEditAndAdd(params.data);
+        setTimeout(() => setAddAsIsLoadingId(null), 500); // NEW
       };
 
       if (selectedModule === "Game Module") {
         return (
           <HStack spacing={2}>
-            <Button colorScheme="blue" size="sm" onClick={handleEdit}>
-              Edit
+            <Button
+              colorScheme="blue"
+              size="sm"
+              onClick={handleEdit}
+              isDisabled={editBtnLoadingId === params.data.id}
+            >
+              {editBtnLoadingId === params.data.id ? (
+                <HStack>
+                  <Spinner size="xs" /> <span>Loading...</span>
+                </HStack>
+              ) : (
+                "Edit"
+              )}
             </Button>
             <Switch
               isChecked={params.data.status === 1}
@@ -641,8 +659,19 @@ const GameQuestionsPage = () => {
       } else {
         return (
           <HStack spacing={2}>
-            <Button colorScheme="green" size="sm" onClick={handleAddAsIs}>
-              Add as is
+            <Button
+              colorScheme="green"
+              size="sm"
+              onClick={handleAddAsIs}
+              isDisabled={addAsIsLoadingId === params.data.id}
+            >
+              {addAsIsLoadingId === params.data.id ? (
+                <HStack>
+                  <Spinner size="xs" /> <span>Loading...</span>
+                </HStack>
+              ) : (
+                "Add as is"
+              )}
             </Button>
             <Button
               colorScheme="purple"
@@ -840,11 +869,13 @@ const GameQuestionsPage = () => {
   };
 
   const handleCreateNewQuestion = () => {
+    setCreateBtnLoading(true); // NEW
     setIsEditMode(false);
     setModalTitle("Create New Question");
     resetModalForm();
     setModalSelectedSubject(selectedSubject);
     onQuestionModalOpen();
+    setTimeout(() => setCreateBtnLoading(false), 500); // NEW: Prevent double click for 0.5s
   };
 
   // const handleSaveQuestion = handleSaveQuestion; // Use the new implementation
@@ -890,9 +921,15 @@ const GameQuestionsPage = () => {
               colorScheme="blue"
               onClick={handleCreateNewQuestion}
               whiteSpace="nowrap"
-              isDisabled={!selectedSubject}
+              isDisabled={!selectedSubject || createBtnLoading}
             >
-              Create New Question
+              {createBtnLoading ? (
+                <HStack>
+                  <Spinner size="xs" /> <span>Loading...</span>
+                </HStack>
+              ) : (
+                "Create New Question"
+              )}
             </Button>
           </HStack>
         </Box>
@@ -1051,12 +1088,26 @@ const GameQuestionsPage = () => {
             <Button colorScheme="gray" mr={3} onClick={onQuestionModalClose}>
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleSaveQuestion}>
-              {modalTitle === "Edit & Add Question"
-                ? "Edit & Add"
-                : isEditMode
-                ? "Update"
-                : "Add"}
+            <Button
+              colorScheme="green"
+              onClick={async () => {
+                if (isLoading) return;
+                await handleSaveQuestion();
+              }}
+              isLoading={isLoading}
+              isDisabled={isLoading}
+            >
+              {isLoading ? (
+                <HStack>
+                  <Spinner size="xs" /> <span>Loading...</span>
+                </HStack>
+              ) : modalTitle === "Edit & Add Question" ? (
+                "Edit & Add"
+              ) : isEditMode ? (
+                "Update"
+              ) : (
+                "Add"
+              )}
             </Button>
           </ModalFooter>
         </ModalContent>

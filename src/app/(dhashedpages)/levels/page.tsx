@@ -115,7 +115,10 @@ const Levels = () => {
             colorScheme="green"
             onChange={(event) => handleToggle(params.data)}
             defaultChecked={params.value === 1 ? true : false}
-          />
+            isDisabled={toggleLoadingId === params.data.id}
+          >
+            {toggleLoadingId === params.data.id && <Spinner size="xs" />}
+          </Switch>
         </div>
       ),
     },
@@ -135,8 +138,15 @@ const Levels = () => {
               size="sm"
               onClick={() => handleEdit(params.data)}
               variant="outline"
+              isDisabled={editBtnLoadingId === params.data.id}
             >
-              Edit
+              {editBtnLoadingId === params.data.id ? (
+                <HStack>
+                  <Spinner size="xs" /> <span>Loading...</span>
+                </HStack>
+              ) : (
+                "Edit"
+              )}
             </Button>
             {/* <Button
                  // leftIcon={<DeleteIcon />}
@@ -154,7 +164,10 @@ const Levels = () => {
   ]);
 
   //toggle function for switch button
+  const [toggleLoadingId, setToggleLoadingId] = useState<string | null>(null); // NEW
+
   const handleToggle = async (data: any) => {
+    setToggleLoadingId(data.id); // NEW
     console.log(data);
     setLoading(true);
     try {
@@ -173,6 +186,7 @@ const Levels = () => {
       console.error("Error toggling course status:", error);
     }
     setLoading(false);
+    setToggleLoadingId(null); // after API call
   };
 
   // State for Add Subject Modal
@@ -194,22 +208,11 @@ const Levels = () => {
   const [Priority, setPriority] = useState(0);
   const [levelId, setLevelId] = useState("");
   const [loading, setLoading] = useState(false);
-  // const [allCourse, setallCourse] = useState<any>([]);
-
-  const handleEdit = (data: any) => {
-    // console.log(data);
-    setlevelName(data.level_name);
-    setDescription(data.description);
-    setLevelId(data.id);
-    setPriority(parseInt(data.priority, 10) || 0); // Ensure integer
-    onEditModalOpen(); // Open Edit Modal
-  };
-
-  const handleDelete = (data: any) => {
-    setRowData((prev) => prev?.filter((subject) => subject.id !== data.id));
-  };
+  const [addBtnLoading, setAddBtnLoading] = useState(false); // NEW
+  const [editBtnLoadingId, setEditBtnLoadingId] = useState<string | null>(null); // NEW
 
   const handleAddLevel = async () => {
+    setAddBtnLoading(true); // NEW
     //  levelName,  description
     setLoading(true);
     try {
@@ -222,13 +225,10 @@ const Levels = () => {
       form.append("courseId", "1"); // Hardcode courseId
       console.log(Object.fromEntries(form.entries()));
 
-      const response = await fetch(
-        `${baseUrl}/admin/game/add-level`,
-        {
-          method: "POST",
-          body: form,
-        }
-      );
+      const response = await fetch(`${baseUrl}/admin/game/add-level`, {
+        method: "POST",
+        body: form,
+      });
       const responseData = await response.json();
       console.log(responseData);
       fetchData();
@@ -258,6 +258,22 @@ const Levels = () => {
     }
 
     setLoading(false);
+    setAddBtnLoading(false); // after API call
+  };
+
+  const handleEdit = (data: any) => {
+    setEditBtnLoadingId(data.id); // NEW
+    // console.log(data);
+    setlevelName(data.level_name);
+    setDescription(data.description);
+    setLevelId(data.id);
+    setPriority(parseInt(data.priority, 10) || 0); // Ensure integer
+    onEditModalOpen(); // Open Edit Modal
+    setTimeout(() => setEditBtnLoadingId(null), 500); // NEW: Prevent double click for 0.5s
+  };
+
+  const handleDelete = (data: any) => {
+    setRowData((prev) => prev?.filter((subject) => subject.id !== data.id));
   };
 
   const handleUpdateSubject = async () => {
@@ -272,13 +288,10 @@ const Levels = () => {
       form.append("courseId", "1");
       console.log(Object.fromEntries(form.entries()));
 
-      const response = await fetch(
-        `${baseUrl}/admin/game/update-level`,
-        {
-          method: "POST",
-          body: form,
-        }
-      );
+      const response = await fetch(`${baseUrl}/admin/game/update-level`, {
+        method: "POST",
+        body: form,
+      });
       const responseData = await response.json();
       console.log(responseData);
       fetchData();
@@ -336,8 +349,18 @@ const Levels = () => {
         }}
       >
         <p style={{ fontSize: "16px", fontWeight: "600" }}>Levels</p>
-        <Button onClick={onAddModalOpen} colorScheme="green">
-          Add New Level
+        <Button
+          onClick={onAddModalOpen}
+          colorScheme="green"
+          isDisabled={addBtnLoading}
+        >
+          {addBtnLoading ? (
+            <HStack>
+              <Spinner size="xs" /> <span>Loading...</span>
+            </HStack>
+          ) : (
+            "Add New Level"
+          )}
         </Button>
       </div>
       <div style={{ height: "100%", width: "100%" }}>
@@ -418,9 +441,16 @@ const Levels = () => {
             <Button
               colorScheme="green"
               onClick={handleAddLevel}
-              isLoading={loading}
+              isLoading={loading || addBtnLoading}
+              isDisabled={loading || addBtnLoading}
             >
-              Add
+              {loading || addBtnLoading ? (
+                <HStack>
+                  <Spinner size="xs" /> <span>Loading...</span>
+                </HStack>
+              ) : (
+                "Add"
+              )}
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -472,8 +502,15 @@ const Levels = () => {
               colorScheme="green"
               onClick={handleUpdateSubject}
               isLoading={loading}
+              isDisabled={loading}
             >
-              Update
+              {loading ? (
+                <HStack>
+                  <Spinner size="xs" /> <span>Loading...</span>
+                </HStack>
+              ) : (
+                "Update"
+              )}
             </Button>
           </ModalFooter>
         </ModalContent>

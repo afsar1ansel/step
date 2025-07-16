@@ -29,8 +29,9 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  Spinner,
 } from "@chakra-ui/react";
-import { Spinner, Center } from "@chakra-ui/react";
+import { Spinner as ChakraSpinner, Center } from "@chakra-ui/react";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -63,7 +64,7 @@ interface LevelSubjectMapping {
 
 const LevelSubjectManagement = () => {
   const toast = useToast();
- const baseUrl = process.env.NEXT_PUBLIC_GAME_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_GAME_URL;
   const [token, setToken] = useState<string | null>(null);
 
   const [levels, setLevels] = useState<Level[]>([]);
@@ -76,6 +77,10 @@ const LevelSubjectManagement = () => {
   const [selectedSubjects, setSelectedSubjects] = useState<number[]>([]);
   const [canMapLevel, setCanMapLevel] = useState(true);
   const [previousLevelError, setPreviousLevelError] = useState("");
+
+  const [addMappingLoading, setAddMappingLoading] = useState(false); // NEW
+  const [editLoadingId, setEditLoadingId] = useState<number | null>(null); // NEW
+  const [toggleLoadingId, setToggleLoadingId] = useState<number | null>(null); // NEW
 
   const {
     isOpen: isMappingModalOpen,
@@ -360,16 +365,19 @@ const LevelSubjectManagement = () => {
   };
 
   const handleAddMapping = () => {
+    setAddMappingLoading(true); // NEW
     setSelectedMapping(null);
     setSelectedLevel(null);
     setSelectedSubjects([]);
     setCanMapLevel(true);
     setPreviousLevelError("");
     onMappingModalOpen();
+    setTimeout(() => setAddMappingLoading(false), 500); // NEW: Prevent double click for 0.5s
   };
 
   // Fixed handleEditMapping without infinite loop
-  const handleEditMapping = (mapping: LevelSubjectMapping) => {
+  const handleEditMapping = async (mapping: LevelSubjectMapping) => {
+    setEditLoadingId(mapping.level_id); // NEW
     console.log("Edit mapping clicked:", mapping);
     console.log("Current levels state:", levels?.length || 0);
     console.log("Current subjects state:", subjects?.length || 0);
@@ -415,6 +423,7 @@ const LevelSubjectManagement = () => {
     setCanMapLevel(true);
     setPreviousLevelError("");
     onMappingModalOpen();
+    setTimeout(() => setEditLoadingId(null), 500); // NEW: Prevent double click for 0.5s
   };
 
   const toggleSubjectSelection = (subjectId: number) => {
@@ -570,6 +579,7 @@ const LevelSubjectManagement = () => {
     levelId: number,
     currentStatus: number
   ) => {
+    setToggleLoadingId(levelId); // NEW
     const newStatus = currentStatus === 1 ? 0 : 1;
 
     try {
@@ -603,6 +613,8 @@ const LevelSubjectManagement = () => {
         duration: 3000,
         isClosable: true,
       });
+    } finally {
+      setToggleLoadingId(null); // after API call
     }
   };
 
@@ -731,9 +743,19 @@ const LevelSubjectManagement = () => {
               colorScheme="green"
               isChecked={params.value === 1}
               onChange={() =>
-                handleToggleMappingStatus(params.data.level_id, params.value)
+                toggleLoadingId === params.data.level_id
+                  ? undefined
+                  : handleToggleMappingStatus(
+                      params.data.level_id,
+                      params.value
+                    )
               }
-            />
+              isDisabled={toggleLoadingId === params.data.level_id}
+            >
+              {toggleLoadingId === params.data.level_id && (
+                <ChakraSpinner size="xs" />
+              )}
+            </Switch>
           </div>
         ),
         cellStyle: {
@@ -754,8 +776,15 @@ const LevelSubjectManagement = () => {
               size="sm"
               onClick={() => handleEditMapping(params.data)}
               variant="outline"
+              isDisabled={editLoadingId === params.data.level_id}
             >
-              Edit
+              {editLoadingId === params.data.level_id ? (
+                <HStack>
+                  <ChakraSpinner size="xs" /> <span>Loading...</span>
+                </HStack>
+              ) : (
+                "Edit"
+              )}
             </Button>
           </HStack>
         ),
@@ -800,8 +829,19 @@ const LevelSubjectManagement = () => {
           >
             Refresh
           </Button> */}
-          <Button colorScheme="green" size="sm" onClick={handleAddMapping}>
-            Add New Mapping
+          <Button
+            colorScheme="green"
+            size="sm"
+            onClick={handleAddMapping}
+            isDisabled={addMappingLoading}
+          >
+            {addMappingLoading ? (
+              <HStack>
+                <ChakraSpinner size="xs" /> <span>Loading...</span>
+              </HStack>
+            ) : (
+              "Add New Mapping"
+            )}
           </Button>
         </HStack>
       </div>
@@ -1029,13 +1069,25 @@ const LevelSubjectManagement = () => {
             </Button>
             <Button
               colorScheme="green"
-              onClick={handleSaveMapping}
+              onClick={async () => {
+                if (loading) return;
+                await handleSaveMapping();
+              }}
               isLoading={loading}
               isDisabled={
-                !selectedLevel || selectedSubjects.length === 0 || !canMapLevel
+                !selectedLevel ||
+                selectedSubjects.length === 0 ||
+                !canMapLevel ||
+                loading
               }
             >
-              Save
+              {loading ? (
+                <HStack>
+                  <ChakraSpinner size="xs" /> <span>Loading...</span>
+                </HStack>
+              ) : (
+                "Save"
+              )}
             </Button>
           </ModalFooter>
         </ModalContent>
