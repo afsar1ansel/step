@@ -36,7 +36,7 @@ const EditorComponent = dynamic(() => import("@/app/componant/editor"), {
 });
 
 const GameQuestionsPage = () => {
-  const baseUrl = "https://step-game-app-jvzwm.ondigitalocean.app/api";
+  const baseUrl = process.env.NEXT_PUBLIC_GAME_URL;
   const toast = useToast();
   const {
     isOpen: isQuestionModalOpen,

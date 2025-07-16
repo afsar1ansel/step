@@ -63,7 +63,7 @@ interface LevelSubjectMapping {
 
 const LevelSubjectManagement = () => {
   const toast = useToast();
-  const baseUrl = "https://step-game-app-jvzwm.ondigitalocean.app/api";
+ const baseUrl = process.env.NEXT_PUBLIC_GAME_URL;
   const [token, setToken] = useState<string | null>(null);
 
   const [levels, setLevels] = useState<Level[]>([]);
