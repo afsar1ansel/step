@@ -28,7 +28,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 const Levels = () => {
   const toast = useToast();
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const baseUrl = process.env.NEXT_PUBLIC_GAME_URL;
 
   useEffect(() => {
     fetchData();
@@ -162,7 +162,7 @@ const Levels = () => {
       const status = data.status == 1 ? 0 : 1;
       console.log(status);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/admin/game/levels/change-status/${data.id}/${status}/${token}`,
+        `${process.env.NEXT_PUBLIC_GAME_URL}/admin/game/change-level-status/${data.id}/${status}/${token}`,
         {
           method: "GET",
         }
@@ -191,7 +191,7 @@ const Levels = () => {
 
   const [levelName, setlevelName] = useState("");
   const [discription, setDescription] = useState("");
-  const [Priority, setPriority] = useState("");
+  const [Priority, setPriority] = useState(0);
   const [levelId, setLevelId] = useState("");
   const [loading, setLoading] = useState(false);
   // const [allCourse, setallCourse] = useState<any>([]);
@@ -201,7 +201,7 @@ const Levels = () => {
     setlevelName(data.level_name);
     setDescription(data.description);
     setLevelId(data.id);
-    setPriority(data.id);
+    setPriority(parseInt(data.priority, 10) || 0); // Ensure integer
     onEditModalOpen(); // Open Edit Modal
   };
 
@@ -218,10 +218,12 @@ const Levels = () => {
       form.append("levelName", levelName);
       form.append("description", discription);
       form.append("token", token);
+      form.append("priority", Priority.toString());
+      form.append("courseId", "1"); // Hardcode courseId
       console.log(Object.fromEntries(form.entries()));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/admin/game/add-level`,
+        `${process.env.NEXT_PUBLIC_GAME_URL}/admin/game/add-level`,
         {
           method: "POST",
           body: form,
@@ -266,10 +268,12 @@ const Levels = () => {
       form.append("description", discription);
       form.append("levelId", levelId);
       form.append("token", token);
+      form.append("priority", Priority.toString());
+      form.append("courseId", "1");
       console.log(Object.fromEntries(form.entries()));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/admin/game/levels/update`,
+        `${process.env.NEXT_PUBLIC_GAME_URL}/admin/game/update-level`,
         {
           method: "POST",
           body: form,
@@ -307,7 +311,7 @@ const Levels = () => {
   const resetForm = () => {
     setlevelName("");
     setDescription("");
-    setPriority("");
+    setPriority(0);
     setLevelId("");
   };
 
@@ -395,13 +399,13 @@ const Levels = () => {
               <Input
                 placeholder="Enter Priority"
                 value={Priority}
-                onChange={(e) => setPriority(e.target.value)}
+                onChange={(e) => setPriority(parseInt(e.target.value, 10) || 0)} // Parse to integer
               />
             </FormControl>
             <FormControl>
-              <FormLabel>Discription</FormLabel>
+              <FormLabel>Description</FormLabel>
               <Input
-                placeholder="Enter Discription"
+                placeholder="Enter Description"
                 value={discription}
                 onChange={(e) => setDescription(e.target.value)}
               />
@@ -448,7 +452,7 @@ const Levels = () => {
               <Input
                 placeholder="Enter Priority"
                 value={Priority}
-                onChange={(e) => setPriority(e.target.value)}
+                onChange={(e) => setPriority(parseInt(e.target.value, 10) || 0)} // Parse to integer
               />
             </FormControl>
             <FormControl>
