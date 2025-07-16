@@ -44,8 +44,8 @@ const Levels = () => {
         }
       );
       const data = await response.json();
-      setRowData(data);
       console.log(data);
+      setRowData(data);
     } catch (error) {
       toast({
         title: "Error",
