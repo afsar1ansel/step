@@ -162,7 +162,7 @@ const Levels = () => {
       const status = data.status == 1 ? 0 : 1;
       console.log(status);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_GAME_URL}/admin/game/change-level-status/${data.id}/${status}/${token}`,
+        `${baseUrl}/admin/game/change-level-status/${data.id}/${status}/${token}`,
         {
           method: "GET",
         }
@@ -223,7 +223,7 @@ const Levels = () => {
       console.log(Object.fromEntries(form.entries()));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_GAME_URL}/admin/game/add-level`,
+        `${baseUrl}/admin/game/add-level`,
         {
           method: "POST",
           body: form,
@@ -273,7 +273,7 @@ const Levels = () => {
       console.log(Object.fromEntries(form.entries()));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_GAME_URL}/admin/game/update-level`,
+        `${baseUrl}/admin/game/update-level`,
         {
           method: "POST",
           body: form,
