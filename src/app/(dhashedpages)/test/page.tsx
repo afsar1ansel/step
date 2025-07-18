@@ -184,11 +184,12 @@ const TestsTab = () => {
       !selectedCourse ||
       !selectedStep ||
       !preCourseTestTitle ||
-      !preCourseTestDuration ||
+      !preCourseTestDuration 
+      // ||
       // !stepNo ||
-      !syllabusTextLine1 ||
-      !syllabusTextLine2 ||
-      !syllabusTextLine3
+      // !syllabusTextLine1 ||
+      // !syllabusTextLine2 ||
+      // !syllabusTextLine3
     ) {
       toast({
         title: "Validation Error",
@@ -233,6 +234,7 @@ const TestsTab = () => {
             resetForm();
             onModalClose();
           } else {
+            // console.error("Error updating test:", data.message);
             toast({
               title: "Error",
               description: data.message,
@@ -408,7 +410,7 @@ const TestsTab = () => {
           columnDefs={columnDefs}
           pagination={true}
           paginationPageSize={10}
-          paginationPageSizeSelector={[5, 10, 20, 30]}
+          paginationPageSizeSelector={[5, 10, 15]}
           defaultColDef={{
             sortable: true,
             filter: true,
@@ -421,15 +423,6 @@ const TestsTab = () => {
             },
           }}
           domLayout="autoHeight"
-          getRowHeight={(params: any) => {
-            // console.log({ params });
-            return 300;
-            // if (params?.data.sub_category_data.length > 1) {
-            //   return params.data.sub_category_data.length * 45;
-            // } else {
-            //   return 80;
-            // }
-          }}
           suppressCellFocus={true}
         />
       </div>

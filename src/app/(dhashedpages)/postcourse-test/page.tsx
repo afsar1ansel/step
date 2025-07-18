@@ -174,11 +174,12 @@ const TestsTab = () => {
       !selectedCourse ||
       !selectedStep ||
       !postCourseTestTitle ||
-      !postCourseTestDuration ||
-      // !stepNo ||
-      !syllabusTextLine1 ||
-      !syllabusTextLine2 ||
-      !syllabusTextLine3
+      !postCourseTestDuration 
+      // ||
+      // // !stepNo ||
+      // !syllabusTextLine1 ||
+      // !syllabusTextLine2 ||
+      // !syllabusTextLine3
     ) {
       toast({
         title: "Validation Error",
@@ -223,6 +224,7 @@ const TestsTab = () => {
             resetForm();
             onModalClose();
           } else {
+            // console.error("Error updating test:", data.message);
             toast({
               title: "Error",
               description: data.message,
