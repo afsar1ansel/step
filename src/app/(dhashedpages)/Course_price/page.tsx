@@ -131,10 +131,14 @@ const CourseMaster = () => {
       field: "selling_price_inr",
     },
     {
+      headerName: "Creation date",
+      field: "created_date",
+    },
+    {
       field: "status",
-      headerName: "Access",
+      headerName: "Status",
       filter: false,
-      maxWidth: 150,
+      maxWidth: 100,
       cellRenderer: (params: any) => (
         <div
           style={{
@@ -153,12 +157,9 @@ const CourseMaster = () => {
       ),
     },
     {
-      headerName: "Creation date",
-      field: "created_date",
-    },
-    {
       headerName: "Actions",
       filter: false,
+      maxWidth: 100,
       cellRenderer: (params: any) => {
         return (
           <HStack spacing={2}>
@@ -205,21 +206,21 @@ const CourseMaster = () => {
   const [editRowId, setEditRowId] = useState("");
   const [selectedCourseId, setSelectedCourseId] = useState("");
 
-//   {
-//     "actual_price_inr": "30000.00",
-//     "course_id": 1,
-//     "course_name": "NEET PG",
-//     "created_admin_user_id": 5,
-//     "created_date": "Mon, 09 Jun 2025 00:00:00 GMT",
-//     "created_time": "19:00:49",
-//     "id": 1,
-//     "price_description": "plan 1 for course",
-//     "selling_price_inr": "25000.00",
-//     "status": 1,
-//     "updated_admin_user_id": null,
-//     "updated_date": null,
-//     "updated_time": null
-// }
+  //   {
+  //     "actual_price_inr": "30000.00",
+  //     "course_id": 1,
+  //     "course_name": "NEET PG",
+  //     "created_admin_user_id": 5,
+  //     "created_date": "Mon, 09 Jun 2025 00:00:00 GMT",
+  //     "created_time": "19:00:49",
+  //     "id": 1,
+  //     "price_description": "plan 1 for course",
+  //     "selling_price_inr": "25000.00",
+  //     "status": 1,
+  //     "updated_admin_user_id": null,
+  //     "updated_date": null,
+  //     "updated_time": null
+  // }
 
   const handleEdit = (data: any) => {
     console.log(data);
@@ -369,11 +370,10 @@ const CourseMaster = () => {
   const handleEditModalOpen = () => {
     fetchAllCourses();
     onEditModalOpen();
-
   };
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "100%", height: "100%" }}>
       <div
         style={{
           height: "60px",

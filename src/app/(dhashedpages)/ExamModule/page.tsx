@@ -120,9 +120,9 @@ const ExamModule = () => {
       headerName: "Question",
       editable: false,
       flex: 2,
-        cellRenderer: (params: any) => {
-              return <ContentFormatter content={params.value} />;
-            },
+      cellRenderer: (params: any) => {
+        return <ContentFormatter content={params.value} />;
+      },
       cellStyle: {
         height: "100%",
         padding: "8px",
@@ -246,9 +246,9 @@ const ExamModule = () => {
       headerName: "Solution Text",
       filter: false,
       flex: 2,
-     cellRenderer: (params: any) => {
-           return <ContentFormatter content={params.value} />;
-         },
+      cellRenderer: (params: any) => {
+        return <ContentFormatter content={params.value} />;
+      },
     },
     {
       field: "question_id",
@@ -532,7 +532,7 @@ const ExamModule = () => {
   };
 
   return (
-    <div style={{ width: "80vw", height: "60vh" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",

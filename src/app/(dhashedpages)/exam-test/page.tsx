@@ -77,14 +77,13 @@ const TestsTab = () => {
     {
       headerName: "Total Time (Minutes)",
       field: "exam_duration_minutes", // Changed from pre_course_test_duration_minutes
-      // maxWidth: 150,
+      maxWidth: 150,
       filter: false,
     },
     {
       headerName: "Step No", // New column for stepNo
       field: "step_no",
-      // maxWidth: 100,
-      filter: false,
+      maxWidth: 100,
     },
     {
       headerName: "Syllabus Line 1",
@@ -105,7 +104,7 @@ const TestsTab = () => {
       field: "status",
       cellStyle: { textAlign: "center" },
       filter: false,
-      maxWidth: 150,
+      maxWidth: 100,
       cellRenderer: (params: any) => (
         <div
           style={{
@@ -140,7 +139,7 @@ const TestsTab = () => {
           {/* <button onClick={() => handleDelete(params.data)}>Delete</button> */}
         </div>
       ),
-      maxWidth: 150,
+      maxWidth: 100,
     },
   ]);
 
@@ -367,7 +366,7 @@ const TestsTab = () => {
   };
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",

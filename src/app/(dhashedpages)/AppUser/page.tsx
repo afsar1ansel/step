@@ -123,17 +123,22 @@ const AppUser: NextPage = () => {
     {
       headerName: "Mobile",
       field: "app_user_mobile",
+      maxWidth: 120,
     },
     {
       headerName: "College",
       field: "college",
     },
     {
+      headerName: "Creation date",
+      field: "created_date",
+    },
+    {
       field: "status",
       headerName: "Status",
+      maxWidth: 100,
       cellStyle: { textAlign: "center" },
       filter: false,
-      maxWidth: 150,
       cellRenderer: (params: any) => (
         // console.log(params.value),
         <div
@@ -151,10 +156,6 @@ const AppUser: NextPage = () => {
           />
         </div>
       ),
-    },
-    {
-      headerName: "Creation date",
-      field: "created_date",
     },
     // {
     //   headerName: "Actions",
@@ -379,7 +380,7 @@ const AppUser: NextPage = () => {
   };
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",

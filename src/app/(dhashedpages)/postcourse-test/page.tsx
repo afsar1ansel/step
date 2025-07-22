@@ -68,12 +68,12 @@ const TestsTab = () => {
     {
       headerName: "Total Time (Minutes)",
       field: "post_course_test_duration_minutes",
-      // maxWidth: 150,
+      maxWidth: 150,
     },
     {
       headerName: "Step No", // New column for stepNo
       field: "step_no",
-      // maxWidth: 100,
+      maxWidth: 100,
     },
     {
       headerName: "Syllabus Line 1",
@@ -95,7 +95,7 @@ const TestsTab = () => {
       field: "status",
       cellStyle: { textAlign: "center" },
       filter: false,
-      // maxWidth: 150,
+      maxWidth: 100,
       cellRenderer: (params: any) => (
         <div
           style={{
@@ -115,6 +115,8 @@ const TestsTab = () => {
     },
     {
       headerName: "Actions",
+      maxWidth: 100,
+      filter: false,
       cellRenderer: (params: any) => (
         <div>
           <Button
@@ -129,7 +131,6 @@ const TestsTab = () => {
           {/* <button onClick={() => handleDelete(params.data)}>Delete</button> */}
         </div>
       ),
-      maxWidth: 150,
     },
   ]);
 
@@ -138,8 +139,9 @@ const TestsTab = () => {
     if (token) {
       fetch(`${baseUrl}/masters/post-course-test-detail/get-all/${token}`)
         .then((response) => response.json())
-        .then((data) => { setRowData(data)
-          console.log(data)
+        .then((data) => {
+          setRowData(data);
+          console.log(data);
         })
         .catch((error) => console.error("Error fetching test data:", error));
     }
@@ -150,9 +152,10 @@ const TestsTab = () => {
     if (token) {
       fetch(`${baseUrl}/masters/subjects/get-all-subjects/${token}`)
         .then((response) => response.json())
-        .then((data) =>  {
-          setCourses(data) 
-          console.log(data)}) 
+        .then((data) => {
+          setCourses(data);
+          console.log(data);
+        })
         .catch((error) => console.error("Error fetching courses:", error));
     }
   }, [token, baseUrl]);
@@ -174,7 +177,7 @@ const TestsTab = () => {
       !selectedCourse ||
       !selectedStep ||
       !postCourseTestTitle ||
-      !postCourseTestDuration 
+      !postCourseTestDuration
       // ||
       // // !stepNo ||
       // !syllabusTextLine1 ||
@@ -330,7 +333,7 @@ const TestsTab = () => {
     console.log("Edit clicked for:", data);
     setIsEditMode(true);
     setCurrentTestId(data.id);
-    setSelectedCourse(data.subject_id); 
+    setSelectedCourse(data.subject_id);
     setSelectedStep(data.course_step_details_master_id);
     setPostCourseTestTitle(data.post_course_test_title);
     setPostCourseTestDuration(data.post_course_test_duration_minutes);
@@ -375,11 +378,11 @@ const TestsTab = () => {
   };
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",
-          width: "80vw",
+          width: "100%",
           backgroundColor: "white",
           padding: "20px",
           borderRadius: "10px 10px 0px 0px",
@@ -393,7 +396,7 @@ const TestsTab = () => {
           Add Test
         </Button>
       </div>
-      <div style={{ height: "100%", width: "80vw" }}>
+      <div style={{ height: "100%", width: "100%" }}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
