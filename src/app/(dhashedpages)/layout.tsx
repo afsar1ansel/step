@@ -73,7 +73,7 @@ type NavItem =
   | "precourse-qa"
   | "postcourse-test"
   | "postcourse-qa"
-  // | "appUserPurchase"
+  | "DopaminMaster"
   | "levels"
   | "tagSubjectGame"
   | "addQuestionToGame"
@@ -580,6 +580,7 @@ export default function RootLayout({
                           "tagSubjectGame",
                           "levels",
                           "addQuestionToGame",
+                          "Currency Config",
                         ].includes(basePath)
                           ? "active"
                           : ""
@@ -628,8 +629,6 @@ export default function RootLayout({
                                 </Link>
                               </li>
 
-
-
                               <li>
                                 <Link href="/tagSubjectGame">
                                   <p
@@ -663,6 +662,24 @@ export default function RootLayout({
                                     }}
                                   >
                                     Questions
+                                  </p>
+                                </Link>
+                              </li>
+                              <li>
+                                <Link href="/DopaminMaster">
+                                  <p
+                                    className={
+                                      basePath === "DopaminMaster"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Currency Config
                                   </p>
                                 </Link>
                               </li>
