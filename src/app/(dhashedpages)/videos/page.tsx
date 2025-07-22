@@ -209,14 +209,14 @@ const StudentsTab = () => {
 
   const [currentVideoLink, setCurrentVideoLink] = useState("");
   const [videoDescription, setvideoDescription] = useState<any>(null);
-   const [courses, setCourses] = useState<any[]>([]);
-     const [steps, setSteps] = useState<any[]>([]);
+  const [courses, setCourses] = useState<any[]>([]);
+  const [steps, setSteps] = useState<any[]>([]);
   const [vedioTitle, setvedioTitle] = useState("");
   const [videoDurationinMin, setvideoDurationinMin] = useState("");
   const [videoLink, setvideoLink] = useState("");
   const [stepNo, setStepNo] = useState("");
-   const [selectedCourse, setSelectedCourse] = useState("");
-   const [selectedStep, setSelectedStep] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedStep, setSelectedStep] = useState("");
   // const [courseStepDetailsMasterId, setCourseStepDetailsMasterId] =
   //   useState("");
   const [videoLearningId, setVideoLearningId] = useState("");
@@ -228,7 +228,7 @@ const StudentsTab = () => {
     setvideoDurationinMin(data.video_duration_in_mins);
     setvideoLink(data.video_link);
     setvideoDescription(data.video_description);
-    setSelectedCourse(data.course_id); 
+    setSelectedCourse(data.course_id);
     setSelectedStep(data.course_step_details_master_id);
     setStepNo(data.step_no);
     // setCourseStepDetailsMasterId(data.course_step_details_master_id);
@@ -239,8 +239,6 @@ const StudentsTab = () => {
   const handleDelete = (data: any) => {
     setRowData((prev) => prev.filter((student) => student.id !== data.id));
   };
-
-
 
   const handleAddStudent = () => {
     resetForm();
@@ -289,8 +287,6 @@ const StudentsTab = () => {
     onAddModalClose();
   };
 
-
-
   const handleEditStudent = () => {
     const token = localStorage.getItem("token") ?? "";
     const form = new FormData();
@@ -304,7 +300,7 @@ const StudentsTab = () => {
     form.append("courseStepDetailsMasterId", selectedStep);
 
     console.log(Object.fromEntries(form.entries()));
-    console.log("updated")
+    console.log("updated");
 
     try {
       fetch(`${baseUrl}/video-learning/update`, {
@@ -358,29 +354,29 @@ const StudentsTab = () => {
     onAddModalOpen(); // Open the modal
   };
 
-   // Fetch courses
-    useEffect(() => {
-      // if (token) {
-        const token = localStorage.getItem("token") || "";
-        fetch(`${baseUrl}/masters/subjects/get-all-subjects/${token}`)
-          .then((response) => response.json())
-          .then((data) => setCourses(data))
-          .catch((error) => console.error("Error fetching courses:", error));
-      // }
-    }, [baseUrl]);
+  // Fetch courses
+  useEffect(() => {
+    // if (token) {
+    const token = localStorage.getItem("token") || "";
+    fetch(`${baseUrl}/masters/subjects/get-all-subjects/${token}`)
+      .then((response) => response.json())
+      .then((data) => setCourses(data))
+      .catch((error) => console.error("Error fetching courses:", error));
+    // }
+  }, [baseUrl]);
 
-      // Fetch steps when a course is selected
-      useEffect(() => {
-        const token = localStorage.getItem("token") || "";
-        if (selectedCourse) {
-          fetch(
-            `${baseUrl}/masters/get-all-course-step-details/${selectedCourse}/${token}`
-          )
-            .then((response) => response.json())
-            .then((data) => setSteps(data))
-            .catch((error) => console.error("Error fetching steps:", error));
-        }
-      }, [selectedCourse, baseUrl]);
+  // Fetch steps when a course is selected
+  useEffect(() => {
+    const token = localStorage.getItem("token") || "";
+    if (selectedCourse) {
+      fetch(
+        `${baseUrl}/masters/get-all-course-step-details/${selectedCourse}/${token}`
+      )
+        .then((response) => response.json())
+        .then((data) => setSteps(data))
+        .catch((error) => console.error("Error fetching steps:", error));
+    }
+  }, [selectedCourse, baseUrl]);
 
   return (
     <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
@@ -406,8 +402,8 @@ const StudentsTab = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 20, 30]}
+          paginationPageSize={50}
+          paginationPageSizeSelector={false}
           // paginationAutoPageSize={true}
           defaultColDef={{
             sortable: true,

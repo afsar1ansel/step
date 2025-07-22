@@ -396,7 +396,8 @@ const CourseMaster = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={10}
+          paginationPageSize={50}
+          paginationPageSizeSelector={false}
           defaultColDef={{
             sortable: true,
             filter: true,

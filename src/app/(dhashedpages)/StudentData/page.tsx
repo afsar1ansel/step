@@ -200,7 +200,7 @@ const StudentsTab = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={5}
+          paginationPageSize={50}
           paginationPageSizeSelector={[5, 10, 15]}
           // paginationAutoPageSize={true}
           defaultColDef={{

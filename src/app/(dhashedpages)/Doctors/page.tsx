@@ -27,7 +27,6 @@ import {
 import { Spinner, Center, CircularProgress } from "@chakra-ui/react";
 import { div } from "framer-motion/client";
 
-
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const Doctors = () => {
@@ -188,8 +187,8 @@ const Doctors = () => {
           method: "GET",
         }
       );
-       setCurrentImageUrl(response.url); // Set the image URL to state
-       onImageModalOpen(); 
+      setCurrentImageUrl(response.url); // Set the image URL to state
+      onImageModalOpen();
 
       // console.log(response.url);
     } catch (error) {
@@ -251,17 +250,17 @@ const Doctors = () => {
   const [loading, setLoading] = useState(false);
   // const [allCourse, setallCourse] = useState<any>([]);
 
-//   {
-//     "created_admin_user_id": 1,
-//     "created_date": "Mon, 31 Mar 2025 00:00:00 GMT",
-//     "doctor_education": "MBBS, MS (Orthopedics)",
-//     "doctor_full_name": "demo1 'Dr. Rohan Verma'",
-//     "doctor_practice_profession": "Orthopedic Surgeon",
-//     "doctor_profile_pic": "Screenshot_2025-03-31_205042.png",
-//     "id": 1,
-//     "status": 1,
-//     "years_of_experience": "updated-15 years"
-// }
+  //   {
+  //     "created_admin_user_id": 1,
+  //     "created_date": "Mon, 31 Mar 2025 00:00:00 GMT",
+  //     "doctor_education": "MBBS, MS (Orthopedics)",
+  //     "doctor_full_name": "demo1 'Dr. Rohan Verma'",
+  //     "doctor_practice_profession": "Orthopedic Surgeon",
+  //     "doctor_profile_pic": "Screenshot_2025-03-31_205042.png",
+  //     "id": 1,
+  //     "status": 1,
+  //     "years_of_experience": "updated-15 years"
+  // }
 
   const handleEdit = (data: any) => {
     // console.log(data);
@@ -416,8 +415,8 @@ const Doctors = () => {
           columnDefs={columnDefs}
           pagination={true}
           // paginationPageSize={10}
-          paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 20, 30]}
+          paginationPageSize={50}
+          paginationPageSizeSelector={false}
           // paginationAutoPageSize={true}
           defaultColDef={{
             sortable: true,

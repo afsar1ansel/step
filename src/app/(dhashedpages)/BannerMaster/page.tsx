@@ -49,7 +49,7 @@ const BannerMaster = () => {
   } = useDisclosure();
 
   const [columnDefs] = useState<ColDef[]>([
-    { headerName: "ID", field: "id", maxWidth: 80 , filter: false },
+    { headerName: "ID", field: "id", maxWidth: 80, filter: false },
     { headerName: "Title", field: "banner_title", minWidth: 200 },
     {
       headerName: "Image",
@@ -63,36 +63,36 @@ const BannerMaster = () => {
         >
           View Banner
         </Button>
-            ),
-            minWidth: 150,
-          },
-          {
-            headerName: "Date & Time",
-            valueGetter: (params) => {
+      ),
+      minWidth: 150,
+    },
+    {
+      headerName: "Date & Time",
+      valueGetter: (params) => {
         const date = params.data.created_date.split(" ")[1]; // Extract the date part
         const month = params.data.created_date.split(" ")[2]; // Extract the month part
         const year = params.data.created_date.split(" ")[3]; // Extract the year part
         return `${date} ${month} ${year} ${params.data.created_time}`;
-            },
-            minWidth: 200,
-          },
-          {
-            headerName: "Status",
-            field: "status",
-            filter: false,
-            cellRenderer: (params: any) => (
+      },
+      minWidth: 200,
+    },
+    {
+      headerName: "Status",
+      field: "status",
+      filter: false,
+      cellRenderer: (params: any) => (
         <Switch
           isChecked={params.value === 1}
           onChange={() => handleToggleStatus(params.data)}
           colorScheme="green"
         />
-            ),
-            maxWidth: 150,
-          },
-          {
-            headerName: "Actions",
-            filter: false,
-            cellRenderer: (params: any) => (
+      ),
+      maxWidth: 150,
+    },
+    {
+      headerName: "Actions",
+      filter: false,
+      cellRenderer: (params: any) => (
         <div>
           <Button
             size="sm"
@@ -338,8 +338,8 @@ const BannerMaster = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 20, 30]}
+          paginationPageSize={50}
+          paginationPageSizeSelector={false}
           defaultColDef={{
             sortable: true,
             filter: true,

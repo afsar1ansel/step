@@ -37,7 +37,8 @@ const TestsTab = () => {
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedStep, setSelectedStep] = useState("");
   const [examTitle, setExamTitle] = useState(""); // Renamed from preCourseTestTitle
-  const [examDurationMinutes, setExamDurationMinutes] = useState< // Renamed from preCourseTestDuration
+  const [examDurationMinutes, setExamDurationMinutes] = useState<
+    // Renamed from preCourseTestDuration
     number | ""
   >("");
   const [syllabusTextLine1, setSyllabusTextLine1] = useState("");
@@ -146,10 +147,12 @@ const TestsTab = () => {
   // Fetch exams data
   useEffect(() => {
     if (token) {
-      fetch(`${examBaseUrl}/masters/exam/get-all`, { // Changed endpoint
-        headers: { // Added headers for token
-          'Authorization': `Bearer ${token}`
-        }
+      fetch(`${examBaseUrl}/masters/exam/get-all`, {
+        // Changed endpoint
+        headers: {
+          // Added headers for token
+          Authorization: `Bearer ${token}`,
+        },
       })
         .then((response) => response.json())
         .then((data) => {
@@ -223,8 +226,9 @@ const TestsTab = () => {
 
     fetch(url, {
       method: "POST",
-      headers: { // Added headers for token
-        'Authorization': `Bearer ${token}`
+      headers: {
+        // Added headers for token
+        Authorization: `Bearer ${token}`,
       },
       body: formData,
     })
@@ -252,10 +256,15 @@ const TestsTab = () => {
         }
       })
       .catch((error) => {
-        console.error(`Error ${isEditMode ? "updating" : "adding"} test:`, error);
+        console.error(
+          `Error ${isEditMode ? "updating" : "adding"} test:`,
+          error
+        );
         toast({
           title: "Error",
-          description: `An error occurred while ${isEditMode ? "updating" : "adding"} the test.`,
+          description: `An error occurred while ${
+            isEditMode ? "updating" : "adding"
+          } the test.`,
           status: "error",
           duration: 3000,
           isClosable: true,
@@ -268,11 +277,12 @@ const TestsTab = () => {
     try {
       const response = await fetch(
         `${examBaseUrl}/masters/exam/change-status/${newStatus}/${data.id}`, // Changed endpoint, removed token from URL
-        { 
+        {
           method: "GET",
-          headers: { // Added headers for token
-            'Authorization': `Bearer ${token}`
-          }
+          headers: {
+            // Added headers for token
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
       if (response.ok) {
@@ -312,7 +322,7 @@ const TestsTab = () => {
   const handleEdit = (data: any) => {
     setIsEditMode(true);
     setCurrentExamId(data.id); // Renamed state variable
-    setSelectedCourse(data.course_id); 
+    setSelectedCourse(data.course_id);
     // setSelectedStep(data.course_step_details_master_id);
     setExamTitle(data.exam_title); // Changed from pre_course_test_title
     setExamDurationMinutes(data.exam_duration_minutes); // Changed from pre_course_test_duration_minutes
@@ -332,7 +342,7 @@ const TestsTab = () => {
     setSyllabusTextLine3("");
     setIsEditMode(false);
     setCurrentExamId(null); // Renamed state variable
-    setSteps([]); 
+    setSteps([]);
   };
 
   const handleModalClose = () => {
@@ -340,12 +350,15 @@ const TestsTab = () => {
     onModalClose();
   };
 
-  const fetchTests = () => { // Renamed to fetchExams for clarity, but keeping as fetchTests to match original call
+  const fetchTests = () => {
+    // Renamed to fetchExams for clarity, but keeping as fetchTests to match original call
     if (token) {
-      fetch(`${examBaseUrl}/masters/exam/get-all`, { // Changed endpoint
-         headers: { // Added headers for token
-          'Authorization': `Bearer ${token}`
-        }
+      fetch(`${examBaseUrl}/masters/exam/get-all`, {
+        // Changed endpoint
+        headers: {
+          // Added headers for token
+          Authorization: `Bearer ${token}`,
+        },
       })
         .then((response) => response.json())
         .then((data) => setRowData(data))
@@ -386,8 +399,8 @@ const TestsTab = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 20, 30]} // Consider removing if causing issues, or ensure it works as expected
+          paginationPageSize={50}
+          paginationPageSizeSelector={false} // Consider removing if causing issues, or ensure it works as expected
           defaultColDef={{
             sortable: true,
             filter: true,

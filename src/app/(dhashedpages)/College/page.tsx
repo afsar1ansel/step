@@ -41,22 +41,6 @@ const College = () => {
     gridRef.current?.api.exportDataAsCsv();
   }, []);
 
-  // [
-  //   {
-  //     college_name: "aiims 1",
-  //     created_admin_user_id: 1,
-  //     created_date: "Wed, 14 May 2025 00:00:00 GMT",
-  //     id: 1,
-  //     status: 1,
-  //   },
-  //   {
-  //     college_name: "aiims raebareli 2 updated",
-  //     created_admin_user_id: 1,
-  //     created_date: "Wed, 14 May 2025 00:00:00 GMT",
-  //     id: 2,
-  //     status: 1,
-  //   },
-  // ];
 
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     {
@@ -423,8 +407,8 @@ const College = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 15]}
+          paginationPageSize={50}
+          paginationPageSizeSelector={false}
           // paginationAutoPageSize={true}
           defaultColDef={{
             sortable: true,

@@ -698,8 +698,8 @@ const PrecourseQaPage = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 20, 30]}
+          paginationPageSize={50}
+          paginationPageSizeSelector={false}
           defaultColDef={{
             sortable: true,
             filter: true,

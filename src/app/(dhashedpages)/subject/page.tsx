@@ -36,7 +36,6 @@ const SubjectMaster = () => {
     fetchCourseData();
   }, []);
 
-
   async function fetchCourseData() {
     setLoading(true);
     try {
@@ -223,7 +222,7 @@ const SubjectMaster = () => {
   const [subjectName, setSubjectName] = useState("");
   const [courseId, setCourseId] = useState("");
   const [createdAdminUserId, setCreatedAdminUserId] = useState("");
-  const [subjectId , setsubjectId] = useState<any>([]);
+  const [subjectId, setsubjectId] = useState<any>([]);
   // const [courseId, setCourseId] = useState("");
   const [loading, setLoading] = useState(false);
   const [allCourse, setallCourse] = useState<any>([]);
@@ -241,8 +240,8 @@ const SubjectMaster = () => {
   };
 
   const handleAddSubject = async () => {
-    console.log(subjectName, courseId , createdAdminUserId);
-    try{
+    console.log(subjectName, courseId, createdAdminUserId);
+    try {
       const token = localStorage.getItem("token") ?? "";
       const form = new FormData();
       form.append("subjectName", subjectName);
@@ -250,48 +249,45 @@ const SubjectMaster = () => {
       form.append("token", token);
       console.log(Object.fromEntries(form.entries()));
 
-       const response = await fetch(
-         `${process.env.NEXT_PUBLIC_BASE_URL}/masters/subjects/add`,
-         {
-           method: "POST",
-           body: form,
-         }
-       );
-       const responseData = await response.json();
-      //  console.log(responseData);
-       fetchData();
-
-        if (responseData.errFlag === 0) {
-          toast({
-            title: "Success",
-            description: "Subject added successfully",
-            status: "success",
-            duration: 3000,
-            isClosable: true,
-          });
-          fetchData();
-        } else {
-          toast({
-            title: "Error",
-            description: responseData.message,
-            status: "error",
-            duration: 3000,
-            isClosable: true,
-          });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/masters/subjects/add`,
+        {
+          method: "POST",
+          body: form,
         }
+      );
+      const responseData = await response.json();
+      //  console.log(responseData);
+      fetchData();
 
-    }
-    catch(error){
+      if (responseData.errFlag === 0) {
+        toast({
+          title: "Success",
+          description: "Subject added successfully",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        fetchData();
+      } else {
+        toast({
+          title: "Error",
+          description: responseData.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
       console.log(error);
-    }finally{
-
-    resetForm();
-    onAddModalClose();
+    } finally {
+      resetForm();
+      onAddModalClose();
     }
   };
 
   const handleUpdateSubject = async () => {
-    try{
+    try {
       const token = localStorage.getItem("token") ?? "";
       const form = new FormData();
       form.append("subjectName", subjectName);
@@ -327,11 +323,11 @@ const SubjectMaster = () => {
           isClosable: true,
         });
       }
-    }catch(error){
+    } catch (error) {
       console.log(error);
-    }finally{
-    resetForm();
-    onEditModalClose();
+    } finally {
+      resetForm();
+      onEditModalClose();
     }
   };
 
@@ -367,8 +363,8 @@ const SubjectMaster = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 20, 30]}
+          paginationPageSize={50}
+          paginationPageSizeSelector={false}
           defaultColDef={{
             sortable: true,
             filter: true,

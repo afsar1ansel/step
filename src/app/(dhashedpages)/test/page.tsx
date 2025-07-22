@@ -409,8 +409,8 @@ const TestsTab = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={10}
-          paginationPageSizeSelector={[5, 10, 15]}
+          paginationPageSize={50}
+          paginationPageSizeSelector={false}
           defaultColDef={{
             sortable: true,
             filter: true,

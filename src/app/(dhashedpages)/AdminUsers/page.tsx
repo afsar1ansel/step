@@ -24,7 +24,6 @@ import {
 } from "@chakra-ui/react";
 import { Spinner, Center, CircularProgress } from "@chakra-ui/react";
 
-
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const AdminUsers = () => {
@@ -34,7 +33,6 @@ const AdminUsers = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
 
   async function fetchData() {
     try {
@@ -141,7 +139,7 @@ const AdminUsers = () => {
 
   //toggle function for switch button
   const handleToggle = async (data: any) => {
-     setLoading(true);
+    setLoading(true);
     try {
       const token = localStorage.getItem("token") ?? "";
       const status = data.status == 1 ? 0 : 1;
@@ -217,7 +215,7 @@ const AdminUsers = () => {
         }
       );
       const responseData = await response.json();
-       console.log(responseData);
+      console.log(responseData);
       fetchData();
 
       if (responseData.errFlag === 0) {
@@ -229,8 +227,8 @@ const AdminUsers = () => {
           isClosable: true,
         });
         fetchData();
-         resetForm();
-         onAddModalClose();
+        resetForm();
+        onAddModalClose();
       } else {
         toast({
           title: "Error",
@@ -257,7 +255,7 @@ const AdminUsers = () => {
       form.append("roleId", role);
       form.append("adminUserId", userId);
       form.append("token", token);
-       console.log(Object.fromEntries(form.entries()));
+      console.log(Object.fromEntries(form.entries()));
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/admin-users/update-admin-user`,
@@ -278,8 +276,8 @@ const AdminUsers = () => {
           isClosable: true,
         });
         fetchData();
-         resetForm();
-         onEditModalClose();
+        resetForm();
+        onEditModalClose();
       } else {
         toast({
           title: "Error",
@@ -288,12 +286,11 @@ const AdminUsers = () => {
           duration: 3000,
           isClosable: true,
         });
-         resetForm();
+        resetForm();
       }
     } catch (error) {
       console.log(error);
-    } 
-   
+    }
   };
 
   const resetForm = () => {
@@ -333,8 +330,8 @@ const AdminUsers = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 20, 30]}
+          paginationPageSize={50}
+          paginationPageSizeSelector={false}
           // paginationAutoPageSize={true}
           defaultColDef={{
             sortable: true,

@@ -4,10 +4,7 @@ import { AgGridReact } from "ag-grid-react";
 import React, { useEffect, useState } from "react";
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
-import {
-  useToast,
-  Select,
-} from "@chakra-ui/react";
+import { useToast, Select } from "@chakra-ui/react";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -15,7 +12,6 @@ const PaymentsLogs = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const [rowData, setRowData] = useState<any[]>([]);
   const toast = useToast();
-
 
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     {
@@ -40,7 +36,7 @@ const PaymentsLogs = () => {
     {
       headerName: "Created Date",
       field: "created_date",
-      filter: true, 
+      filter: true,
       maxWidth: 150,
       cellStyle: { textAlign: "left" },
       cellRenderer: (params: { value: any; data: any }) => {
@@ -76,7 +72,7 @@ const PaymentsLogs = () => {
         const labelStyle = {
           fontWeight: 500,
           fontSize: "16px",
-          color: isSuccess ? "#E53E3E" : "#38A169" ,
+          color: isSuccess ? "#E53E3E" : "#38A169",
           textAlign: "center" as any,
           maxWidth: "fit-content",
         };
@@ -325,8 +321,6 @@ const PaymentsLogs = () => {
   //   }
   // };
 
-
-
   return (
     <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
       <div
@@ -352,8 +346,8 @@ const PaymentsLogs = () => {
           rowHeight={100}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 20, 30]}
+          paginationPageSize={50}
+          paginationPageSizeSelector={false}
           // paginationAutoPageSize={true}
           defaultColDef={{
             sortable: true,

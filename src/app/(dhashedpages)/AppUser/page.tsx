@@ -409,8 +409,8 @@ const AppUser: NextPage = () => {
           columnDefs={columnDefs}
           pagination={true}
           // paginationPageSize={10}
-          paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 20, 30]}
+          paginationPageSize={50}
+          paginationPageSizeSelector={false}
           // paginationAutoPageSize={true}
           defaultColDef={{
             sortable: true,

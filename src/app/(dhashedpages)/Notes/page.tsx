@@ -181,53 +181,53 @@ const StudentsTab = () => {
     }
   }
 
-const fetchDetail = async (url: string) => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await fetch(
-      `${baseUrl}/notes-content/display/presign-url/${token}/${url}`,
-      {
-        method: "GET",
+  const fetchDetail = async (url: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${baseUrl}/notes-content/display/presign-url/${token}/${url}`,
+        {
+          method: "GET",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch PDF. Please try again.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
       }
-    );
-    
-    const data = await response.json();
 
-    if (!response.ok) {
+      if (data.errFlag === 0 && data.downloadUrl) {
+        // Open the presigned URL directly
+        window.open(data.downloadUrl, "_blank");
+      } else {
+        toast({
+          title: "Error",
+          description: data.message || "Could not fetch PDF",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        console.error("API Error:", data);
+      }
+    } catch (error) {
+      console.error("Error fetching PDF:", error);
       toast({
         title: "Error",
-        description: "Failed to fetch PDF. Please try again.",
+        description: "Failed to fetch PDF",
         status: "error",
         duration: 3000,
         isClosable: true,
       });
-      return;
     }
-
-    if (data.errFlag === 0 && data.downloadUrl) {
-      // Open the presigned URL directly
-      window.open(data.downloadUrl, "_blank");
-    } else {
-      toast({
-        title: "Error",
-        description: data.message || "Could not fetch PDF",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      console.error("API Error:", data);
-    }
-  } catch (error) {
-    console.error("Error fetching PDF:", error);
-    toast({
-      title: "Error",
-      description: "Failed to fetch PDF",
-      status: "error",
-      duration: 3000,
-      isClosable: true,
-    });
-  }
-};  
+  };
 
   // State for Add Student Modal
   const {
@@ -271,9 +271,7 @@ const fetchDetail = async (url: string) => {
     onEditModalOpen();
   };
 
-
   const handleAddStudent = () => {
-
     const token = localStorage.getItem("token") ?? "";
     const form = new FormData();
     form.append("token", token);
@@ -284,9 +282,9 @@ const fetchDetail = async (url: string) => {
     form.append("subjectId", selectedStep); // Add subjectId
     if (uploadedFile) {
       // Clean filename before upload
-      const cleanFileName = uploadedFile.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const cleanFileName = uploadedFile.name.replace(/[^a-zA-Z0-9.-]/g, "_");
       const renamedFile = new File([uploadedFile], cleanFileName, {
-        type: uploadedFile.type
+        type: uploadedFile.type,
       });
       form.append("pdfFile", renamedFile);
     }
@@ -305,12 +303,11 @@ const fetchDetail = async (url: string) => {
               title: "Success",
               description: `Note Added Successfully, Selected Course: ${selectedCourse}`,
               status: "success",
-              duration: 3000, 
+              duration: 3000,
               isClosable: true,
             });
-    resetForm();
-    onAddModalClose();
- 
+            resetForm();
+            onAddModalClose();
           } else {
             toast({
               title: "Error",
@@ -324,7 +321,7 @@ const fetchDetail = async (url: string) => {
     } catch (error) {
       console.error("Error adding Note:", error);
     }
- };
+  };
 
   const handleEditStudent = () => {
     const token = localStorage.getItem("token") ?? "";
@@ -358,9 +355,8 @@ const fetchDetail = async (url: string) => {
               duration: 3000,
               isClosable: true,
             });
-    resetForm();
-    onEditModalClose();
- 
+            resetForm();
+            onEditModalClose();
           } else {
             toast({
               title: "Error",
@@ -374,7 +370,7 @@ const fetchDetail = async (url: string) => {
     } catch (error) {
       console.error("Error updating Notes:", error);
     }
- };
+  };
 
   const resetForm = () => {
     setnoteTitle("");
@@ -409,8 +405,9 @@ const fetchDetail = async (url: string) => {
       return;
     } else {
       fetch(`${baseUrl}/masters/courses/get-all-courses/${token}`)
-        .then((response) =>response.json())
-        .then((data) => { setCourses(data)
+        .then((response) => response.json())
+        .then((data) => {
+          setCourses(data);
           console.log(data);
         })
         .catch((error) => console.error("Error fetching courses:", error));
@@ -421,8 +418,7 @@ const fetchDetail = async (url: string) => {
   useEffect(() => {
     if (selectedCourse) {
       const token = localStorage.getItem("token");
-      fetch(
-        `${baseUrl}/masters/subjects/get-all-subjects/${token}`)
+      fetch(`${baseUrl}/masters/subjects/get-all-subjects/${token}`)
         .then((response) => response.json())
         .then((data) => setSteps(data))
         .catch((error) => console.error("Error fetching steps:", error));
@@ -453,8 +449,8 @@ const fetchDetail = async (url: string) => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={5}
-          paginationPageSizeSelector={[5, 10, 20, 30]}
+          paginationPageSize={50}
+          paginationPageSizeSelector={false}
           // paginationAutoPageSize={true}
           defaultColDef={{
             sortable: true,

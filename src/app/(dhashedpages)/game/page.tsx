@@ -24,7 +24,6 @@ import {
 } from "@chakra-ui/react";
 import { Spinner, Center, CircularProgress } from "@chakra-ui/react";
 
-
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const Levels = () => {
@@ -35,16 +34,12 @@ const Levels = () => {
     // fetchData();
   }, []);
 
-
   async function fetchData() {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${baseUrl}//${token}`,
-        {
-          method: "GET",
-        }
-      );
+      const response = await fetch(`${baseUrl}//${token}`, {
+        method: "GET",
+      });
       const data = await response.json();
       setRowData(data);
       console.log(data);
@@ -137,7 +132,7 @@ const Levels = () => {
 
   //toggle function for switch button
   const handleToggle = async (data: any) => {
-     setLoading(true);
+    setLoading(true);
     try {
       const token = localStorage.getItem("token") ?? "";
       const status = data.status == 1 ? 0 : 1;
@@ -202,7 +197,7 @@ const Levels = () => {
         }
       );
       const responseData = await response.json();
-       console.log(responseData);
+      console.log(responseData);
       fetchData();
 
       if (responseData.errFlag === 0) {
@@ -214,8 +209,8 @@ const Levels = () => {
           isClosable: true,
         });
         fetchData();
-         resetForm();
-         onAddModalClose();
+        resetForm();
+        onAddModalClose();
       } else {
         toast({
           title: "Error",
@@ -238,7 +233,7 @@ const Levels = () => {
       const form = new FormData();
       form.append("username", levelName);
       form.append("token", token);
-       console.log(Object.fromEntries(form.entries()));
+      console.log(Object.fromEntries(form.entries()));
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/admin-users/update-admin-user`,
@@ -259,8 +254,8 @@ const Levels = () => {
           isClosable: true,
         });
         fetchData();
-         resetForm();
-         onEditModalClose();
+        resetForm();
+        onEditModalClose();
       } else {
         toast({
           title: "Error",
@@ -269,12 +264,11 @@ const Levels = () => {
           duration: 3000,
           isClosable: true,
         });
-         resetForm();
+        resetForm();
       }
     } catch (error) {
       console.log(error);
-    } 
-   
+    }
   };
 
   const resetForm = () => {
@@ -288,7 +282,7 @@ const Levels = () => {
   ];
 
   return (
-    <div style={{ width: "80vw", height: "60vh", }}>
+    <div style={{ width: "80vw", height: "60vh" }}>
       <div
         style={{
           height: "60px",
@@ -311,7 +305,7 @@ const Levels = () => {
           rowData={rowData}
           columnDefs={columnDefs}
           pagination={true}
-          paginationPageSize={5}
+          paginationPageSize={50}
           paginationPageSizeSelector={[5, 10, 15]}
           // paginationAutoPageSize={true}
           defaultColDef={{
@@ -358,7 +352,11 @@ const Levels = () => {
             <Button colorScheme="gray" mr={3} onClick={onAddModalClose}>
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleAddLevel} isLoading={loading}>
+            <Button
+              colorScheme="green"
+              onClick={handleAddLevel}
+              isLoading={loading}
+            >
               Add
             </Button>
           </ModalFooter>
@@ -379,14 +377,17 @@ const Levels = () => {
                 value={levelName}
                 onChange={(e) => setlevelName(e.target.value)}
               />
-
             </FormControl>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="gray" mr={3} onClick={onEditModalClose}>
               Cancel
             </Button>
-            <Button colorScheme="green" onClick={handleUpdateSubject} isLoading={loading}>
+            <Button
+              colorScheme="green"
+              onClick={handleUpdateSubject}
+              isLoading={loading}
+            >
               Update
             </Button>
           </ModalFooter>

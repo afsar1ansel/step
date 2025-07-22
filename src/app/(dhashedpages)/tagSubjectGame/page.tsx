@@ -871,7 +871,7 @@ const LevelSubjectManagement = () => {
               columnDefs={columnDefs}
               pagination={true}
               paginationPageSize={10}
-              paginationPageSizeSelector={[5, 10, 20, 30]}
+              paginationPageSizeSelector={false}
               defaultColDef={{
                 sortable: true,
                 filter: true,
