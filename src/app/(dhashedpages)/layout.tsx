@@ -254,12 +254,25 @@ export default function RootLayout({
                     <li
                       style={{ padding: 0, margin: 0 }}
                       className={
-                        ["Doctors", "subject", "course"].includes(basePath)
+                        ["Doctors", "subject", "course", "Course_price"].includes(active) ||
+                        ["Doctors", "subject", "course", "Course_price"].includes(basePath)
                           ? "active"
                           : ""
                       }
                     >
-                      <Accordion allowToggle>
+                      <Accordion
+                        allowToggle
+                        defaultIndex={
+                          [
+                            "Doctors",
+                            "subject",
+                            "course",
+                            "Course_price",
+                          ].includes(basePath)
+                            ? [0]
+                            : []
+                        }
+                      >
                         <AccordionItem border="none">
                           <AccordionButton
                             style={{
@@ -376,12 +389,30 @@ export default function RootLayout({
                           "precourse-qa",
                           "postcourse-test",
                           "postcourse-qa",
+                        ].includes(active) ||
+                        [
+                          "test",
+                          "precourse-qa",
+                          "postcourse-test",
+                          "postcourse-qa",
                         ].includes(basePath)
                           ? "active"
                           : ""
                       }
                     >
-                      <Accordion allowToggle>
+                      <Accordion
+                        allowToggle
+                        defaultIndex={
+                          [
+                            "test",
+                            "precourse-qa",
+                            "postcourse-test",
+                            "postcourse-qa",
+                          ].includes(basePath)
+                            ? [0]
+                            : []
+                        }
+                      >
                         <AccordionItem border="none">
                           <AccordionButton
                             style={{
@@ -580,14 +611,35 @@ export default function RootLayout({
                         [
                           "tagSubjectGame",
                           "levels",
-                          "addQuestionToGame",
-                          "Currency Config",
+                          "game-questions",
+                          "CurrencyConfigPage",
+                          "GameConfig",
+                        ].includes(active) ||
+                        [
+                          "tagSubjectGame",
+                          "levels",
+                          "game-questions",
+                          "CurrencyConfigPage",
+                          "GameConfig",
                         ].includes(basePath)
                           ? "active"
                           : ""
                       }
                     >
-                      <Accordion allowToggle>
+                      <Accordion
+                        allowToggle
+                        defaultIndex={
+                          [
+                            "tagSubjectGame",
+                            "levels",
+                            "game-questions",
+                            "CurrencyConfigPage",
+                            "GameConfig",
+                          ].includes(basePath)
+                            ? [0]
+                            : []
+                        }
+                      >
                         <AccordionItem border="none">
                           <AccordionButton
                             style={{
