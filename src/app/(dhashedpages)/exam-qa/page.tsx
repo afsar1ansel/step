@@ -626,7 +626,7 @@ const PrecourseQaPage = () => {
   return (
     <div
       style={{
-        width: "80vw",
+        width: "100%",
         height: "calc(100vh - 120px)" /* Adjust height as needed */,
       }}
     >

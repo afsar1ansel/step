@@ -143,12 +143,12 @@ const StepsTab = () => {
     {
       headerName: "Created Date",
       field: "created_date",
-      cellStyle: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "80%",
-      },
+      // cellStyle: {
+      //   display: "flex",
+      //   justifyContent: "center",
+      //   alignItems: "center",
+      //   height: "80%",
+      // },
     },
     {
       headerName: "No. of Test",
@@ -187,6 +187,7 @@ const StepsTab = () => {
     {
       headerName: "Actions",
       filter: false,
+      maxWidth: 100,
       cellRenderer: (params: any) => {
         // console.log(params.data)
         return (
@@ -860,7 +861,7 @@ const StepsTab = () => {
           </Button>
         </div>
       </div>
-      <div style={{ height: "100%", width: "100%", border: "1px solid #ccc" }}>
+      <div style={{ height: "100%", width: "100%" }}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}

@@ -187,21 +187,19 @@ const TeacherMaster = () => {
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
-
-const subjectOptions = [
-  { label: "Books", value: "Books" },
-  { label: "Movies, Music & Games", value: "Movies, Music & Games" },
-  { label: "Electronics & Computers", value: "Electronics & Computers" },
-  { label: "Home, Garden & Tools", value: "Home, Garden & Tools" },
-  { label: "Health & Beauty", value: "Health & Beauty" },
-  { label: "Toys, Kids & Baby", value: "Toys, Kids & Baby" },
-  { label: "Clothing & Jewelry", value: "Clothing & Jewelry" },
-  { label: "Sports & Outdoors", value: "Sports & Outdoors" },
-];
-
+  const subjectOptions = [
+    { label: "Books", value: "Books" },
+    { label: "Movies, Music & Games", value: "Movies, Music & Games" },
+    { label: "Electronics & Computers", value: "Electronics & Computers" },
+    { label: "Home, Garden & Tools", value: "Home, Garden & Tools" },
+    { label: "Health & Beauty", value: "Health & Beauty" },
+    { label: "Toys, Kids & Baby", value: "Toys, Kids & Baby" },
+    { label: "Clothing & Jewelry", value: "Clothing & Jewelry" },
+    { label: "Sports & Outdoors", value: "Sports & Outdoors" },
+  ];
 
   return (
-    <div style={{ width: "80vw", height: "60vh" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",

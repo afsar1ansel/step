@@ -100,9 +100,10 @@ const StudentsTab = () => {
       },
     },
     {
-      headerName: "status",
+      headerName: "Status",
       field: "status",
       filter: false,
+      maxWidth: 100,
       cellStyle: {
         display: "flex",
         alignItems: "center",
@@ -142,6 +143,7 @@ const StudentsTab = () => {
       headerName: "Action",
       field: "action",
       filter: false,
+      maxWidth: 100,
       cellStyle: {
         display: "flex",
         alignItems: "center",
@@ -379,7 +381,7 @@ const StudentsTab = () => {
   }, [selectedCourse, baseUrl]);
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",

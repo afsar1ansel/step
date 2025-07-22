@@ -120,11 +120,15 @@ const Doctors = () => {
       field: "doctor_education",
     },
     {
+      headerName: "Creation date",
+      field: "created_date",
+    },
+    {
       field: "status",
       headerName: "Status",
       cellStyle: { textAlign: "center" },
       filter: false,
-      maxWidth: 150,
+      maxWidth: 100,
       cellRenderer: (params: any) => (
         // console.log(params.value),
         <div
@@ -144,12 +148,9 @@ const Doctors = () => {
       ),
     },
     {
-      headerName: "Creation date",
-      field: "created_date",
-    },
-    {
       headerName: "Actions",
       filter: false,
+      maxWidth: 100,
       cellRenderer: (params: any) => {
         return (
           <HStack spacing={2}>
@@ -391,7 +392,7 @@ const Doctors = () => {
   };
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",

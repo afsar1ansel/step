@@ -61,6 +61,27 @@ const PaymentsLogs = () => {
       },
     },
     {
+      headerName: "Amount",
+      field: "actual_price_inr",
+      cellStyle: { textAlign: "left", paddingTop: "8px", paddingBottom: "8px" },
+      autoHeight: true,
+      cellRenderer: (params: { value: any; data: any }) => {
+        const amount = params.value;
+        const Damount = params.data.selling_price_inr;
+
+        return (
+          <div style={{ lineHeight: 1.2 }}>
+            <div style={{ fontWeight: "500", marginBottom: "2px" }}>
+              Discounted Price: ₹ {Damount}
+            </div>
+            <div style={{ color: "#888", fontSize: "12px", margin: 0 }}>
+              Actual Price: ₹ {amount}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
       headerName: "Status",
       field: "payment_status",
       filter: false,
@@ -79,27 +100,6 @@ const PaymentsLogs = () => {
 
         return (
           <span style={labelStyle}>{isSuccess ? "Failed" : "Success"}</span>
-        );
-      },
-    },
-    {
-      headerName: "Amount",
-      field: "actual_price_inr",
-      cellStyle: { textAlign: "left", paddingTop: "8px", paddingBottom: "8px" },
-      autoHeight: true,
-      cellRenderer: (params: { value: any; data: any }) => {
-        const amount = params.value;
-        const Damount = params.data.selling_price_inr;
-
-        return (
-          <div style={{ lineHeight: 1.2 }}>
-            <div style={{ fontWeight: "500", marginBottom: "2px" }}>
-              Discounted Price: ₹ {Damount}
-            </div>
-            <div style={{ color: "#888", fontSize: "12px", margin: 0 }}>
-              Actual Price: ₹ {amount}
-            </div>
-          </div>
         );
       },
     },
@@ -322,7 +322,7 @@ const PaymentsLogs = () => {
   // };
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",

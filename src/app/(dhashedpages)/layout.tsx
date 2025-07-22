@@ -11,16 +11,21 @@ import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { IoIosHome } from "react-icons/io";
 import { TbDeviceAnalytics } from "react-icons/tb";
 import { FaRegIdCard } from "react-icons/fa6";
-import { PiVideoConferenceFill } from "react-icons/pi";
+import {
+  PiUsersThreeLight,
+  PiVideoConference,
+  PiVideoConferenceFill,
+} from "react-icons/pi";
 import { RiUserSettingsFill } from "react-icons/ri";
 import { FaUsers } from "react-icons/fa6";
 import { FaPowerOff } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import { FaUserEdit } from "react-icons/fa";
-import { GrNotes } from "react-icons/gr";
+import { LiaUserEditSolid } from "react-icons/lia";
+import { GrNotes, GrTest } from "react-icons/gr";
 import { CiBoxList } from "react-icons/ci";
 import { FaRegImages } from "react-icons/fa6";
-import { IoGameControllerOutline } from "react-icons/io5";
+import { IoGameControllerOutline, IoHomeOutline } from "react-icons/io5";
 import { GrTestDesktop } from "react-icons/gr";
 import { RiSecurePaymentLine } from "react-icons/ri";
 
@@ -187,8 +192,8 @@ export default function RootLayout({
         <ChakraProvider>
           <div className="app-container">
             {/* Header Section */}
-            <header className="header">
-              {/* <div className="search-bar">
+            {/* <header className="header">
+              <div className="search-bar">
                 <div>
                   <FaSearch className="searchIcon" />
                   <input
@@ -200,8 +205,8 @@ export default function RootLayout({
                 <div className="icons">
                   <div className="user"></div>
                 </div>
-              </div> */}
-            </header>
+              </div>
+            </header> */}
 
             <div className="main-content">
               {/* Sidebar Navigation */}
@@ -222,7 +227,7 @@ export default function RootLayout({
                 <div className="sidebar-nav-container">
                   <ul>
                     <li className={active === "dashboard" ? "active" : ""}>
-                      <IoIosHome />
+                      <IoHomeOutline />
                       <Link className="link" href="/dashboard">
                         <p className="linkname">Dashboard</p>
                       </Link>
@@ -254,8 +259,18 @@ export default function RootLayout({
                     <li
                       style={{ padding: 0, margin: 0 }}
                       className={
-                        ["Doctors", "subject", "course", "Course_price"].includes(active) ||
-                        ["Doctors", "subject", "course", "Course_price"].includes(basePath)
+                        [
+                          "Doctors",
+                          "subject",
+                          "course",
+                          "Course_price",
+                        ].includes(active) ||
+                        [
+                          "Doctors",
+                          "subject",
+                          "course",
+                          "Course_price",
+                        ].includes(basePath)
                           ? "active"
                           : ""
                       }
@@ -272,6 +287,7 @@ export default function RootLayout({
                             ? [0]
                             : []
                         }
+                        w={"100%"}
                       >
                         <AccordionItem border="none">
                           <AccordionButton
@@ -282,7 +298,9 @@ export default function RootLayout({
                               padding: "0.5rem 20px",
                             }}
                           >
-                            <CiBoxList />
+                            <CiBoxList
+                              style={{ width: "18px", height: "18px" }}
+                            />
                             <p
                               style={{
                                 flex: 1,
@@ -412,6 +430,7 @@ export default function RootLayout({
                             ? [0]
                             : []
                         }
+                        w={"100%"}
                       >
                         <AccordionItem border="none">
                           <AccordionButton
@@ -422,7 +441,9 @@ export default function RootLayout({
                               padding: "0.5rem 20px",
                             }}
                           >
-                            <FaUserEdit />
+                            <LiaUserEditSolid
+                              style={{ width: "18px", height: "18px" }}
+                            />
                             <p
                               style={{
                                 flex: 1,
@@ -534,6 +555,7 @@ export default function RootLayout({
                         defaultIndex={
                           ["exam-test", "exam-qa"].includes(basePath) ? [0] : []
                         }
+                        w={"100%"}
                       >
                         <AccordionItem border="none">
                           <AccordionButton
@@ -544,7 +566,12 @@ export default function RootLayout({
                               padding: "0.5rem 20px",
                             }}
                           >
-                            <GrTestDesktop />
+                            <GrTest
+                              style={{
+                                width: "18px",
+                                height: "18px",
+                              }}
+                            />
                             <p
                               style={{
                                 flex: 1,
@@ -639,6 +666,7 @@ export default function RootLayout({
                             ? [0]
                             : []
                         }
+                        w={"100%"}
                       >
                         <AccordionItem border="none">
                           <AccordionButton
@@ -649,7 +677,9 @@ export default function RootLayout({
                               padding: "0.5rem 20px",
                             }}
                           >
-                            <IoGameControllerOutline />
+                            <IoGameControllerOutline
+                              style={{ width: "18px", height: "18px" }}
+                            />
                             <p
                               style={{
                                 flex: 1,
@@ -784,7 +814,7 @@ export default function RootLayout({
                       </Link>
                     </li>
                     <li className={active === "videos" ? "active" : ""}>
-                      <PiVideoConferenceFill />
+                      <PiVideoConference />
                       <Link href="/videos">
                         <p className="linkname">Videos</p>
                       </Link>
@@ -796,13 +826,13 @@ export default function RootLayout({
                       </Link>
                     </li>
                     <li className={active === "College" ? "active" : ""}>
-                      <FaUserEdit />
+                      <LiaUserEditSolid />
                       <Link href="/College">
                         <p className="linkname">College</p>
                       </Link>
                     </li>
                     <li className={active === "AppUser" ? "active" : ""}>
-                      <FaUsers />
+                      <PiUsersThreeLight />
                       <Link href="/AppUser">
                         <p className="linkname">App User</p>
                       </Link>

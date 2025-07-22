@@ -77,14 +77,13 @@ const TestsTab = () => {
     {
       headerName: "Total Time (Minutes)",
       field: "pre_course_test_duration_minutes",
-      // maxWidth: 150,
+      maxWidth: 150,
       filter: false,
     },
     {
       headerName: "Step No", // New column for stepNo
       field: "step_no",
-      // maxWidth: 100,
-      filter: false,
+      maxWidth: 100,
     },
     {
       headerName: "Syllabus Line 1",
@@ -105,7 +104,7 @@ const TestsTab = () => {
       field: "status",
       cellStyle: { textAlign: "center" },
       filter: false,
-      maxWidth: 150,
+      maxWidth: 100,
       cellRenderer: (params: any) => (
         <div
           style={{
@@ -126,6 +125,7 @@ const TestsTab = () => {
     {
       headerName: "Actions",
       filter: false,
+      maxWidth: 100,
       cellRenderer: (params: any) => (
         <div>
           <Button
@@ -140,7 +140,6 @@ const TestsTab = () => {
           {/* <button onClick={() => handleDelete(params.data)}>Delete</button> */}
         </div>
       ),
-      maxWidth: 150,
     },
   ]);
 
@@ -184,7 +183,7 @@ const TestsTab = () => {
       !selectedCourse ||
       !selectedStep ||
       !preCourseTestTitle ||
-      !preCourseTestDuration 
+      !preCourseTestDuration
       // ||
       // !stepNo ||
       // !syllabusTextLine1 ||
@@ -386,11 +385,11 @@ const TestsTab = () => {
   };
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",
-          width: "80vw",
+          width: "100%",
           backgroundColor: "white",
           padding: "20px",
           borderRadius: "10px 10px 0px 0px",
@@ -404,7 +403,7 @@ const TestsTab = () => {
           Add Test
         </Button>
       </div>
-      <div style={{ height: "100%", width: "80vw" }}>
+      <div style={{ height: "100%", width: "100%" }}>
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}

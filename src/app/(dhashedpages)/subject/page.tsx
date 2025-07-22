@@ -128,10 +128,14 @@ const SubjectMaster = () => {
       },
     },
     {
+      headerName: "Creation date",
+      field: "created_date",
+    },
+    {
       field: "subject_status",
       headerName: "Status",
       filter: false,
-      maxWidth: 150,
+      maxWidth: 100,
       cellRenderer: (params: any) => (
         // console.log(params.value),
         <div
@@ -151,12 +155,9 @@ const SubjectMaster = () => {
       ),
     },
     {
-      headerName: "Creation date",
-      field: "created_date",
-    },
-    {
       headerName: "Actions",
       filter: false,
+      maxWidth: 100,
       cellRenderer: (params: any) => {
         return (
           <HStack spacing={2}>
@@ -340,7 +341,7 @@ const SubjectMaster = () => {
   };
 
   return (
-    <div style={{ width: "80vw", height: "60vh" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",

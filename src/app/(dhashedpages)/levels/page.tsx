@@ -335,7 +335,7 @@ const Levels = () => {
   ];
 
   return (
-    <div style={{ width: "80vw", height: "60vh" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",

@@ -41,18 +41,21 @@ const StudentsTab = () => {
     {
       headerName: "Description",
       field: "notes_description",
+      flex: 2,
       filter: false,
-      cellStyle: { textAlign: "center" },
+      // cellStyle: { textAlign: "center" },
     },
     {
       headerName: "No of Pages",
       field: "no_of_pages",
       filter: false,
+      maxWidth: 120,
       cellStyle: { textAlign: "center" },
     },
     {
       headerName: "Course",
       field: "document_url",
+      maxWidth: 120,
       filter: false,
       cellStyle: {
         display: "flex",
@@ -95,9 +98,10 @@ const StudentsTab = () => {
       },
     },
     {
-      headerName: "status",
+      headerName: "Status",
       field: "status",
       filter: false,
+      maxWidth: 100,
       cellStyle: {
         display: "flex",
         alignItems: "center",
@@ -137,6 +141,7 @@ const StudentsTab = () => {
       headerName: "Action",
       field: "action",
       filter: false,
+      maxWidth: 100,
       cellStyle: {
         display: "flex",
         alignItems: "center",
@@ -426,7 +431,7 @@ const StudentsTab = () => {
   }, [selectedCourse, baseUrl]);
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",

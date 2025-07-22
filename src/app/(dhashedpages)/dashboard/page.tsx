@@ -108,7 +108,7 @@ export default function Home() {
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     {
       headerName: "Sl. No",
-      field: "id",
+      // field: "id",
       maxWidth: 80,
       filter: false,
       suppressAutoSize: true,
@@ -142,17 +142,22 @@ export default function Home() {
     {
       headerName: "Mobile",
       field: "app_user_mobile",
+      maxWidth: 150,
     },
     {
       headerName: "College",
       field: "college",
     },
     {
+      headerName: "Creation date",
+      field: "created_date",
+    },
+    {
       field: "status",
       headerName: "Status",
       cellStyle: { textAlign: "center" },
       filter: false,
-      maxWidth: 150,
+      maxWidth: 100,
       cellRenderer: (params: any) => (
         // console.log(params.value),
         <div
@@ -170,10 +175,6 @@ export default function Home() {
           />
         </div>
       ),
-    },
-    {
-      headerName: "Creation date",
-      field: "created_date",
     },
     // {
     //   headerName: "Actions",
@@ -450,7 +451,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div style={{ width: "95%", height: "60vh" }}>
+      <div style={{ width: "100%", height: "auto" }}>
         <div
           style={{
             height: "60px",

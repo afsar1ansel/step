@@ -41,7 +41,6 @@ const College = () => {
     gridRef.current?.api.exportDataAsCsv();
   }, []);
 
-
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     {
       headerName: "College Name",
@@ -49,6 +48,7 @@ const College = () => {
       filter: true,
       floatingFilter: true,
       cellStyle: { textAlign: "left" },
+      flex: 3,
     },
     {
       headerName: "Created Date",
@@ -71,9 +71,10 @@ const College = () => {
       },
     },
     {
-      headerName: "status",
+      headerName: "Status",
       field: "status",
       filter: false,
+      maxWidth: 100,
       cellStyle: {
         display: "flex",
         alignItems: "center",
@@ -112,6 +113,7 @@ const College = () => {
     {
       headerName: "Action",
       field: "action",
+      maxWidth: 100,
       filter: false,
       cellStyle: {
         display: "flex",
@@ -374,7 +376,7 @@ const College = () => {
   // }, [selectedCourse, baseUrl]);
 
   return (
-    <div style={{ width: "80vw", height: "60vh", maxWidth: "1250px" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",

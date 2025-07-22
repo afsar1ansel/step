@@ -64,7 +64,7 @@ const BannerMaster = () => {
           View Banner
         </Button>
       ),
-      minWidth: 150,
+      minWidth: 100,
     },
     {
       headerName: "Date & Time",
@@ -87,7 +87,7 @@ const BannerMaster = () => {
           colorScheme="green"
         />
       ),
-      maxWidth: 150,
+      maxWidth: 100,
     },
     {
       headerName: "Actions",
@@ -105,7 +105,7 @@ const BannerMaster = () => {
           </Button>
         </div>
       ),
-      maxWidth: 150,
+      maxWidth: 100,
     },
   ]);
 
@@ -315,7 +315,7 @@ const BannerMaster = () => {
   });
 
   return (
-    <div style={{ width: "80vw", height: "60vh" }}>
+    <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
           height: "60px",
