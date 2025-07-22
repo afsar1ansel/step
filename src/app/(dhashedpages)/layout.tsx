@@ -73,7 +73,7 @@ type NavItem =
   | "precourse-qa"
   | "postcourse-test"
   | "postcourse-qa"
-  | "DopaminMaster"
+  | "CurrencyConfigPage"
   | "levels"
   | "tagSubjectGame"
   | "addQuestionToGame"
@@ -666,10 +666,10 @@ export default function RootLayout({
                                 </Link>
                               </li>
                               <li>
-                                <Link href="/DopaminMaster">
+                                <Link href="/CurrencyConfigPage">
                                   <p
                                     className={
-                                      basePath === "DopaminMaster"
+                                      basePath === "CurrencyConfigPage"
                                         ? "active-sub-option"
                                         : ""
                                     }
