@@ -77,6 +77,7 @@ type NavItem =
   | "levels"
   | "tagSubjectGame"
   | "addQuestionToGame"
+  | "GameConfig"
   | "ExamModule"
   | "exam-test"
   | "exam-qa";
@@ -680,6 +681,24 @@ export default function RootLayout({
                                     }}
                                   >
                                     Currency Config
+                                  </p>
+                                </Link>
+                              </li>
+                              <li>
+                                <Link href="/GameConfig">
+                                  <p
+                                    className={
+                                      basePath === "GameConfig"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Game Config
                                   </p>
                                 </Link>
                               </li>

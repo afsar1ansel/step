@@ -1,4 +1,3 @@
-// app/admin/game-config/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -27,7 +26,7 @@ import {
 
 interface GameConfig {
   id: number;
-  gameDuration: number; // in minutes
+  gameDuration: number;
   correctAnswerPoints: number;
   wrongAnswerPoints: number;
   unansweredPoints: number;
@@ -42,9 +41,9 @@ export default function GameConfigPage() {
 
   const [config, setConfig] = useState<GameConfig>({
     id: 0,
-    gameDuration: 10,
-    correctAnswerPoints: 4,
-    wrongAnswerPoints: -1,
+    gameDuration: 0,
+    correctAnswerPoints: 0,
+    wrongAnswerPoints: 0,
     unansweredPoints: 0,
   });
 
@@ -61,7 +60,7 @@ export default function GameConfigPage() {
       }
 
       const response = await fetch(
-        `${baseUrl}/admin/game/get-game-config/${token}`
+        `${baseUrl}/admin/game/get-rules-config/${token}`
       );
 
       if (!response.ok) {
@@ -71,14 +70,14 @@ export default function GameConfigPage() {
       }
 
       const data = await response.json();
-      console.log("Fetched game config:", data);
+      console.log("Fetched config:", data);
 
-      // Map API response to state
+      // Fixed mapping to match API response structure
       setConfig({
         id: data.id,
-        gameDuration: data.game_duration,
-        correctAnswerPoints: data.points_correct_answer,
-        wrongAnswerPoints: data.points_wrong_answer,
+        gameDuration: data.game_duration_minutes,
+        correctAnswerPoints: data.points_correct,
+        wrongAnswerPoints: data.points_wrong,
         unansweredPoints: data.points_unanswered,
       });
     } catch (error: any) {
@@ -127,23 +126,21 @@ export default function GameConfigPage() {
       if (!token) {
         throw new Error("Authentication token not found");
       }
-
+    
       const formData = new FormData();
       formData.append("token", token);
       formData.append("gameDuration", config.gameDuration.toString());
-      formData.append(
-        "correctAnswerPoints",
-        config.correctAnswerPoints.toString()
-      );
-      formData.append("wrongAnswerPoints", config.wrongAnswerPoints.toString());
+      formData.append("correctPoints", config.correctAnswerPoints.toString());
+      formData.append("wrongPoints", config.wrongAnswerPoints.toString());
       formData.append("unansweredPoints", config.unansweredPoints.toString());
-
       console.log(Object.fromEntries(formData.entries()));
 
-      const response = await fetch(`${baseUrl}/admin/game/save-game-config`, {
+      const response = await fetch(`${baseUrl}/admin/game/save-rules-config`, {
         method: "POST",
         body: formData,
       });
+
+      console.log("Response status:", response);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -158,7 +155,6 @@ export default function GameConfigPage() {
         isClosable: true,
       });
 
-      // Refresh config after update
       fetchConfig();
     } catch (error: any) {
       toast({
@@ -176,7 +172,7 @@ export default function GameConfigPage() {
   const handleSubmit = () => {
     try {
       validateConfig();
-      onOpen(); // Open confirmation modal
+      onOpen();
     } catch (error: any) {
       toast({
         title: "Validation Error",
@@ -292,7 +288,6 @@ export default function GameConfigPage() {
         </Box>
       </Box>
 
-      {/* Confirmation Modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
