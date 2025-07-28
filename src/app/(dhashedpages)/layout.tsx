@@ -85,6 +85,7 @@ type NavItem =
   | "GameConfig"
   | "ExamModule"
   | "exam-test"
+  | "BotProfiles"
   | "exam-qa";
 
 export default function RootLayout({
@@ -641,6 +642,7 @@ export default function RootLayout({
                           "game-questions",
                           "CurrencyConfigPage",
                           "GameConfig",
+                          "BotProfiles",
                         ].includes(active) ||
                         [
                           "tagSubjectGame",
@@ -648,6 +650,7 @@ export default function RootLayout({
                           "game-questions",
                           "CurrencyConfigPage",
                           "GameConfig",
+                          "BotProfiles",
                         ].includes(basePath)
                           ? "active"
                           : ""
@@ -662,6 +665,7 @@ export default function RootLayout({
                             "game-questions",
                             "CurrencyConfigPage",
                             "GameConfig",
+                            "BotProfiles",
                           ].includes(basePath)
                             ? [0]
                             : []
@@ -784,11 +788,29 @@ export default function RootLayout({
                                   </p>
                                 </Link>
                               </li>
-                              {/* <li>
-                                <Link href="/addQuestionToGame">
+                              <li>
+                                <Link href="/BotProfiles">
                                   <p
                                     className={
-                                      basePath === "addQuestionToGame"
+                                      basePath === "BotProfiles"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Bot Profiles
+                                  </p>
+                                </Link>
+                              </li>
+                              {/* <li>
+                                <Link href="/BotProfiles">
+                                  <p
+                                    className={
+                                      basePath === "BotProfiles"
                                         ? "active-sub-option"
                                         : ""
                                     }
