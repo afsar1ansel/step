@@ -86,6 +86,7 @@ type NavItem =
   | "ExamModule"
   | "exam-test"
   | "BotProfiles"
+  | "BotsFrequency"
   | "exam-qa";
 
 export default function RootLayout({
@@ -643,6 +644,7 @@ export default function RootLayout({
                           "CurrencyConfigPage",
                           "GameConfig",
                           "BotProfiles",
+                          "BotsFrequency",
                         ].includes(active) ||
                         [
                           "tagSubjectGame",
@@ -651,6 +653,7 @@ export default function RootLayout({
                           "CurrencyConfigPage",
                           "GameConfig",
                           "BotProfiles",
+                          "BotsFrequency",
                         ].includes(basePath)
                           ? "active"
                           : ""
@@ -666,6 +669,7 @@ export default function RootLayout({
                             "CurrencyConfigPage",
                             "GameConfig",
                             "BotProfiles",
+                            "BotsFrequency",
                           ].includes(basePath)
                             ? [0]
                             : []
@@ -803,6 +807,24 @@ export default function RootLayout({
                                     }}
                                   >
                                     Bot Profiles
+                                  </p>
+                                </Link>
+                              </li>
+                              <li>
+                                <Link href="/BotFrequency">
+                                  <p
+                                    className={
+                                      basePath === "BotFrequency"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Bot Frequency
                                   </p>
                                 </Link>
                               </li>
