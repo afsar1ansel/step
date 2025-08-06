@@ -367,7 +367,7 @@ export default function GameConfigPage() {
         <Box p={6}>
           <VStack spacing={6} align="stretch">
             <FormControl>
-              <FormLabel>User Online status Timeout (minutes)</FormLabel>
+              <FormLabel>User Online status Timeout</FormLabel>
               <Input
                 type="number"
                 name="gameDuration"
