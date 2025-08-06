@@ -118,7 +118,9 @@ const BannerMaster = () => {
     if (token) {
       fetch(`${baseUrl}/masters/ad-banners/get-all/${token}`)
         .then((response) => response.json())
-        .then((data) => setRowData(data))
+        .then((data) => {setRowData(data)
+          console.log(data);
+        })
         .catch((error) => console.error("Error fetching banners:", error));
     }
   };

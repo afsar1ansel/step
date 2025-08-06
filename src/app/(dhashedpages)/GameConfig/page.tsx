@@ -38,6 +38,8 @@ export default function GameConfigPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [onlineConfig, setOnlineConfig] = useState<string>("");
+  const [newOnlineConfig, setnewOnlineConfig] = useState("");
 
   const [config, setConfig] = useState<GameConfig>({
     id: 0,
@@ -49,6 +51,7 @@ export default function GameConfigPage() {
 
   useEffect(() => {
     fetchConfig();
+    getOnlineConfig();
   }, []);
 
   async function fetchConfig() {
@@ -184,6 +187,55 @@ export default function GameConfigPage() {
     }
   };
 
+  async function getOnlineConfig() {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(
+        `${baseUrl}/admin/config/get-online-timeout/${token}`
+      );
+      const data = await response.json();
+      console.log(data);
+      setOnlineConfig(data.timeout_seconds);
+    } catch (error) {
+      console.error("Error fetching online config:", error);
+    }
+  }
+
+  function handleOnlineStatusChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setOnlineConfig(event.target.value);
+  }
+
+  async function updateonlinestatusConfig() {
+    try{
+      const newForm = new FormData();
+      newForm.append("token", localStorage.getItem("token")!);
+      newForm.append("timeoutSeconds", onlineConfig);
+     
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${baseUrl}/admin/config/save-online-timeout`,
+        {
+          method: "POST",
+          body: newForm,
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      toast({
+        title: "Success",
+        description: "Online config updated successfully",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+
+
+    } catch (error) {
+      console.error("Error fetching online config:", error);
+    }
+
+  }
+
   if (isLoading) {
     return (
       <Center h="50vh">
@@ -284,6 +336,100 @@ export default function GameConfigPage() {
                 Points awarded for unanswered questions (usually 0)
               </Text>
             </FormControl>
+          </VStack>
+        </Box>
+      </Box>
+
+      <Box w="80vw" bg="white" borderRadius="10px" boxShadow="md" mt={6}>
+        <Box
+          h="60px"
+          w="100%"
+          bg="white"
+          p="20px"
+          borderRadius="10px 10px 0px 0px"
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          borderBottom="1px solid"
+          borderColor="gray.100"
+        >
+          <Heading size="md">Online User Configuration</Heading>
+          <Button
+            colorScheme="green"
+            onClick={updateonlinestatusConfig}
+            isLoading={isSaving}
+            loadingText="Saving..."
+          >
+            Save Configuration
+          </Button>
+        </Box>
+
+        <Box p={6}>
+          <VStack spacing={6} align="stretch">
+            <FormControl>
+              <FormLabel>User Online status Timeout (minutes)</FormLabel>
+              <Input
+                type="number"
+                name="gameDuration"
+                value={onlineConfig}
+                onChange={handleOnlineStatusChange}
+                min={1}
+                bg="white"
+                borderColor="gray.300"
+              />
+              <Text fontSize="sm" color="gray.500" mt={1}>
+                Time user will be considered offline
+              </Text>
+            </FormControl>
+
+            {/* <HStack spacing={6} align="start">
+              <FormControl flex={1}>
+                <FormLabel>Points for Correct Answer</FormLabel>
+                <Input
+                  type="number"
+                  name="correctAnswerPoints"
+                  value={config.correctAnswerPoints}
+                  // onChange={handleChange}
+                  min={1}
+                  bg="white"
+                  borderColor="gray.300"
+                />
+                <Text fontSize="sm" color="gray.500" mt={1}>
+                  Positive points awarded for correct answers
+                </Text>
+              </FormControl>
+
+              <FormControl flex={1}>
+                <FormLabel>Points for Wrong Answer</FormLabel>
+                <Input
+                  type="number"
+                  name="wrongAnswerPoints"
+                  value={config.wrongAnswerPoints}
+                  // onChange={handleChange}
+                  max={0}
+                  bg="white"
+                  borderColor="gray.300"
+                />
+                <Text fontSize="sm" color="gray.500" mt={1}>
+                  Negative points for incorrect answers
+                </Text>
+              </FormControl>
+            </HStack> */}
+
+            {/* <FormControl>
+              <FormLabel>Points for Unanswered</FormLabel>
+              <Input
+                type="number"
+                name="unansweredPoints"
+                value={config.unansweredPoints}
+                onChange={handleChange}
+                bg="white"
+                borderColor="gray.300"
+              />
+              <Text fontSize="sm" color="gray.500" mt={1}>
+                Points awarded for unanswered questions (usually 0)
+              </Text>
+            </FormControl> */}
           </VStack>
         </Box>
       </Box>
