@@ -74,7 +74,7 @@ export default function Login() {
         router.push("/dashboard");
       }
     } catch (error: any) {
-      console.error("Error:", error.message);
+      // console.error("Error:", error.message);
       toast({
         title: "Login failed.",
         description: error.message || "Something went wrong.",
