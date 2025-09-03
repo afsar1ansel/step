@@ -53,6 +53,21 @@ const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
     };
   };
 
+  // NEW: Function to format URL for display
+  const formatUrlForDisplay = (url: string): string => {
+    // Check if this is a base64 data URL
+    if (url.startsWith("data:image/")) {
+      return "[Pasted image data]";
+    }
+
+    // For regular URLs, if they're too long, truncate them
+    if (url.length > 50) {
+      return url.substring(0, 47) + "...";
+    }
+
+    return url;
+  };
+
   useEffect(() => {
     if (!editorRef.current) {
       initEditor();
@@ -102,11 +117,15 @@ const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
                 if (response.ok && result.success === 1) {
                   console.log("Image URL upload:", result.file.url);
                   toast({
-                    title: "Image upload",
-                    description: `URL: ${result.file.url}`,
-                    status: "info",
-                    duration: null,
+                    title: "Image uploaded",
+                    description: `Image successfully uploaded`,
+                    status: "success",
+                    duration: 3000,
                     isClosable: true,
+                    position: "top-right",
+                    containerStyle: {
+                      maxWidth: "300px",
+                    },
                   });
                   return result;
                 } else {
@@ -116,11 +135,15 @@ const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
               async uploadByUrl(url: string) {
                 console.log("Image URL upload:", url);
                 toast({
-                  title: "Image upload",
-                  description: `URL: ${url}`,
-                  status: "info",
-                  duration: null,
+                  title: "Image pasted",
+                  description: formatUrlForDisplay(url),
+                  status: "success",
+                  duration: 3000,
                   isClosable: true,
+                  position: "top-right",
+                  containerStyle: {
+                    maxWidth: "300px",
+                  },
                 });
                 return {
                   success: 1,
