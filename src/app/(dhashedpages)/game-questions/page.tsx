@@ -1010,20 +1010,34 @@ const GameQuestionsPage = () => {
                 >
                   <Text fontSize="sm" fontWeight="medium">
                     Page {currentPage} • Showing {rowData.length} questions
+                    {!hasMoreQuestions && rowData.length > 0 && (
+                      <span style={{ color: "green", marginLeft: "8px" }}>
+                        (All questions loaded)
+                      </span>
+                    )}
                   </Text>
 
                   <HStack spacing={4}>
                     {isLoadingMore ? (
                       <Spinner size="md" color="blue.500" />
+                    ) : hasMoreQuestions ? (
+                      <Button
+                        colorScheme="blue"
+                        onClick={() => fetchQuestions(currentPage + 1, true)}
+                        leftIcon={<span>⬇️</span>}
+                        size="md"
+                      >
+                        Load Next 20 Questions
+                      </Button>
                     ) : (
-                      hasMoreQuestions && (
+                      rowData.length > 0 && (
                         <Button
-                          colorScheme="blue"
-                          onClick={() => fetchQuestions(currentPage + 1, true)}
-                          leftIcon={<span>⬇️</span>}
+                          isDisabled
                           size="md"
+                          variant="outline"
+                          title="No more questions available"
                         >
-                          Load Next 20 Questions
+                          No more questions
                         </Button>
                       )
                     )}
