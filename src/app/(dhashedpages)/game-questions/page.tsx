@@ -165,7 +165,7 @@ const GameQuestionsPage = () => {
 
     try {
       let endpoint = "";
-      const pageSize = 20; // Number of items per request
+      const pageSize = 20; // Ensure this matches your backend default
 
       // Updated endpoints with pagination parameters
       switch (selectedModule) {
@@ -978,8 +978,8 @@ const GameQuestionsPage = () => {
               <AgGridReact
                 rowData={rowData}
                 columnDefs={columnDefs}
-                pagination={true}
-                paginationPageSize={50}
+                pagination={selectedModule !== "Game Module"} // Only use AG Grid pagination for other modules
+                paginationPageSize={20} // Match backend page size
                 paginationPageSizeSelector={false}
                 defaultColDef={{
                   sortable: true,
