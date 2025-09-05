@@ -19,6 +19,7 @@ import {
   ModalOverlay,
   Select,
   Switch,
+  Text, // Add this import
   useDisclosure,
   useToast,
   VStack,
@@ -166,9 +167,11 @@ const GameQuestionsPage = () => {
 
     try {
       let endpoint = "";
+      const pageSize = 20; // Keep consistent with backend
+
       // For Game Module, add pagination parameters
       if (selectedModule === "Game Module") {
-        endpoint = `${baseUrl}/admin/game/questions/get-by-subject/${selectedSubject}/${token}?page=${page}&limit=20`;
+        endpoint = `${baseUrl}/admin/game/questions/get-by-subject/${selectedSubject}/${token}?page=${page}&limit=${pageSize}`;
       } else if (selectedModule === "PreCourse Test") {
         endpoint = `${baseUrl}/admin/game/questions/get-precourse/${selectedSubject}/${token}`;
       } else if (selectedModule === "Postcourse Test") {
@@ -180,7 +183,9 @@ const GameQuestionsPage = () => {
         return;
       }
 
-      console.log(`Fetching questions from: ${endpoint}`);
+      console.log(
+        `Fetching questions from: ${endpoint}, page: ${page}, append: ${append}`
+      );
       const response = await fetch(endpoint, {
         method: "GET",
         headers: {
@@ -204,12 +209,17 @@ const GameQuestionsPage = () => {
         if (selectedModule === "Game Module") {
           setCurrentPage(responseData.page || page);
           setHasMoreQuestions(responseData.hasMore || false);
+
+          // Log pagination info for debugging
+          console.log(
+            `Pagination: Page ${responseData.page}, Has more: ${responseData.hasMore}, Received: ${parsedData.length} questions`
+          );
         }
       } else {
         throw new Error(responseData.message || "Failed to fetch questions");
       }
 
-      // Parse JSON strings in question and solution fields if needed
+      // Parse JSON strings in question and solution fields
       parsedData = parsedData.map((row: any) => {
         let questionValue, solutionValue;
 
@@ -259,14 +269,6 @@ const GameQuestionsPage = () => {
       } else {
         setRowData(parsedData);
       }
-
-      // Now add the debug log
-      console.log("Pagination debug:", {
-        currentPage: responseData.page || page,
-        hasMoreQuestions: responseData.hasMore || false,
-        rowsReceived: parsedData.length,
-        totalRows: rowData.length + (append ? parsedData.length : 0),
-      });
     } catch (error) {
       console.error("Error fetching questions:", error);
       toast({
@@ -285,13 +287,6 @@ const GameQuestionsPage = () => {
       setIsLoadingMore(false);
     }
   }
-
-  // Add this function to handle loading more questions
-  const handleLoadMore = () => {
-    if (!isLoadingMore && hasMoreQuestions) {
-      fetchQuestions(currentPage + 1, true);
-    }
-  };
 
   const handleSearch = () => {
     if (!selectedSubject) {
@@ -976,14 +971,14 @@ const GameQuestionsPage = () => {
               <CircularProgress isIndeterminate color="blue.300" />
             </Center>
           ) : (
-            <VStack spacing={0} align="stretch">
+            <VStack spacing={4} align="stretch">
               <Box className="ag-theme-alpine" h="auto" minH="400px" w="100%">
                 <AgGridReact
                   rowData={rowData}
                   columnDefs={columnDefs}
-                  pagination={true}
-                  paginationPageSize={5} // This determines how many rows show per page
-                  paginationPageSizeSelector={[5, 10, 20, 50]}
+                  pagination={selectedModule !== "Game Module"} // Only use AG Grid pagination for other modules
+                  paginationPageSize={10}
+                  paginationPageSizeSelector={[10, 20, 50]}
                   defaultColDef={{
                     sortable: true,
                     filter: true,
@@ -1003,21 +998,36 @@ const GameQuestionsPage = () => {
                 />
               </Box>
 
-              {/* Load more button for Game Module only - outside grid but still in the white box */}
-              {selectedModule === "Game Module" && (
-                <Box mt={4} textAlign="center" pb={2}>
-                  {isLoadingMore && <Spinner size="md" color="blue.500" />}
+              {/* Custom pagination for Game Module */}
+              {selectedModule === "Game Module" && rowData.length > 0 && (
+                <Box
+                  mt={2}
+                  p={3}
+                  borderTop="1px solid #E2E8F0"
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Text fontSize="sm" fontWeight="medium">
+                    Page {currentPage} • Showing {rowData.length} questions
+                  </Text>
 
-                  {hasMoreQuestions && !isLoadingMore && (
-                    <Button
-                      colorScheme="blue"
-                      onClick={handleLoadMore}
-                      size="lg"
-                      leftIcon={<span>⏬</span>}
-                    >
-                      Load More Questions
-                    </Button>
-                  )}
+                  <HStack spacing={4}>
+                    {isLoadingMore ? (
+                      <Spinner size="md" color="blue.500" />
+                    ) : (
+                      hasMoreQuestions && (
+                        <Button
+                          colorScheme="blue"
+                          onClick={() => fetchQuestions(currentPage + 1, true)}
+                          leftIcon={<span>⬇️</span>}
+                          size="md"
+                        >
+                          Load Next 20 Questions
+                        </Button>
+                      )
+                    )}
+                  </HStack>
                 </Box>
               )}
             </VStack>
