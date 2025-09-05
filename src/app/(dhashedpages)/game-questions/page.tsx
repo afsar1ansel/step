@@ -74,9 +74,9 @@ const GameQuestionsPage = () => {
 
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
-  const [createBtnLoading, setCreateBtnLoading] = useState(false); // NEW
-  const [editBtnLoadingId, setEditBtnLoadingId] = useState<string | null>(null); // NEW
-  const [addAsIsLoadingId, setAddAsIsLoadingId] = useState<string | null>(null); // NEW
+  const [createBtnLoading, setCreateBtnLoading] = useState(false);
+  const [editBtnLoadingId, setEditBtnLoadingId] = useState<string | null>(null);
+  const [addAsIsLoadingId, setAddAsIsLoadingId] = useState<string | null>(null);
 
   // Add pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -159,31 +159,25 @@ const GameQuestionsPage = () => {
 
     if (!append) {
       setIsLoading(true);
+      setCurrentPage(1);
     } else {
       setIsLoadingMore(true);
     }
 
     try {
       let endpoint = "";
-      const pageSize = 20; // Ensure this matches your backend default
-
-      // Updated endpoints with pagination parameters
-      switch (selectedModule) {
-        case "Game Module":
-          endpoint = `${baseUrl}/admin/game/questions/get-by-subject/${selectedSubject}/${token}?page=${page}&limit=${pageSize}`;
-          break;
-        case "PreCourse Test":
-          endpoint = `${baseUrl}/admin/game/questions/get-precourse/${selectedSubject}/${token}`;
-          break;
-        case "Postcourse Test":
-          endpoint = `${baseUrl}/admin/game/questions/get-postcourse/${selectedSubject}/${token}`;
-          break;
-        case "Subject Test":
-          endpoint = `${baseUrl}/admin/game/questions/get-exam/${selectedSubject}/${token}`;
-          break;
-        default:
-          setRowData([]);
-          return;
+      // For Game Module, add pagination parameters
+      if (selectedModule === "Game Module") {
+        endpoint = `${baseUrl}/admin/game/questions/get-by-subject/${selectedSubject}/${token}?page=${page}&limit=20`;
+      } else if (selectedModule === "PreCourse Test") {
+        endpoint = `${baseUrl}/admin/game/questions/get-precourse/${selectedSubject}/${token}`;
+      } else if (selectedModule === "Postcourse Test") {
+        endpoint = `${baseUrl}/admin/game/questions/get-postcourse/${selectedSubject}/${token}`;
+      } else if (selectedModule === "Subject Test") {
+        endpoint = `${baseUrl}/admin/game/questions/get-exam/${selectedSubject}/${token}`;
+      } else {
+        setRowData([]);
+        return;
       }
 
       console.log(`Fetching questions from: ${endpoint}`);
@@ -206,7 +200,7 @@ const GameQuestionsPage = () => {
       if (responseData.errFlag === 0) {
         parsedData = responseData.data || [];
 
-        // Update pagination state only for Game Module (which supports pagination)
+        // Update pagination state for Game Module
         if (selectedModule === "Game Module") {
           setCurrentPage(responseData.page || page);
           setHasMoreQuestions(responseData.hasMore || false);
@@ -260,11 +254,19 @@ const GameQuestionsPage = () => {
       });
 
       // If loading more pages, append to existing data rather than replacing
-      if (append) {
+      if (append && selectedModule === "Game Module") {
         setRowData((prevData) => [...prevData, ...parsedData]);
       } else {
         setRowData(parsedData);
       }
+
+      // Now add the debug log
+      console.log("Pagination debug:", {
+        currentPage: responseData.page || page,
+        hasMoreQuestions: responseData.hasMore || false,
+        rowsReceived: parsedData.length,
+        totalRows: rowData.length + (append ? parsedData.length : 0),
+      });
     } catch (error) {
       console.error("Error fetching questions:", error);
       toast({
@@ -284,7 +286,7 @@ const GameQuestionsPage = () => {
     }
   }
 
-  // Function to load the next page of data
+  // Add this function to handle loading more questions
   const handleLoadMore = () => {
     if (!isLoadingMore && hasMoreQuestions) {
       fetchQuestions(currentPage + 1, true);
