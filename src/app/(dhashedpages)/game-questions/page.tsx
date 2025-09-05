@@ -974,50 +974,51 @@ const GameQuestionsPage = () => {
               <CircularProgress isIndeterminate color="blue.300" />
             </Center>
           ) : (
-            <Box className="ag-theme-alpine" h="400px" w="100%">
-              <AgGridReact
-                rowData={rowData}
-                columnDefs={columnDefs}
-                pagination={selectedModule !== "Game Module"} // Only use AG Grid pagination for other modules
-                paginationPageSize={20} // Match backend page size
-                paginationPageSizeSelector={false}
-                defaultColDef={{
-                  sortable: true,
-                  filter: true,
-                  floatingFilter: true,
-                  resizable: true,
-                  flex: 1,
-                  filterParams: {
-                    debounceMs: 0,
-                    buttons: ["reset"],
-                  },
-                }}
-                domLayout="autoHeight"
-                getRowHeight={(params: any) => {
-                  return 300;
-                }}
-                suppressCellFocus={true}
-              />
+            <VStack spacing={0} align="stretch">
+              <Box className="ag-theme-alpine" h="auto" minH="400px" w="100%">
+                <AgGridReact
+                  rowData={rowData}
+                  columnDefs={columnDefs}
+                  pagination={true}
+                  paginationPageSize={5} // This determines how many rows show per page
+                  paginationPageSizeSelector={[5, 10, 20, 50]}
+                  defaultColDef={{
+                    sortable: true,
+                    filter: true,
+                    floatingFilter: true,
+                    resizable: true,
+                    flex: 1,
+                    filterParams: {
+                      debounceMs: 0,
+                      buttons: ["reset"],
+                    },
+                  }}
+                  domLayout="autoHeight"
+                  getRowHeight={(params: any) => {
+                    return 300;
+                  }}
+                  suppressCellFocus={true}
+                />
+              </Box>
 
-              {/* Load more button for Game Module only */}
+              {/* Load more button for Game Module only - outside grid but still in the white box */}
               {selectedModule === "Game Module" && (
-                <>
-                  {isLoadingMore && (
-                    <Center mt={4}>
-                      <Spinner size="md" color="blue.500" />
-                    </Center>
-                  )}
+                <Box mt={4} textAlign="center" pb={2}>
+                  {isLoadingMore && <Spinner size="md" color="blue.500" />}
 
                   {hasMoreQuestions && !isLoadingMore && (
-                    <Center mt={4}>
-                      <Button colorScheme="blue" onClick={handleLoadMore}>
-                        Load More Questions
-                      </Button>
-                    </Center>
+                    <Button
+                      colorScheme="blue"
+                      onClick={handleLoadMore}
+                      size="lg"
+                      leftIcon={<span>⏬</span>}
+                    >
+                      Load More Questions
+                    </Button>
                   )}
-                </>
+                </Box>
               )}
-            </Box>
+            </VStack>
           )}
         </Box>
       </VStack>
