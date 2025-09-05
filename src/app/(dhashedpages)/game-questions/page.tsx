@@ -78,6 +78,11 @@ const GameQuestionsPage = () => {
   const [editBtnLoadingId, setEditBtnLoadingId] = useState<string | null>(null); // NEW
   const [addAsIsLoadingId, setAddAsIsLoadingId] = useState<string | null>(null); // NEW
 
+  // Add pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreQuestions, setHasMoreQuestions] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
   // Data loading
   useEffect(() => {
     fetchSubjects();
@@ -144,22 +149,28 @@ const GameQuestionsPage = () => {
   }
 
   // Fetch questions based on module and subject
-  async function fetchQuestions() {
+  async function fetchQuestions(page = 1, append = false) {
     if (!selectedSubject) {
       setRowData([]);
       return;
     }
 
     const token = localStorage.getItem("token") ?? "";
-    setIsLoading(true);
+
+    if (!append) {
+      setIsLoading(true);
+    } else {
+      setIsLoadingMore(true);
+    }
 
     try {
       let endpoint = "";
+      const pageSize = 20; // Number of items per request
 
-      // Updated endpoints to match your backend
+      // Updated endpoints with pagination parameters
       switch (selectedModule) {
         case "Game Module":
-          endpoint = `${baseUrl}/admin/game/questions/get-by-subject/${selectedSubject}/${token}`;
+          endpoint = `${baseUrl}/admin/game/questions/get-by-subject/${selectedSubject}/${token}?page=${page}&limit=${pageSize}`;
           break;
         case "PreCourse Test":
           endpoint = `${baseUrl}/admin/game/questions/get-precourse/${selectedSubject}/${token}`;
@@ -175,6 +186,7 @@ const GameQuestionsPage = () => {
           return;
       }
 
+      console.log(`Fetching questions from: ${endpoint}`);
       const response = await fetch(endpoint, {
         method: "GET",
         headers: {
@@ -193,6 +205,12 @@ const GameQuestionsPage = () => {
       let parsedData = [];
       if (responseData.errFlag === 0) {
         parsedData = responseData.data || [];
+
+        // Update pagination state only for Game Module (which supports pagination)
+        if (selectedModule === "Game Module") {
+          setCurrentPage(responseData.page || page);
+          setHasMoreQuestions(responseData.hasMore || false);
+        }
       } else {
         throw new Error(responseData.message || "Failed to fetch questions");
       }
@@ -241,7 +259,12 @@ const GameQuestionsPage = () => {
         };
       });
 
-      setRowData(parsedData);
+      // If loading more pages, append to existing data rather than replacing
+      if (append) {
+        setRowData((prevData) => [...prevData, ...parsedData]);
+      } else {
+        setRowData(parsedData);
+      }
     } catch (error) {
       console.error("Error fetching questions:", error);
       toast({
@@ -252,11 +275,21 @@ const GameQuestionsPage = () => {
         isClosable: true,
         position: "top",
       });
-      setRowData([]);
+      if (!append) {
+        setRowData([]);
+      }
     } finally {
       setIsLoading(false);
+      setIsLoadingMore(false);
     }
   }
+
+  // Function to load the next page of data
+  const handleLoadMore = () => {
+    if (!isLoadingMore && hasMoreQuestions) {
+      fetchQuestions(currentPage + 1, true);
+    }
+  };
 
   const handleSearch = () => {
     if (!selectedSubject) {
@@ -965,6 +998,25 @@ const GameQuestionsPage = () => {
                 }}
                 suppressCellFocus={true}
               />
+
+              {/* Load more button for Game Module only */}
+              {selectedModule === "Game Module" && (
+                <>
+                  {isLoadingMore && (
+                    <Center mt={4}>
+                      <Spinner size="md" color="blue.500" />
+                    </Center>
+                  )}
+
+                  {hasMoreQuestions && !isLoadingMore && (
+                    <Center mt={4}>
+                      <Button colorScheme="blue" onClick={handleLoadMore}>
+                        Load More Questions
+                      </Button>
+                    </Center>
+                  )}
+                </>
+              )}
             </Box>
           )}
         </Box>
