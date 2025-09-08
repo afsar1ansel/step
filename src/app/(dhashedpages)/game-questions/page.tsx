@@ -1027,7 +1027,7 @@ const GameQuestionsPage = () => {
                         leftIcon={<span>⬇️</span>}
                         size="md"
                       >
-                        Load Next 100 Questions
+                        Load Next 400 Questions
                       </Button>
                     ) : (
                       rowData.length > 0 && (
