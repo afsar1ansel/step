@@ -101,50 +101,92 @@ const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
           config: {
             uploader: {
               async uploadByFile(file: File) {
+                // The existing upload logic remains the same.
+                // It already relies on the backend for size validation.
                 const formData = new FormData();
                 formData.append("token", localStorage.getItem("token") ?? "");
                 formData.append("image", file);
 
-                const response = await fetch(
-                  `${process.env.NEXT_PUBLIC_BASE_URL}/edit-panel/upload-image`,
-                  {
-                    method: "POST",
-                    body: formData,
-                  }
-                );
+                try {
+                  const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_BASE_URL}/edit-panel/upload-image`,
+                    {
+                      method: "POST",
+                      body: formData,
+                    }
+                  );
 
-                const result = await response.json();
-                if (response.ok && result.success === 1) {
-                  console.log("Image URL upload:", result.file.url);
+                  const result = await response.json();
+                  if (response.ok && result.success === 1) {
+                    toast({
+                      title: "Image uploaded",
+                      description: `Image successfully uploaded and compressed.`,
+                      status: "success",
+                      duration: 3000,
+                      isClosable: true,
+                      position: "top-right",
+                    });
+                    return result;
+                  } else {
+                    throw new Error(result.message || "Image upload failed");
+                  }
+                } catch (error: any) {
                   toast({
-                    title: "Image uploaded",
-                    description: `Image successfully uploaded`,
-                    status: "success",
-                    duration: 3000,
+                    title: "Upload Error",
+                    description: error.message,
+                    status: "error",
+                    duration: 5000,
                     isClosable: true,
                     position: "top-right",
-                    containerStyle: {
-                      maxWidth: "300px",
-                    },
                   });
-                  return result;
-                } else {
-                  throw new Error(result.message || "Image upload failed");
+                  return { success: 0 };
                 }
               },
               async uploadByUrl(url: string) {
-                console.log("Image URL upload:", url);
-                toast({
-                  title: "Image pasted",
-                  description: formatUrlForDisplay(url),
-                  status: "success",
-                  duration: 3000,
-                  isClosable: true,
-                  position: "top-right",
-                  containerStyle: {
-                    maxWidth: "300px",
-                  },
-                });
+                if (url.startsWith("data:image/")) {
+                  try {
+                    // --- Client-side size check for pasted images ---
+                    const res = await fetch(url);
+                    const blob = await res.blob();
+                    const fileSizeInMB = blob.size / 1024 / 1024;
+                    const MAX_SIZE_MB = 5;
+
+                    if (fileSizeInMB > MAX_SIZE_MB) {
+                      toast({
+                        title: "Image Too Large",
+                        description: `Pasted image is ${fileSizeInMB.toFixed(
+                          2
+                        )}MB. The maximum allowed size is ${MAX_SIZE_MB}MB.`,
+                        status: "error",
+                        duration: 5000,
+                        isClosable: true,
+                        position: "top-right",
+                      });
+                      return { success: 0 }; // Fail the upload immediately
+                    }
+                    // --- End of client-side check ---
+
+                    // If size is valid, convert blob to a file
+                    const file = new File([blob], "pasted-image.png", {
+                      type: blob.type,
+                    });
+
+                    // Send it through the secure uploadByFile logic
+                    return this.uploadByFile(file);
+                  } catch (error) {
+                    toast({
+                      title: "Paste Error",
+                      description: "Could not process pasted image.",
+                      status: "error",
+                      duration: 5000,
+                      isClosable: true,
+                      position: "top-right",
+                    });
+                    return { success: 0 };
+                  }
+                }
+
+                // If it's a regular URL, just accept it
                 return {
                   success: 1,
                   file: {
