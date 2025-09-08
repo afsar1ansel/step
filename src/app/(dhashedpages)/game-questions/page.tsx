@@ -167,7 +167,7 @@ const GameQuestionsPage = () => {
 
     try {
       let endpoint = "";
-      const pageSize = 100; // Keep consistent with backend
+      const pageSize = 30; // Reduced to 20 to match backend
 
       // For Game Module, add pagination parameters
       if (selectedModule === "Game Module") {
@@ -1027,7 +1027,7 @@ const GameQuestionsPage = () => {
                         leftIcon={<span>⬇️</span>}
                         size="md"
                       >
-                        Load Next 100 Questions
+                        Load Next 30 Questions
                       </Button>
                     ) : (
                       rowData.length > 0 && (
