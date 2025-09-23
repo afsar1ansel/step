@@ -719,9 +719,8 @@ const GameQuestionsPage = () => {
       {
         headerName: "S.No.",
         maxWidth: 80,
-        filter: false,
+        filter: false, // Keep this as false since it's a calculated field
         valueGetter: (params: any) => {
-          // Get the current page and page size
           const startIndex =
             params.api.paginationGetCurrentPage() *
             params.api.paginationGetPageSize();
@@ -733,7 +732,7 @@ const GameQuestionsPage = () => {
         field: "question_no",
         headerName: "Q.No.",
         maxWidth: 80,
-        filter: false,
+        filter: "agTextColumnFilter", // Changed from false to enable filtering
       },
       {
         field: "question",
@@ -743,18 +742,32 @@ const GameQuestionsPage = () => {
             content={params.value || params.data.question_text}
           />
         ),
+        // Add this valueGetter to extract text for filtering
+        valueGetter: (params: any) => {
+          const questionData =
+            params.data.question || params.data.question_text;
+          if (typeof questionData === "string") return questionData;
+          if (questionData?.blocks) {
+            return questionData.blocks
+              .map((block: any) => block.data?.text || "")
+              .join(" ")
+              .replace(/<[^>]*>/g, ""); // Remove HTML tags
+          }
+          return "";
+        },
         flex: 2,
         cellStyle: {
           height: "100%",
           padding: "8px",
         },
         autoHeight: true,
+        filter: "agTextColumnFilter", // Enable filtering
       },
       {
         headerName: "Option 1",
-        filter: false,
+        filter: "agTextColumnFilter", // Changed from false
         flex: 1,
-        valueGetter: (params) => params.data.options?.[0]?.option_text,
+        valueGetter: (params) => params.data.options?.[0]?.option_text || "",
         cellRenderer: (params: any) => {
           const optionText = params.data.options?.[0]?.option_text || "";
           const isCorrect =
@@ -780,9 +793,9 @@ const GameQuestionsPage = () => {
       },
       {
         headerName: "Option 2",
-        filter: false,
+        filter: "agTextColumnFilter", // Changed from false
         flex: 1,
-        valueGetter: (params) => params.data.options?.[1]?.option_text,
+        valueGetter: (params) => params.data.options?.[1]?.option_text || "",
         cellRenderer: (params: any) => {
           const optionText = params.data.options?.[1]?.option_text || "";
           const isCorrect =
@@ -808,9 +821,9 @@ const GameQuestionsPage = () => {
       },
       {
         headerName: "Option 3",
-        filter: false,
+        filter: "agTextColumnFilter", // Changed from false
         flex: 1,
-        valueGetter: (params) => params.data.options?.[2]?.option_text,
+        valueGetter: (params) => params.data.options?.[2]?.option_text || "",
         cellRenderer: (params: any) => {
           const optionText = params.data.options?.[2]?.option_text || "";
           const isCorrect =
@@ -836,9 +849,9 @@ const GameQuestionsPage = () => {
       },
       {
         headerName: "Option 4",
-        filter: false,
+        filter: "agTextColumnFilter", // Changed from false
         flex: 1,
-        valueGetter: (params) => params.data.options?.[3]?.option_text,
+        valueGetter: (params) => params.data.options?.[3]?.option_text || "",
         cellRenderer: (params: any) => {
           const optionText = params.data.options?.[3]?.option_text || "";
           const isCorrect =
@@ -869,7 +882,19 @@ const GameQuestionsPage = () => {
       {
         field: "solution_text",
         headerName: "Solution",
-        filter: false,
+        filter: "agTextColumnFilter", // Changed from false
+        // Add valueGetter for solution filtering
+        valueGetter: (params: any) => {
+          const solutionData = params.data.solution_text;
+          if (typeof solutionData === "string") return solutionData;
+          if (solutionData?.blocks) {
+            return solutionData.blocks
+              .map((block: any) => block.data?.text || "")
+              .join(" ")
+              .replace(/<[^>]*>/g, ""); // Remove HTML tags
+          }
+          return "";
+        },
         flex: 2,
         cellRenderer: (params: any) => {
           return <ContentFormatter content={params.value} />;
@@ -880,7 +905,7 @@ const GameQuestionsPage = () => {
         cellRenderer: actionsCellRenderer,
         flex: 1,
         minWidth: 240,
-        filter: false,
+        filter: false, // Keep this as false
       },
     ]);
   }, [selectedModule, onQuestionModalOpen, toast, selectedSubject]);
