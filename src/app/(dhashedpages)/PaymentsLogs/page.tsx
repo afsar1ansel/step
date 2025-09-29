@@ -211,22 +211,15 @@ const PaymentsLogs = () => {
           ? `${baseUrl}/admin/app-purchase/all-user-purchase-list/${token}`
           : `${baseUrl}/admin/app-purchase/all-dope-deal-list/${token}`;
 
-      console.log(`Fetching data from: ${endpoint}`);
-
       const response = await fetch(endpoint, {
         method: "GET",
       });
-
-      // Check if response is ok before parsing
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status} ${response.statusText}`);
-      }
 
       const data = await response.json();
 
       if (Array.isArray(data)) {
         setRowData(data);
-        console.log(`${paymentType} payment data:`, data);
+        console.log("Payment data:", data);
       } else {
         setRowData([]);
         toast({
@@ -238,13 +231,11 @@ const PaymentsLogs = () => {
         });
       }
     } catch (error) {
-      console.error("Error fetching payment data:", error);
-      setRowData([]);
       toast({
         title: "Error",
-        description: `Failed to fetch ${paymentType} data: ${error}`,
+        description: "Failed to fetch data",
         status: "error",
-        duration: 5000,
+        duration: 3000,
         isClosable: true,
       });
     }
