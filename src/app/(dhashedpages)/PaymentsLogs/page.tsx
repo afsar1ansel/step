@@ -217,9 +217,13 @@ const PaymentsLogs = () => {
 
       const data = await response.json();
 
+      // Handle both array format and object format with data property
       if (Array.isArray(data)) {
         setRowData(data);
         console.log("Payment data:", data);
+      } else if (data.data && Array.isArray(data.data)) {
+        setRowData(data.data);
+        console.log("Payment data:", data.data);
       } else {
         setRowData([]);
         toast({
@@ -231,6 +235,7 @@ const PaymentsLogs = () => {
         });
       }
     } catch (error) {
+      setRowData([]);
       toast({
         title: "Error",
         description: "Failed to fetch data",
