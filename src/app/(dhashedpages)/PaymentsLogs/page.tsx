@@ -206,24 +206,38 @@ const PaymentsLogs = () => {
   async function fetchData() {
     try {
       const token = localStorage.getItem("token");
-      const endpoint =
-        paymentType === "Courses"
-          ? `${baseUrl}/admin/app-purchase/all-user-purchase-list/${token}`
-          : `${baseUrl}/admin/app-purchase/all-dope-deal-list/${token}`;
+
+      // Use a temporary workaround while waiting for deployment
+      if (paymentType === "Dopamine") {
+        setRowData([]);
+        toast({
+          title: "Coming Soon",
+          description:
+            "Dopamine purchase records will be available after next deployment.",
+          status: "info",
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      // For courses, use the existing working endpoint
+      const endpoint = `${baseUrl}/admin/app-purchase/all-user-purchase-list/${token}`;
 
       const response = await fetch(endpoint, {
         method: "GET",
       });
 
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
       const data = await response.json();
 
-      // Handle both array format and object format with data property
       if (Array.isArray(data)) {
         setRowData(data);
-        console.log("Payment data:", data);
       } else if (data.data && Array.isArray(data.data)) {
         setRowData(data.data);
-        console.log("Payment data:", data.data);
       } else {
         setRowData([]);
         toast({
@@ -235,6 +249,7 @@ const PaymentsLogs = () => {
         });
       }
     } catch (error) {
+      console.error("Error fetching data:", error);
       setRowData([]);
       toast({
         title: "Error",
