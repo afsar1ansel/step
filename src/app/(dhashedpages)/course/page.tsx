@@ -79,10 +79,13 @@ const CourseMaster = () => {
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     {
       headerName: "Sl. No",
-      field: "id",
+      valueGetter: (params: any) => {
+        return params.node.rowIndex + 1;
+      },
       maxWidth: 80,
       filter: false,
       suppressAutoSize: true,
+      sortable: false,
     },
     {
       headerName: "Course Name",
@@ -284,10 +287,19 @@ const CourseMaster = () => {
     setLoading(true);
     try {
       const form = new FormData();
-      form.append("courseName", courseName);
+
+      // Only append fields that have values
+      if (courseName.trim()) {
+        form.append("courseName", courseName);
+      }
+
       form.append("courseId", editRowId);
-      form.append("examDate", examDate);
       form.append("token", localStorage.getItem("token") ?? "");
+
+      if (examDate) {
+        form.append("examDate", examDate);
+      }
+
       if (selectedImage) {
         form.append("courseImage", selectedImage);
       }
