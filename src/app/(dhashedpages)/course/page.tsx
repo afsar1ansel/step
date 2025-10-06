@@ -103,6 +103,14 @@ const CourseMaster = () => {
       ),
     },
     {
+      headerName: "Exam Date",
+      field: "exam_date",
+      minWidth: 120,
+      cellRenderer: (params: any) => {
+        return params.value || "Not Set";
+      },
+    },
+    {
       headerName: "Course Created By",
       field: "created_admin_user_id",
       cellRenderer: (params: any) => {
@@ -176,6 +184,7 @@ const CourseMaster = () => {
   // Form states
   const [currentCourse, setCurrentCourse] = useState<any>(null);
   const [courseName, setCourseName] = useState("");
+  const [examDate, setExamDate] = useState("");
   const [editRowId, setEditRowId] = useState("");
 
   const fetchImage = async (imageName: string) => {
@@ -199,6 +208,7 @@ const CourseMaster = () => {
   const handleEdit = (data: any) => {
     setEditRowId(data.id);
     setCourseName(data.course_name);
+    setExamDate(data.exam_date || "");
     setCurrentCourse(data);
     onEditModalOpen();
   };
@@ -276,6 +286,7 @@ const CourseMaster = () => {
       const form = new FormData();
       form.append("courseName", courseName);
       form.append("courseId", editRowId);
+      form.append("examDate", examDate);
       form.append("token", localStorage.getItem("token") ?? "");
       if (selectedImage) {
         form.append("courseImage", selectedImage);
@@ -322,6 +333,7 @@ const CourseMaster = () => {
 
   const resetForm = () => {
     setCourseName("");
+    setExamDate("");
     setSelectedImage(null);
     setPreview(null);
     setCurrentCourse(null);
@@ -456,6 +468,14 @@ const CourseMaster = () => {
                 placeholder="Enter Course Name"
                 value={courseName}
                 onChange={(e) => setCourseName(e.target.value)}
+              />
+
+              <FormLabel mt={4}>Exam Date</FormLabel>
+              <Input
+                type="date"
+                placeholder="Select Exam Date"
+                value={examDate}
+                onChange={(e) => setExamDate(e.target.value)}
               />
 
               <FormLabel mt={4}>Course Image</FormLabel>
