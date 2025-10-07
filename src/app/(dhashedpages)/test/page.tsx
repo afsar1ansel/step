@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import type { ColDef } from "ag-grid-community";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import {
+  Box,
   Button,
   FormControl,
   FormLabel,
@@ -33,7 +34,12 @@ const TestsTab = () => {
 
   const [rowData, setRowData] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
+  const [allCourses, setAllCourses] = useState<any[]>([]); // NEW: For course dropdown
   const [steps, setSteps] = useState<any[]>([]);
+
+  // NEW: Course filter
+  const [selectedCourseFilter, setSelectedCourseFilter] = useState("");
+
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedStep, setSelectedStep] = useState("");
   const [preCourseTestTitle, setPreCourseTestTitle] = useState("");
@@ -143,10 +149,12 @@ const TestsTab = () => {
     },
   ]);
 
-  // Fetch tests data
+  // Fetch tests data based on selected course filter
   useEffect(() => {
-    if (token) {
-      fetch(`${baseUrl}/masters/pre-course-test/get-all/${token}`)
+    if (token && selectedCourseFilter) {
+      fetch(
+        `${baseUrl}/masters/pre-course-test/get-by-course/${selectedCourseFilter}/${token}`
+      )
         .then((response) => response.json())
         .then((data) => {
           console.log("Fetched test data:", data);
@@ -154,9 +162,26 @@ const TestsTab = () => {
         })
         .catch((error) => console.error("Error fetching test data:", error));
     }
+  }, [token, baseUrl, selectedCourseFilter]);
+
+  // NEW: Fetch all courses for filter dropdown
+  useEffect(() => {
+    if (token) {
+      fetch(`${baseUrl}/masters/courses/get-all-courses/${token}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setAllCourses(data);
+          // Set default to NEET PG (id: 1) or first course
+          const defaultCourse = data.find((c: any) => c.id === 1) || data[0];
+          if (defaultCourse) {
+            setSelectedCourseFilter(defaultCourse.id.toString());
+          }
+        })
+        .catch((error) => console.error("Error fetching courses:", error));
+    }
   }, [token, baseUrl]);
 
-  // Fetch courses
+  // Fetch subjects for modal (all subjects, will be filtered in modal)
   useEffect(() => {
     if (token) {
       fetch(`${baseUrl}/masters/subjects/get-all-subjects/${token}`)
@@ -399,10 +424,30 @@ const TestsTab = () => {
         }}
       >
         <p style={{ fontSize: "16px", fontWeight: "600" }}>Tests Data</p>
-        <Button onClick={onModalOpen} colorScheme="green">
-          Add Test
-        </Button>
+
+        <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+          {/* NEW: Course Filter Dropdown */}
+          <Box minW="200px">
+            <Select
+              placeholder="Select Course"
+              value={selectedCourseFilter}
+              onChange={(e) => setSelectedCourseFilter(e.target.value)}
+            >
+              {allCourses &&
+                allCourses.map((course: any) => (
+                  <option key={course.id} value={course.id}>
+                    {course.course_name}
+                  </option>
+                ))}
+            </Select>
+          </Box>
+
+          <Button onClick={onModalOpen} colorScheme="green">
+            Add Test
+          </Button>
+        </div>
       </div>
+
       <div style={{ height: "100%", width: "100%" }}>
         <AgGridReact
           rowData={rowData}
@@ -433,37 +478,51 @@ const TestsTab = () => {
           <ModalHeader>{isEditMode ? "Edit Test" : "Add New Test"}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            {/* NEW: Course Selection in Modal */}
+            <FormControl mb={4}>
+              <FormLabel>Course</FormLabel>
+              <Select
+                placeholder="Select Course"
+                value={selectedCourse}
+                onChange={(e) => {
+                  setSelectedCourse(e.target.value);
+                  setSelectedStep(""); // Reset step when course changes
+                  setSteps([]);
+
+                  // Fetch subjects for this course
+                  if (e.target.value && token) {
+                    fetch(
+                      `${baseUrl}/masters/subjects/get-by-course/${e.target.value}/${token}`
+                    )
+                      .then((response) => response.json())
+                      .then((data) => setCourses(data))
+                      .catch((error) =>
+                        console.error("Error fetching subjects:", error)
+                      );
+                  }
+                }}
+              >
+                {allCourses.map((course: any) => (
+                  <option key={course.id} value={course.id}>
+                    {course.course_name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+
             <FormControl mb={4}>
               <FormLabel>Subject</FormLabel>
               <Select
                 placeholder="Select Subject"
-                value={selectedCourse}
-                onChange={(e) => setSelectedCourse(e.target.value)}
+                value={selectedStep}
+                onChange={(e) => setSelectedStep(e.target.value)}
+                isDisabled={!selectedCourse}
               >
                 {courses.map((course) => (
                   <option key={course.subject_id} value={course.subject_id}>
                     {course.subject_name}
                   </option>
                 ))}
-              </Select>
-            </FormControl>
-            <FormControl mb={4}>
-              <FormLabel>Step</FormLabel>
-              <Select
-                placeholder="Select Step"
-                value={selectedStep}
-                onChange={(e) => setSelectedStep(e.target.value)}
-                isDisabled={!selectedCourse}
-              >
-                {steps.length > 0 ? (
-                  steps.map((step) => (
-                    <option key={step.id} value={step.id}>
-                      {step.course_step_title}
-                    </option>
-                  ))
-                ) : (
-                  <option disabled>No data available</option>
-                )}
               </Select>
             </FormControl>
             <FormControl mb={4}>

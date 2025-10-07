@@ -33,8 +33,14 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 const precourseqa = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const [rowData, setRowData] = useState<any[]>([]);
-  const [testId, setTestId] = useState("1");
+  const [testId, setTestId] = useState("");
   const [testOptions, settestOptions] = useState<any[]>([]);
+
+  // NEW: Course filter
+  const [selectedCourseFilter, setSelectedCourseFilter] = useState("");
+  const [allCourses, setAllCourses] = useState<any[]>([]);
+  const [selectedCourseForModal, setSelectedCourseForModal] = useState("");
+
   const [preCourseTestQuestionsMasterId, setPreCourseTestQuestionsMasterId] =
     useState("");
   const [questionNo, setQuestionNo] = useState("");
@@ -64,30 +70,89 @@ const precourseqa = () => {
   const toast = useToast();
 
   useEffect(() => {
-    fetchTest();
-    fetcherDrop();
+    fetchAllCourses();
   }, []);
 
   useEffect(() => {
-    fetchTest();
+    if (selectedCourseFilter) {
+      fetchTestsByCourse(selectedCourseFilter);
+      setTestId(""); // Reset test selection
+    }
+  }, [selectedCourseFilter]);
+
+  useEffect(() => {
+    if (testId) {
+      fetchTest();
+    }
   }, [testId]);
+
+  async function fetchAllCourses() {
+    const token = localStorage.getItem("token") ?? "";
+    try {
+      const response = await fetch(
+        `${baseUrl}/masters/courses/get-all-courses/${token}`,
+        { method: "GET" }
+      );
+      const responseData = await response.json();
+      setAllCourses(responseData);
+
+      // Set default to NEET PG (id: 1) or first course
+      const defaultCourse =
+        responseData.find((c: any) => c.id === 1) || responseData[0];
+      if (defaultCourse) {
+        setSelectedCourseFilter(defaultCourse.id.toString());
+      }
+    } catch (error: any) {
+      console.error("Error fetching courses:", error);
+    }
+  }
+
+  async function fetchTestsByCourse(courseId: string) {
+    const token = localStorage.getItem("token") ?? "";
+    try {
+      const response = await fetch(
+        `${baseUrl}/masters/pre-course-test/get-by-course/${courseId}/${token}`,
+        { method: "GET" }
+      );
+      const responseData = await response.json();
+      settestOptions(responseData);
+
+      // Auto-select first test if available
+      if (responseData.length > 0) {
+        setTestId(responseData[0].id.toString());
+      }
+    } catch (error: any) {
+      console.error("Error fetching tests:", error);
+    }
+  }
+
+  // ADD THIS NEW FUNCTION for modal
+  async function fetchTestsByCourseForModal(courseId: string) {
+    const token = localStorage.getItem("token") ?? "";
+    try {
+      const response = await fetch(
+        `${baseUrl}/masters/pre-course-test/get-by-course/${courseId}/${token}`,
+        { method: "GET" }
+      );
+      const responseData = await response.json();
+      settestOptions(responseData);
+      // Don't auto-select for modal - let user choose
+    } catch (error: any) {
+      console.error("Error fetching tests:", error);
+    }
+  }
 
   async function fetchTest() {
     const token = localStorage.getItem("token") ?? "";
     try {
       const response = await fetch(
         `${baseUrl}/masters/pre-course-test/questions/view/${testId}/${token}`,
-        {
-          method: "GET",
-        }
+        { method: "GET" }
       );
       const responseData = await response.json();
-      console.log(responseData);
       setRowData(responseData);
-    } catch {
-      (error: Error) => {
-        console.error("Error fetching data:", error);
-      };
+    } catch (error: any) {
+      console.error("Error fetching data:", error);
     }
   }
 
@@ -588,22 +653,41 @@ const precourseqa = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          // border: "1px solid black",
         }}
       >
         <p style={{ fontSize: "16px", fontWeight: "600" }}>Course Data</p>
-        <div style={{ display: "flex", gap: "12px" }}>
+        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          {/* NEW: Course Filter Dropdown */}
           <Select
-            placeholder="Select Test"
+            placeholder="Select Course"
+            value={selectedCourseFilter}
+            onChange={(e) => setSelectedCourseFilter(e.target.value)}
+            minW="180px"
+          >
+            {allCourses &&
+              allCourses.map((course: any) => (
+                <option key={course.id} value={course.id}>
+                  {course.course_name}
+                </option>
+              ))}
+          </Select>
+
+          {/* Existing Test Dropdown */}
+          <Select
+            placeholder="Select test"
+            value={testId}
             onChange={(e) => setTestId(e.target.value)}
+            minW="200px"
+            isDisabled={!selectedCourseFilter}
           >
             {testOptions &&
-              testOptions.map((item: any, index: number) => (
+              testOptions.map((item: any) => (
                 <option key={item.id} value={item.id}>
                   {item.pre_course_test_title}
                 </option>
               ))}
           </Select>
+
           <HStack spacing={4}>
             <Button onClick={onAddQuestionModalOpen} colorScheme="blue" px={6}>
               Add Question
@@ -614,6 +698,7 @@ const precourseqa = () => {
           </HStack>
         </div>
       </div>
+
       <div style={{ height: "100%", width: "100%" }}>
         <AgGridReact
           rowData={rowData}
@@ -703,22 +788,49 @@ const precourseqa = () => {
           <ModalHeader>Add New Question</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <FormControl>
+            {/* NEW: Course Selection */}
+            <FormControl mb={4}>
+              <FormLabel>Course</FormLabel>
+              <Select
+                placeholder="Select Course"
+                value={selectedCourseForModal}
+                onChange={(e) => {
+                  setSelectedCourseForModal(e.target.value);
+                  setNewTestId(""); // Reset test selection
+
+                  // Fetch tests for this course
+                  if (e.target.value) {
+                    fetchTestsByCourseForModal(e.target.value);
+                  }
+                }}
+              >
+                {allCourses &&
+                  allCourses.map((course: any) => (
+                    <option key={course.id} value={course.id}>
+                      {course.course_name}
+                    </option>
+                  ))}
+              </Select>
+            </FormControl>
+
+            <FormControl mb={4}>
               <FormLabel>Select Test</FormLabel>
               <Select
                 placeholder="Select Test"
-                onChange={(e) => setNewTestId(e.target.value)}
                 value={newTestId}
+                onChange={(e) => setNewTestId(e.target.value)}
+                isDisabled={!selectedCourseForModal}
               >
                 {testOptions &&
-                  testOptions.map((item: any, index: number) => (
+                  testOptions.map((item: any) => (
                     <option key={item.id} value={item.id}>
                       {item.pre_course_test_title}
                     </option>
                   ))}
               </Select>
             </FormControl>
-            <FormControl mt={4}>
+
+            <FormControl>
               <FormLabel>Question No</FormLabel>
               <Input
                 placeholder="Enter Question Number"

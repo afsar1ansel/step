@@ -47,6 +47,12 @@ const StepsTab = () => {
   const toast = useToast();
   const [rowData, setRowData] = useState<any[]>();
 
+  // Add course filter state
+  const [selectedCourseFilter, setSelectedCourseFilter] = useState("");
+  const [courseDrop, setCourseDrop] = useState<any[]>([]);
+  const [subject, setSubject] = useState<any[]>([]);
+  const [step, setStep] = useState<any>("1");
+
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     // {
     //   headerName: "Step No.",
@@ -229,7 +235,7 @@ const StepsTab = () => {
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
     try {
       const response = await fetch(
-        `${baseUrl}/masters/get-all-course-step-details/${step}/${token}`
+        `${baseUrl}/masters/get-steps-by-course-subject/${selectedCourseFilter}/${step}/${token}`
       );
 
       const data = await response.json();
@@ -240,11 +246,13 @@ const StepsTab = () => {
           duration: 3000,
           isClosable: true,
         });
+        setRowData([]);
+      } else {
+        setRowData(data);
       }
-      setRowData(data);
-      console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setRowData([]);
     }
   }
 
@@ -394,7 +402,6 @@ const StepsTab = () => {
     // }
   };
 
-  const [step, setStep] = useState<any>("1");
   const [stepTitle, setStepTitle] = useState("");
   const [currentStep, setCurrentStep] = useState<any>(null);
   const [stepNumber, setStepNumber] = useState("");
@@ -429,8 +436,6 @@ const StepsTab = () => {
   const [currentImageUrl, setCurrentImageUrl] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [teachers, setTeachers] = useState<any>([]);
-  const [subject, setSubject] = useState<any>([]);
-  const [courseDrop, setCourseDrop] = useState<any>([]);
 
   const handleEdit = (data: any) => {
     // console.log(data)
@@ -687,41 +692,53 @@ const StepsTab = () => {
   };
 
   useEffect(() => {
-    fetchCource();
-    fetchData();
-    fetchSubjects();
+    fetchCourseData();
   }, []);
 
   useEffect(() => {
-    fetchData();
-    // console.log(step)
-  }, [step]);
+    if (selectedCourseFilter) {
+      fetchSubjectsByCourse(selectedCourseFilter);
+      setStep(""); // Reset subject selection
+    }
+  }, [selectedCourseFilter]);
 
-  const [course, setCourse] = useState<any>([]);
-  async function fetchCource() {
-    const tok = localStorage.getItem("token");
-    // console.log(tok);
+  useEffect(() => {
+    if (selectedCourseFilter && step) {
+      fetchData();
+    }
+  }, [step, selectedCourseFilter]);
+
+  async function fetchCourseData() {
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(
-        `${baseUrl}/masters/courses/get-all-courses/${tok}`,
-        {
-          method: "GET",
-        }
+        `${baseUrl}/masters/courses/get-all-courses/${token}`,
+        { method: "GET" }
       );
-      const responseData = await response.json();
-      console.log(responseData);
+      const data = await response.json();
+      setCourseDrop(data);
 
-      if (responseData.message == "Invalid token") {
-        localStorage.removeItem("token");
-        window.location.href = "/auth/login";
-        return;
+      // Set default to NEET PG (id: 1) or first course
+      const defaultCourse = data.find((c: any) => c.id === 1) || data[0];
+      if (defaultCourse) {
+        setSelectedCourseFilter(defaultCourse.id.toString());
       }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-      setCourse(responseData);
-    } catch {
-      (error: Error) => {
-        console.error("Error fetching data:", error);
-      };
+  async function fetchSubjectsByCourse(courseId: string) {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${baseUrl}/masters/subjects/get-by-course/${courseId}/${token}`,
+        { method: "GET" }
+      );
+      const data = await response.json();
+      setSubject(data);
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -813,20 +830,6 @@ const StepsTab = () => {
         alignItems: "center",
       }}
     >
-      {/* <Box p={4} mb={2}>
-   
-        <Select
-          placeholder="Select Subject"
-          onChange={(e) => setStep(e.target.value)}
-        >
-          {subject &&
-            subject.map((item: any, index: number) => (
-              <option key={item.id} value={item.course_id}>
-                {item.subject_name}
-              </option>
-            ))}
-        </Select>
-      </Box> */}
       <div
         style={{
           height: "60px",
@@ -843,24 +846,45 @@ const StepsTab = () => {
           Course Step Details
         </p>
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-          <Box>
+          {/* NEW: Course Filter Dropdown */}
+          <Box minW="200px">
+            <Select
+              placeholder="Select Course"
+              value={selectedCourseFilter}
+              onChange={(e) => setSelectedCourseFilter(e.target.value)}
+            >
+              {courseDrop &&
+                courseDrop.map((item: any) => (
+                  <option key={item.id} value={item.id}>
+                    {item.course_name}
+                  </option>
+                ))}
+            </Select>
+          </Box>
+
+          {/* Existing Subject Filter */}
+          <Box minW="200px">
             <Select
               placeholder="Select Subject"
+              value={step}
               onChange={(e) => setStep(e.target.value)}
+              isDisabled={!selectedCourseFilter}
             >
               {subject &&
-                subject.map((item: any, index: number) => (
-                  <option key={index} value={item.subject_id}>
+                subject.map((item: any) => (
+                  <option key={item.subject_id} value={item.subject_id}>
                     {item.subject_name}
                   </option>
                 ))}
             </Select>
           </Box>
+
           <Button onClick={openAddModal} colorScheme="green">
             Add Step
           </Button>
         </div>
       </div>
+
       <div style={{ height: "100%", width: "100%" }}>
         <AgGridReact
           rowData={rowData}
