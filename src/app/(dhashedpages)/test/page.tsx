@@ -33,23 +33,25 @@ const TestsTab = () => {
   const toast = useToast();
 
   const [rowData, setRowData] = useState<any[]>([]);
-  const [courses, setCourses] = useState<any[]>([]);
-  const [allCourses, setAllCourses] = useState<any[]>([]); // NEW: For course dropdown
+  const [subjects, setSubjects] = useState<any[]>([]); // Renamed from courses
+  const [allCourses, setAllCourses] = useState<any[]>([]);
   const [steps, setSteps] = useState<any[]>([]);
 
-  // NEW: Course filter
+  // Filter states
   const [selectedCourseFilter, setSelectedCourseFilter] = useState("");
 
-  const [selectedCourse, setSelectedCourse] = useState("");
-  const [selectedStep, setSelectedStep] = useState("");
+  // Modal states
+  const [selectedCourseForModal, setSelectedCourseForModal] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const [selectedStepId, setSelectedStepId] = useState(""); // The actual step ID
+
   const [preCourseTestTitle, setPreCourseTestTitle] = useState("");
   const [preCourseTestDuration, setPreCourseTestDuration] = useState<
     number | ""
   >("");
-  // const [stepNo, setStepNo] = useState<number | "">("");
-  const [syllabusTextLine1, setSyllabusTextLine1] = useState(""); // New state
-  const [syllabusTextLine2, setSyllabusTextLine2] = useState(""); // New state
-  const [syllabusTextLine3, setSyllabusTextLine3] = useState(""); // New state
+  const [syllabusTextLine1, setSyllabusTextLine1] = useState("");
+  const [syllabusTextLine2, setSyllabusTextLine2] = useState("");
+  const [syllabusTextLine3, setSyllabusTextLine3] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentTestId, setCurrentTestId] = useState<number | null>(null);
 
@@ -147,9 +149,15 @@ const TestsTab = () => {
         </div>
       ),
     },
+    // Add this column if you want to show which course the test belongs to
+    {
+      headerName: "Course",
+      field: "course_name",
+      minWidth: 150,
+    },
   ]);
 
-  // Fetch tests data based on selected course filter
+  // Fetch tests based on selected course filter
   useEffect(() => {
     if (token && selectedCourseFilter) {
       fetch(
@@ -164,14 +172,13 @@ const TestsTab = () => {
     }
   }, [token, baseUrl, selectedCourseFilter]);
 
-  // NEW: Fetch all courses for filter dropdown
+  // Fetch all courses for filter dropdown
   useEffect(() => {
     if (token) {
       fetch(`${baseUrl}/masters/courses/get-all-courses/${token}`)
         .then((response) => response.json())
         .then((data) => {
           setAllCourses(data);
-          // Set default to NEET PG (id: 1) or first course
           const defaultCourse = data.find((c: any) => c.id === 1) || data[0];
           if (defaultCourse) {
             setSelectedCourseFilter(defaultCourse.id.toString());
@@ -181,43 +188,54 @@ const TestsTab = () => {
     }
   }, [token, baseUrl]);
 
-  // Fetch subjects for modal (all subjects, will be filtered in modal)
+  // Fetch subjects when course is selected in modal
   useEffect(() => {
-    if (token) {
-      fetch(`${baseUrl}/masters/subjects/get-all-subjects/${token}`)
-        .then((response) => response.json())
-        .then((data) => setCourses(data))
-        .catch((error) => console.error("Error fetching courses:", error));
-    }
-  }, [token, baseUrl]);
-
-  // Fetch steps when a course is selected
-  useEffect(() => {
-    if (selectedCourse && token) {
+    if (selectedCourseForModal && token) {
       fetch(
-        `${baseUrl}/masters/get-all-course-step-details/${selectedCourse}/${token}`
+        `${baseUrl}/masters/subjects/get-by-course/${selectedCourseForModal}/${token}`
       )
         .then((response) => response.json())
-        .then((data) => setSteps(data))
-        .catch((error) => console.error("Error fetching steps:", error));
+        .then((data) => {
+          console.log("Fetched subjects:", data);
+          setSubjects(data);
+        })
+        .catch((error) => console.error("Error fetching subjects:", error));
     }
-  }, [selectedCourse, token, baseUrl]);
+  }, [selectedCourseForModal, token, baseUrl]);
+
+  // Fetch steps when subject is selected in modal
+  useEffect(() => {
+    if (selectedSubject && token && selectedCourseForModal) {
+      fetch(
+        `${baseUrl}/masters/get-steps-by-course-subject/${selectedCourseForModal}/${selectedSubject}/${token}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Fetched steps:", data);
+          if (data.errFlag === 1) {
+            setSteps([]);
+          } else {
+            setSteps(data);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching steps:", error);
+          setSteps([]);
+        });
+    }
+  }, [selectedSubject, selectedCourseForModal, token, baseUrl]);
 
   const handleAddOrUpdateTest = () => {
     if (
-      !selectedCourse ||
-      !selectedStep ||
+      !selectedCourseForModal ||
+      !selectedSubject ||
+      !selectedStepId ||
       !preCourseTestTitle ||
       !preCourseTestDuration
-      // ||
-      // !stepNo ||
-      // !syllabusTextLine1 ||
-      // !syllabusTextLine2 ||
-      // !syllabusTextLine3
     ) {
       toast({
         title: "Validation Error",
-        description: "Please fill in all fields.",
+        description: "Please fill in all required fields.",
         status: "warning",
         duration: 3000,
         isClosable: true,
@@ -227,16 +245,15 @@ const TestsTab = () => {
 
     const formData = new FormData();
     formData.append("token", token || "");
-    formData.append("courseStepDetailsMasterId", selectedStep);
+    formData.append("courseStepDetailsMasterId", selectedStepId);
     formData.append("preCourseTestTitle", preCourseTestTitle);
     formData.append(
       "preCourseTestDurationMinutes",
       String(preCourseTestDuration)
     );
-    // formData.append("stepNo", String(stepNo)); // Include stepNo in the form data
-    formData.append("syllabusTextLine1", syllabusTextLine1); // Include syllabusTextLine1
-    formData.append("syllabusTextLine2", syllabusTextLine2); // Include syllabusTextLine2
-    formData.append("syllabusTextLine3", syllabusTextLine3); // Include syllabusTextLine3
+    formData.append("syllabusTextLine1", syllabusTextLine1);
+    formData.append("syllabusTextLine2", syllabusTextLine2);
+    formData.append("syllabusTextLine3", syllabusTextLine3);
 
     if (isEditMode) {
       formData.append("preCourseTestId", String(currentTestId));
@@ -254,11 +271,10 @@ const TestsTab = () => {
               duration: 3000,
               isClosable: true,
             });
-            fetchTests(); // Refresh the table
+            fetchTests();
             resetForm();
             onModalClose();
           } else {
-            // console.error("Error updating test:", data.message);
             toast({
               title: "Error",
               description: data.message,
@@ -294,7 +310,7 @@ const TestsTab = () => {
               duration: 3000,
               isClosable: true,
             });
-            fetchTests(); // Refresh the table
+            fetchTests();
             resetForm();
             onModalClose();
           } else {
@@ -365,44 +381,44 @@ const TestsTab = () => {
     console.log("Edit clicked for:", data);
     setIsEditMode(true);
     setCurrentTestId(data.id);
-    setSelectedCourse(data.subject_id);
-    setSelectedStep(data.course_step_details_master_id);
+
+    // Need to derive courseId from the step
+    setSelectedCourseForModal(data.course_id || "1"); // Assuming this exists in response
+    setSelectedSubject(data.subject_id);
+    setSelectedStepId(data.course_step_details_master_id);
     setPreCourseTestTitle(data.pre_course_test_title);
     setPreCourseTestDuration(data.pre_course_test_duration_minutes);
-    // setStepNo(data.step_no); // Set stepNo for editing
-    setSyllabusTextLine1(data.syllabus_text_line_1); // Set syllabusTextLine1
-    setSyllabusTextLine2(data.syllabus_text_line_2); // Set syllabusTextLine2
-    setSyllabusTextLine3(data.syllabus_text_line_3); // Set syllabusTextLine3
+    setSyllabusTextLine1(data.syllabus_text_line_1);
+    setSyllabusTextLine2(data.syllabus_text_line_2);
+    setSyllabusTextLine3(data.syllabus_text_line_3);
     onModalOpen();
   };
 
-  const handleDelete = (data: any) => {
-    console.log("Delete clicked for:", data);
-    // Add delete logic here
-  };
-
   const resetForm = () => {
-    setSelectedCourse("");
-    setSelectedStep("");
+    setSelectedCourseForModal("");
+    setSelectedSubject("");
+    setSelectedStepId("");
     setPreCourseTestTitle("");
     setPreCourseTestDuration("");
-    // setStepNo(""); // Reset stepNo
-    setSyllabusTextLine1(""); // Reset syllabusTextLine1
-    setSyllabusTextLine2(""); // Reset syllabusTextLine2
-    setSyllabusTextLine3(""); // Reset syllabusTextLine3
-    setIsEditMode(false); // Reset edit mode
+    setSyllabusTextLine1("");
+    setSyllabusTextLine2("");
+    setSyllabusTextLine3("");
+    setIsEditMode(false);
     setCurrentTestId(null);
     setSteps([]);
+    setSubjects([]);
   };
 
   const handleModalClose = () => {
-    resetForm(); // Reset the form and states
-    onModalClose(); // Close the modal
+    resetForm();
+    onModalClose();
   };
 
   const fetchTests = () => {
-    if (token) {
-      fetch(`${baseUrl}/masters/pre-course-test/get-all/${token}`)
+    if (token && selectedCourseFilter) {
+      fetch(
+        `${baseUrl}/masters/pre-course-test/get-by-course/${selectedCourseFilter}/${token}`
+      )
         .then((response) => response.json())
         .then((data) => setRowData(data))
         .catch((error) => console.error("Error fetching test data:", error));
@@ -426,7 +442,6 @@ const TestsTab = () => {
         <p style={{ fontSize: "16px", fontWeight: "600" }}>Tests Data</p>
 
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-          {/* NEW: Course Filter Dropdown */}
           <Box minW="200px">
             <Select
               placeholder="Select Course"
@@ -478,28 +493,18 @@ const TestsTab = () => {
           <ModalHeader>{isEditMode ? "Edit Test" : "Add New Test"}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* NEW: Course Selection in Modal */}
+            {/* Course Selection */}
             <FormControl mb={4}>
               <FormLabel>Course</FormLabel>
               <Select
                 placeholder="Select Course"
-                value={selectedCourse}
+                value={selectedCourseForModal}
                 onChange={(e) => {
-                  setSelectedCourse(e.target.value);
-                  setSelectedStep(""); // Reset step when course changes
+                  setSelectedCourseForModal(e.target.value);
+                  setSelectedSubject("");
+                  setSelectedStepId("");
                   setSteps([]);
-
-                  // Fetch subjects for this course
-                  if (e.target.value && token) {
-                    fetch(
-                      `${baseUrl}/masters/subjects/get-by-course/${e.target.value}/${token}`
-                    )
-                      .then((response) => response.json())
-                      .then((data) => setCourses(data))
-                      .catch((error) =>
-                        console.error("Error fetching subjects:", error)
-                      );
-                  }
+                  setSubjects([]);
                 }}
               >
                 {allCourses.map((course: any) => (
@@ -510,21 +515,43 @@ const TestsTab = () => {
               </Select>
             </FormControl>
 
+            {/* Subject Selection */}
             <FormControl mb={4}>
               <FormLabel>Subject</FormLabel>
               <Select
                 placeholder="Select Subject"
-                value={selectedStep}
-                onChange={(e) => setSelectedStep(e.target.value)}
-                isDisabled={!selectedCourse}
+                value={selectedSubject}
+                onChange={(e) => {
+                  setSelectedSubject(e.target.value);
+                  setSelectedStepId("");
+                }}
+                isDisabled={!selectedCourseForModal}
               >
-                {courses.map((course) => (
-                  <option key={course.subject_id} value={course.subject_id}>
-                    {course.subject_name}
+                {subjects.map((subject) => (
+                  <option key={subject.subject_id} value={subject.subject_id}>
+                    {subject.subject_name}
                   </option>
                 ))}
               </Select>
             </FormControl>
+
+            {/* Step Selection */}
+            <FormControl mb={4}>
+              <FormLabel>Step</FormLabel>
+              <Select
+                placeholder="Select Step"
+                value={selectedStepId}
+                onChange={(e) => setSelectedStepId(e.target.value)}
+                isDisabled={!selectedSubject}
+              >
+                {steps.map((step: any) => (
+                  <option key={step.id} value={step.id}>
+                    Step {step.step_no}: {step.course_step_title}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+
             <FormControl mb={4}>
               <FormLabel>Test Title</FormLabel>
               <Input
@@ -544,15 +571,6 @@ const TestsTab = () => {
                 }
               />
             </FormControl>
-            {/* <FormControl mb={4}>
-              <FormLabel>Step No</FormLabel>
-              <Input
-                type="number"
-                placeholder="Enter Step No"
-                value={stepNo}
-                onChange={(e) => setStepNo(Number(e.target.value))}
-              />
-            </FormControl> */}
             <FormControl mb={4}>
               <FormLabel>Syllabus Line 1</FormLabel>
               <Input
