@@ -25,10 +25,17 @@ import {
   Text,
 } from "@chakra-ui/react";
 
+import dynamic from "next/dynamic";
+// Dynamically importing ExamEditorComponent to prevent SSR issues
+const ExamEditorComponent = dynamic(
+  () => import("@/app/componant/examEditor"),
+  {
+    ssr: false,
+  }
+);
+
 // Assuming these imports are available relative to StepathonStep.tsx
 import ContentFormatter from "@/app/componant/ContentFormatter";
-import ExamEditorComponent from "@/app/componant/examEditor";
-
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -62,14 +69,12 @@ const safeParseEditorData = (data: string | any): any => {
     : { blocks: [] };
 };
 
-// Define Option structure
+// Define Option structure (using snake_case for internal state/submission)
 interface Option {
-  id: number | null; // Null for new options
+  id: number | null;
   option_text: any; // EditorJS data
   explanation_text: any; // EditorJS data
   is_correct: 0 | 1;
-  // NOTE: When fetching/editing, this structure might include the option text/explanation
-  // which might already be parsed (as objects) or unparsed (as strings).
 }
 
 // Define Question/Step structure
@@ -80,7 +85,10 @@ interface QuestionRow {
   hint: any; // EditorJS data
   created_at: string;
   status: 0 | 1;
-  options?: Option[]; // Optional property for edit/view
+  // Note: Data fetching returns options with camelCase, but we define the type
+  // based on the expected final structure or how the API response is used.
+  // The columnDefs below access the camelCase properties directly from the rowData.
+  options?: any[];
 }
 
 const emptyEditorData = { blocks: [] };
@@ -90,25 +98,25 @@ const initialOptionsState: Option[] = [
     option_text: emptyEditorData,
     explanation_text: emptyEditorData,
     is_correct: 0,
-  }, // Option A (Index 0)
+  },
   {
     id: null,
     option_text: emptyEditorData,
     explanation_text: emptyEditorData,
     is_correct: 0,
-  }, // Option B (Index 1)
+  },
   {
     id: null,
     option_text: emptyEditorData,
     explanation_text: emptyEditorData,
     is_correct: 0,
-  }, // Option C (Index 2)
+  },
   {
     id: null,
     option_text: emptyEditorData,
     explanation_text: emptyEditorData,
     is_correct: 0,
-  }, // Option D (Index 3)
+  },
 ];
 const optionLabels = ["A", "B", "C", "D"];
 
@@ -157,7 +165,7 @@ const StepathonStep = () => {
   const [conceptsForModal, setConceptsForModal] = useState<any[]>([]);
   const [selectedConceptForModal, setSelectedConceptForModal] = useState("");
 
-  // --- Fetch Data Logic ---
+  // --- Fetch Data Logic (Keep original logic) ---
 
   // 1. Fetch all subjects
   useEffect(() => {
@@ -251,7 +259,6 @@ const StepathonStep = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
-        // Assuming API returns data.data which is an array of questions
         setRowData(Array.isArray(data.data) ? data.data : []);
       } catch (error) {
         console.error("Error fetching questions:", error);
@@ -270,10 +277,10 @@ const StepathonStep = () => {
 
   const [columnDefs] = useState<ColDef<QuestionRow>[]>([
     {
-      headerName: "Concept ID",
-      field: "concept_id",
-      maxWidth: 100,
-      filter: true,
+      headerName: "S.No.",
+      valueGetter: "node.rowIndex + 1", // Use row index for S.No.
+      maxWidth: 80,
+      filter: false,
     },
     {
       headerName: "Question",
@@ -294,20 +301,44 @@ const StepathonStep = () => {
       filter: false,
       valueGetter: (params) => (params.data?.hint ? "View Hint" : "N/A"),
     },
+    // Dynamically create columns for Options A, B, C, D
+    ...(optionLabels.map((label, index) => ({
+      headerName: `Option ${label}`,
+      minWidth: 150,
+      filter: false,
+      valueGetter: (params: any) => {
+        // Note: Accessing camelCase properties from the provided API data structure
+        return params.data?.options?.[index]?.optionText;
+      },
+      cellRenderer: (params: any) => {
+        const optionContent = params.data?.options?.[index]?.optionText;
+        const contentData = safeParseEditorData(optionContent);
+        return <ContentFormatter content={contentData} />;
+      },
+      cellStyle: (params: any) => ({
+        height: "100%",
+        padding: "8px",
+        // Highlight the correct option (using camelCase isCorrect from API data)
+        backgroundColor:
+          params.data?.options?.[index]?.isCorrect === 1 ? "#e6fffa" : "white",
+      }),
+      autoHeight: true,
+    })) as ColDef<QuestionRow>[]),
     {
-      headerName: "Correct Option",
+      headerName: "Correct",
       field: "options",
-      maxWidth: 150,
+      maxWidth: 100,
       filter: false,
       valueGetter: (params) => {
-        const correct = params.data?.options?.find(
-          (opt: Option) => opt.is_correct === 1
-        );
         const correctIndex = params.data?.options?.findIndex(
-          (opt: Option) => opt.is_correct === 1
+          // Note: Accessing camelCase isCorrect from the provided API data structure
+          (opt: any) => opt.isCorrect === 1
         );
-        return correct ? `${optionLabels}` : "N/A";
+        return correctIndex !== undefined && correctIndex !== -1
+          ? optionLabels[correctIndex]
+          : "N/A";
       },
+      cellStyle: { textAlign: "center", fontWeight: "bold" },
     },
     {
       headerName: "Created At",
@@ -357,7 +388,7 @@ const StepathonStep = () => {
     },
   ]);
 
-  // --- Form & Modal Handlers ---
+  // --- Form & Modal Handlers (Minor Fixes to handle Option property naming) ---
 
   const resetForm = () => {
     setQuestionText(emptyEditorData);
@@ -372,14 +403,12 @@ const StepathonStep = () => {
       (c) => c.id.toString() === selectedConceptFilter
     );
     if (currentConcept) {
-      // Find the parent chapter and subject
       const currentChapter = chaptersBySubject.find(
         (ch) => ch.id === currentConcept.chapter_id
       );
       if (currentChapter) {
         setSelectedSubjectForModal(currentChapter.subject_id.toString());
         setSelectedChapterForModal(currentChapter.id.toString());
-        // This useEffect will populate conceptsForModal
       }
       setSelectedConceptForModal(selectedConceptFilter);
     } else {
@@ -418,24 +447,31 @@ const StepathonStep = () => {
       if (chapter) {
         setSelectedSubjectForModal(chapter.subject_id.toString());
         setSelectedChapterForModal(chapter.id.toString());
-        // Note: fetchChapters/fetchConcepts useEffects handle populating the modal dropdowns
       }
     }
 
-    // 3. Fetch Options (assuming an API call is needed here)
+    // 3. Fetch Options (using the nested options data if available, or the separate API call)
     try {
-      const optionsUrl = `${gameUrl}/masters/question/get-options/${questionData.id}`;
-      const response = await fetch(optionsUrl, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
+      let optionsData = questionData.options;
 
-      if (Array.isArray(data.data) && data.data.length === 4) {
-        const fetchedOptions = data.data.map((opt: any) => ({
+      // If options are not directly available in rowData, call the separate API
+      if (!optionsData) {
+        const optionsUrl = `${gameUrl}/masters/question/get-options/${questionData.id}`;
+        const response = await fetch(optionsUrl, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        // console.log(data);
+        optionsData = data.data;
+      }
+
+      if (Array.isArray(optionsData) && optionsData.length === 4) {
+        const fetchedOptions = optionsData.map((opt: any) => ({
           id: opt.id,
-          option_text: safeParseEditorData(opt.option_text),
-          explanation_text: safeParseEditorData(opt.explanation_text),
-          is_correct: opt.is_correct,
+          // FIX: Use opt.optionText and opt.explanationText from the fetched data
+          option_text: safeParseEditorData(opt.optionText),
+          explanation_text: safeParseEditorData(opt.explanationText),
+          is_correct: opt.isCorrect, // FIX: Use opt.isCorrect
         }));
 
         setOptions(fetchedOptions);
@@ -444,7 +480,6 @@ const StepathonStep = () => {
         );
         setCorrectOptionIndex(correctIndex >= 0 ? correctIndex : null);
       } else {
-        // Handle case where options are missing or malformed
         setOptions(initialOptionsState);
         setCorrectOptionIndex(null);
         toast({
@@ -481,7 +516,6 @@ const StepathonStep = () => {
   const handleToggle = async (data: QuestionRow) => {
     const newStatus = data.status === 1 ? 0 : 1;
     try {
-      // Assuming a status change API for questions
       const response = await fetch(
         `${gameUrl}/masters/question/change-status/${newStatus}/${data.id}`,
         { method: "GET", headers: { Authorization: `Bearer ${token}` } }
@@ -546,38 +580,45 @@ const StepathonStep = () => {
     }
 
     // 2. Prepare nested data structure for submission
+    // FIX: Mapping internal snake_case to external camelCase
     const submittedOptions = options.map((opt, index) => ({
-      ...opt,
-      is_correct: index === correctOptionIndex ? 1 : 0,
-      option_text: JSON.stringify(opt.option_text),
-      explanation_text: JSON.stringify(opt.explanation_text),
+      // Pass ID for updates, null for new
+      id: opt.id,
+      // Map internal option_text (EditorJS object) to external optionText (JSON string)
+      optionText: JSON.stringify(opt.option_text),
+      // Map internal explanation_text (EditorJS object) to external explanationText (JSON string)
+      explanationText: JSON.stringify(opt.explanation_text),
+      // Set the correct option flag using the calculated index
+      isCorrect: index === correctOptionIndex ? 1 : 0,
     }));
 
-    const payload = {
-      token: token || "",
-      conceptId: selectedConceptForModal,
-      questionText: JSON.stringify(questionText),
-      hint: JSON.stringify(hintText),
-      options: submittedOptions,
-      // Pass question ID only for update
-      ...(isEditMode && { questionId: currentQuestionId }),
-    };
+    const formData = new FormData();
+    formData.append("token", token || "");
+    formData.append("conceptId", selectedConceptForModal);
+    formData.append("questionText", JSON.stringify(questionText));
+    formData.append("hint", JSON.stringify(hintText));
+    formData.append("options", JSON.stringify(submittedOptions));
+    if (isEditMode) {
+      formData.append("questionId", String(currentQuestionId));
+    }
+    console.log(Object.fromEntries(formData));
 
     const url = isEditMode
       ? `${gameUrl}/masters/question/update`
       : `${gameUrl}/masters/question/add`;
 
-    // NOTE: The backend must be configured to accept JSON payload and handle nested updates for options.
+    // NOTE: Sending as JSON content type for nested payload
+    // We remove the intermediate FormData usage and send the JSON payload directly.
     fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: formData,
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         if (data.errFlag === 0) {
           toast({
             title: "Success",
@@ -836,7 +877,7 @@ const StepathonStep = () => {
                     >
                       <ExamEditorComponent
                         data={opt.option_text}
-                        onChange={(data : any) =>
+                        onChange={(data: any) =>
                           handleOptionChange(index, "option_text", data)
                         }
                         holder={`questions-option${optionLabels[
@@ -858,7 +899,7 @@ const StepathonStep = () => {
                     >
                       <ExamEditorComponent
                         data={opt.explanation_text}
-                        onChange={(data:any) =>
+                        onChange={(data: any) =>
                           handleOptionChange(index, "explanation_text", data)
                         }
                         holder={`questions-explanation${optionLabels[
