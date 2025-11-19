@@ -23,9 +23,16 @@ import {
   useToast,
 } from "@chakra-ui/react";
 
-// Assuming these imports are available relative to StepathonConcepts.tsx
+import dynamic from "next/dynamic";
+// Dynamically importing ExamEditorComponent to prevent SSR issues
+const ExamEditorComponent = dynamic(
+  () => import("@/app/componant/examEditor"),
+  {
+    ssr: false,
+  }
+);
+
 import ContentFormatter from "@/app/componant/ContentFormatter";
-import ExamEditorComponent from "@/app/componant/examEditor";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
