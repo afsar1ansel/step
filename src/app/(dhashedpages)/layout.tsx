@@ -26,6 +26,7 @@ import { GrNotes, GrTest } from "react-icons/gr";
 import { CiBoxList } from "react-icons/ci";
 import { FaRegImages } from "react-icons/fa6";
 import { IoGameControllerOutline, IoHomeOutline } from "react-icons/io5";
+import { SiGamedeveloper } from "react-icons/si";
 import { GrTestDesktop } from "react-icons/gr";
 import { RiSecurePaymentLine } from "react-icons/ri";
 
@@ -87,7 +88,10 @@ type NavItem =
   | "exam-test"
   | "BotProfiles"
   | "BotsFrequency"
-  | "exam-qa";
+  | "exam-qa"
+  | "StepathonConcept"
+  | "StepathonChapter"
+  | "StepathonStep";
 
 export default function RootLayout({
   children,
@@ -846,6 +850,122 @@ export default function RootLayout({
                                   </p>
                                 </Link>
                               </li> */}
+                            </ul>
+                          </AccordionPanel>
+                        </AccordionItem>
+                      </Accordion>
+                    </li>
+                    <li
+                      style={{ padding: 0, margin: 0 }}
+                      className={
+                        [
+                          "StepathonChapter",
+                          "StepathonConcept",
+                          "StepathonStep",
+                        ].includes(active) ||
+                        [
+                          "StepathonChapter",
+                          "StepathonConcept",
+                          "StepathonStep",
+                        ].includes(basePath)
+                          ? "active"
+                          : ""
+                      }
+                    >
+                      <Accordion
+                        allowToggle
+                        defaultIndex={
+                          [
+                            "StepathonChapter",
+                            "StepathonConcept",
+                            "StepathonStep",
+                          ].includes(basePath)
+                            ? [0]
+                            : []
+                        }
+                        w={"100%"}
+                      >
+                        <AccordionItem border="none">
+                          <AccordionButton
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              width: "100%",
+                              padding: "0.5rem 20px",
+                            }}
+                          >
+                            <SiGamedeveloper
+                              style={{ width: "18px", height: "18px" }}
+                            />
+                            <p
+                              style={{
+                                flex: 1,
+                                textAlign: "left",
+                                marginLeft: "0.5rem",
+                              }}
+                            >
+                              Stepathon
+                            </p>
+                            <AccordionIcon />
+                          </AccordionButton>
+                          <AccordionPanel pb={0} pl={1} margin={0} padding={0}>
+                            <ul style={{ listStyle: "none", padding: 0 }}>
+                              <li>
+                                <Link href="/StepathonChapter">
+                                  <p
+                                    className={
+                                      basePath === "StepathonChapter"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Tag Chapter to Subject
+                                  </p>
+                                </Link>
+                              </li>
+
+                              <li>
+                                <Link href="/StepathonConcept">
+                                  <p
+                                    className={
+                                      basePath === "StepathonConcept"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Tag Concept to chapter
+                                  </p>
+                                </Link>
+                              </li>
+
+                              <li>
+                                <Link href="/StepathonStep">
+                                  <p
+                                    className={
+                                      basePath === "StepathonStep"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Stepthon Steps{" "}
+                                  </p>
+                                </Link>
+                              </li>
                             </ul>
                           </AccordionPanel>
                         </AccordionItem>

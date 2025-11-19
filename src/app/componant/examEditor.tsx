@@ -14,9 +14,14 @@ interface EditorComponentProps {
   holder: string;
 }
 
-const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
+const ExamEditorComponent = ({
+  data,
+  onChange,
+  holder,
+}: EditorComponentProps) => {
   const editorRef = useRef<EditorJS | null>(null);
   const toast = useToast();
+  console.log(holder);
 
   // Function to clean empty blocks before saving
   const cleanEditorData = (content: any) => {
@@ -103,15 +108,32 @@ const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
               async uploadByFile(file: File) {
                 // The existing upload logic remains the same.
                 // It already relies on the backend for size validation.
+                let folderName = "";
+                const folderTypes = ["concepts", "questions", "options"];
+
+                // Extract folder name from holder
+                for (const folder of folderTypes) {
+                  if (holder.includes(folder)) {
+                    folderName = folder;
+                    break;
+                  }
+                }
+
+                console.log(holder, folderName);
+                const token = localStorage.getItem("token") ?? "";
                 const formData = new FormData();
-                formData.append("token", localStorage.getItem("token") ?? "");
-                formData.append("image", file);
+                // formData.append("token", token);
+                formData.append("imageFile", file);
+                formData.append("folderName", folderName);
 
                 try {
                   const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_BASE_URL}/edit-panel/upload-image`,
+                    `${process.env.NEXT_PUBLIC_GAME_URL}/masters/sps/upload-image`,
                     {
                       method: "POST",
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
                       body: formData,
                     }
                   );
@@ -230,4 +252,4 @@ const EditorComponent = ({ data, onChange, holder }: EditorComponentProps) => {
   return <div id={holder} />;
 };
 
-export default EditorComponent;
+export default ExamEditorComponent;
