@@ -294,13 +294,13 @@ const StepathonStep = () => {
       cellStyle: { height: "100%", padding: "8px" },
       autoHeight: true,
     },
-    {
-      headerName: "Hint",
-      field: "hint",
-      minWidth: 150,
-      filter: false,
-      valueGetter: (params) => (params.data?.hint ? "View Hint" : "N/A"),
-    },
+    // {
+    //   headerName: "Hint",
+    //   field: "hint",
+    //   minWidth: 150,
+    //   filter: false,
+    //   valueGetter: (params) => (params.data?.hint ? "View Hint" : "N/A"),
+    // },
     // Dynamically create columns for Options A, B, C, D
     ...(optionLabels.map((label, index) => ({
       headerName: `Option ${label}`,
@@ -340,12 +340,12 @@ const StepathonStep = () => {
       },
       cellStyle: { textAlign: "center", fontWeight: "bold" },
     },
-    {
-      headerName: "Created At",
-      field: "created_at",
-      maxWidth: 120,
-      cellRenderer: (params: { value: any }) => formatDate(params.value),
-    },
+    // {
+    //   headerName: "Created At",
+    //   field: "created_at",
+    //   maxWidth: 120,
+    //   cellRenderer: (params: { value: any }) => formatDate(params.value),
+    // },
     {
       headerName: "Status",
       field: "status",
@@ -723,7 +723,7 @@ const StepathonStep = () => {
           <Button
             onClick={handleModalOpen}
             colorScheme="green"
-            disabled={!selectedConceptFilter}
+            // disabled={!selectedConceptFilter}
           >
             Add Step
           </Button>
