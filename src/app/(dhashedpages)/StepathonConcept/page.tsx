@@ -66,7 +66,7 @@ const StepathonConcepts = () => {
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const gameUrl = process.env.NEXT_PUBLIC_GAME_URL;
+  const gameUrl = process.env.NEXT_PUBLIC_EXAM_BASE_URL;
   const toast = useToast();
 
   // Data states
