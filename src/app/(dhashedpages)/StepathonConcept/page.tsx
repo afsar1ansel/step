@@ -54,7 +54,7 @@ interface ConceptRow {
   chapter_id: number;
   name: string;
   duration: string;
-  story: any;
+  // story: any;
   step0: any;
   cover_picture: string; // URL
   recap: any;
@@ -90,7 +90,7 @@ const StepathonConcepts = () => {
   // Form states
   const [conceptName, setConceptName] = useState("");
   const [conceptDuration, setConceptDuration] = useState("");
-  const [conceptStory, setConceptStory] = useState<any>({ blocks: [] });
+  // const [conceptStory, setConceptStory] = useState<any>({ blocks: [] });
   const [conceptStep0, setConceptStep0] = useState<any>({ blocks: [] });
   const [conceptRecap, setConceptRecap] = useState<any>({ blocks: [] });
 
@@ -231,18 +231,18 @@ const StepathonConcepts = () => {
       maxWidth: 100,
       filter: false,
     },
-    {
-      headerName: "Story",
-      field: "story",
-      minWidth: 200,
-      filter: false,
-      cellRenderer: (params: any) => {
-        const contentData = safeParseEditorData(params.value);
-        return <ContentFormatter content={contentData} />;
-      },
-      cellStyle: { height: "100%", padding: "8px" },
-      autoHeight: true,
-    },
+    // {
+    //   headerName: "Story",
+    //   field: "story",
+    //   minWidth: 200,
+    //   filter: false,
+    //   cellRenderer: (params: any) => {
+    //     const contentData = safeParseEditorData(params.value);
+    //     return <ContentFormatter content={contentData} />;
+    //   },
+    //   cellStyle: { height: "100%", padding: "8px" },
+    //   autoHeight: true,
+    // },
     {
       headerName: "Step 0",
       field: "step0",
@@ -330,7 +330,7 @@ const StepathonConcepts = () => {
     // Reset form states
     setConceptName("");
     setConceptDuration("");
-    setConceptStory(emptyEditorData);
+    // setConceptStory(emptyEditorData);
     setConceptStep0(emptyEditorData);
     setConceptRecap(emptyEditorData);
     setConceptCoverPictureFile(null);
@@ -364,7 +364,7 @@ const StepathonConcepts = () => {
     // Set form values for editing
     setConceptName(data.name);
     setConceptDuration(data.duration);
-    setConceptStory(safeParseEditorData(data.story));
+    // setConceptStory(safeParseEditorData(data.story));
     setConceptStep0(safeParseEditorData(data.step0));
     setConceptRecap(safeParseEditorData(data.recap));
     // Set the existing URL for preview and submission
@@ -494,7 +494,7 @@ const StepathonConcepts = () => {
       !selectedChapterForModal ||
       !conceptName ||
       !conceptDuration ||
-      conceptStory.blocks.length === 0 ||
+      // conceptStory.blocks.length === 0 ||
       conceptStep0.blocks.length === 0 ||
       conceptRecap.blocks.length === 0 ||
       (!isEditMode && !conceptCoverPictureUrl) || // Must have a URL if adding
@@ -527,7 +527,7 @@ const StepathonConcepts = () => {
     formData.append("chapterId", selectedChapterForModal);
     formData.append("name", conceptName);
     formData.append("duration", conceptDuration);
-    formData.append("story", JSON.stringify(conceptStory));
+    // formData.append("story", JSON.stringify(conceptStory));
     formData.append("step0", JSON.stringify(conceptStep0));
     formData.append("recap", JSON.stringify(conceptRecap));
 
@@ -727,9 +727,9 @@ const StepathonConcepts = () => {
 
             {/* Duration */}
             <FormControl mb={4} isRequired>
-              <FormLabel>Duration (in Seconds e.g., 300)</FormLabel>
+              <FormLabel>Duration (in Minutes e.g., 3)</FormLabel>
               <Input
-                placeholder="Enter Duration (in Seconds)"
+                placeholder="Enter Duration (in Minutes)"
                 value={conceptDuration}
                 onChange={(e) => setConceptDuration(e.target.value)}
                 type="number"
@@ -737,7 +737,7 @@ const StepathonConcepts = () => {
             </FormControl>
 
             {/* Story (EditorJS) */}
-            <FormControl mb={4} isRequired>
+            {/* <FormControl mb={4} isRequired>
               <FormLabel>Story</FormLabel>
               <Box border="1px solid #ccc" padding="10px">
                 <ExamEditorComponent
@@ -746,7 +746,7 @@ const StepathonConcepts = () => {
                   holder="concepts-story-editor"
                 />
               </Box>
-            </FormControl>
+            </FormControl> */}
 
             {/* Step 0 (EditorJS) */}
             <FormControl mb={4} isRequired>
