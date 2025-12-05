@@ -128,7 +128,7 @@ const ExamEditorComponent = ({
 
                 try {
                   const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_GAME_URL}/masters/sps/upload-image`,
+                    `${process.env.NEXT_PUBLIC_EXAM_BASE_URL}/masters/sps/upload-image`,
                     {
                       method: "POST",
                       headers: {
