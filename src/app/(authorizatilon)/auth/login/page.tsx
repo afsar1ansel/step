@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import style from "./page.module.css";
 import Image from "next/image";
-import photo from "/public/Group19697.png";
 import Link from "next/link";
 import { Heading, useToast } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
@@ -21,10 +20,10 @@ export default function Login() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    
+
     // Prevent double submission
     if (isSubmitting) return;
-    
+
     setIsSubmitting(true);
 
     if (!isStrongPassword(password)) {
@@ -53,7 +52,7 @@ export default function Login() {
       });
 
       const responseData = await response.json();
-      
+
       if (responseData.errFlag == 1) {
         throw new Error(responseData.message || "Login failed");
       }
@@ -61,7 +60,7 @@ export default function Login() {
       if (responseData.errFlag == 0) {
         localStorage.setItem("token", responseData.token.trim());
         localStorage.setItem("user", JSON.stringify(responseData.username));
-        
+
         toast({
           title: "Login successful.",
           description: "You have logged in successfully!",
@@ -116,7 +115,13 @@ export default function Login() {
   return (
     <div className={style.logbody}>
       <div className={style.logo}>
-        <Image src={photo} alt="Logo" width={200} height={75} priority />
+        <Image
+          src="/Group19697.png"
+          alt="Logo"
+          width={200}
+          height={75}
+          priority
+        />
       </div>
       <div className={style.form}>
         <div style={{ backgroundColor: "white" }}></div>
@@ -155,11 +160,7 @@ export default function Login() {
                 {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
               </div>
             </div>
-            <button 
-              type="submit" 
-              className={style.btn}
-              disabled={isSubmitting}
-            >
+            <button type="submit" className={style.btn} disabled={isSubmitting}>
               {isSubmitting ? "Logging in..." : "Login"}
             </button>
           </form>

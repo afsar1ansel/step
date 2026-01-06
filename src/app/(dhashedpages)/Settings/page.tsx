@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import styles from "./page.module.css";
 import Image from "next/image";
-import profile from "/public/BG.png";
 
 import { FiUpload } from "react-icons/fi";
 

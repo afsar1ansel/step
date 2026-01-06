@@ -5,7 +5,6 @@ import Link from "next/link";
 import "./globals.css";
 import Image from "next/image";
 // import logo from "/public/Mesha_inc_logo-1.png";
-import profile from "/public/Group19697.png";
 import { FaUserDoctor } from "react-icons/fa6";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { IoIosHome } from "react-icons/io";
@@ -61,7 +60,7 @@ type NavItem =
   | "AdminUsers"
   | "Doctors"
   | "steps"
-  // | "test"
+  | "test"
   | "BannerMaster"
   | "videos"
   | "Notes"
@@ -227,7 +226,7 @@ export default function RootLayout({
                   // }}
                   className="sidebar-logo-container"
                 >
-                  <Image src={profile} alt="Logo" width={200} height={200} />
+                  <Image src="/Group19697.png" alt="Logo" width={200} height={200} />
                 </div>
                 {/* Scrollable navigation items container */}
                 <div className="sidebar-nav-container">
