@@ -256,6 +256,123 @@ export default function RootLayout({
                         <p className="linkname">Payments Logs</p>
                       </Link>
                     </li>
+
+                    {/* Game Subscriptions Section */}
+                    <li
+                      style={{ padding: 0, margin: 0 }}
+                      className={
+                        [
+                          "GameSubscriptions",
+                          "GameSubscriptionPayments",
+                          "GameCoupons",
+                        ].includes(active) ||
+                          [
+                            "GameSubscriptions",
+                            "GameSubscriptionPayments",
+                            "GameCoupons",
+                          ].includes(basePath)
+                          ? "active"
+                          : ""
+                      }
+                    >
+                      <Accordion
+                        allowToggle
+                        defaultIndex={
+                          [
+                            "GameSubscriptions",
+                            "GameSubscriptionPayments",
+                            "GameCoupons",
+                          ].includes(basePath)
+                            ? [0]
+                            : []
+                        }
+                        w={"100%"}
+                      >
+                        <AccordionItem border="none">
+                          <AccordionButton
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              width: "100%",
+                              padding: "0.5rem 20px",
+                            }}
+                          >
+                            <RiSecurePaymentLine
+                              style={{ width: "18px", height: "18px" }}
+                            />
+                            <p
+                              style={{
+                                flex: 1,
+                                textAlign: "left",
+                                marginLeft: "0.5rem",
+                              }}
+                            >
+                              Game Subscriptions
+                            </p>
+                            <AccordionIcon />
+                          </AccordionButton>
+                          <AccordionPanel pb={0} pl={1} margin={0} padding={0}>
+                            <ul style={{ listStyle: "none", padding: 0 }}>
+                              <li>
+                                <Link href="/GameSubscriptions">
+                                  <p
+                                    className={
+                                      basePath === "GameSubscriptions"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Active Subscriptions
+                                  </p>
+                                </Link>
+                              </li>
+                              <li>
+                                <Link href="/GameSubscriptionPayments">
+                                  <p
+                                    className={
+                                      basePath === "GameSubscriptionPayments"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Payment Logs
+                                  </p>
+                                </Link>
+                              </li>
+                              <li>
+                                <Link href="/GameCoupons">
+                                  <p
+                                    className={
+                                      basePath === "GameCoupons"
+                                        ? "active-sub-option"
+                                        : ""
+                                    }
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "1rem",
+                                      padding: "0",
+                                    }}
+                                  >
+                                    Coupon Codes
+                                  </p>
+                                </Link>
+                              </li>
+                            </ul>
+                          </AccordionPanel>
+                        </AccordionItem>
+                      </Accordion>
+                    </li>
+
                     <li className={active === "steps" ? "active" : ""}>
                       <TbDeviceAnalytics />
                       <Link href="/steps">
@@ -271,12 +388,12 @@ export default function RootLayout({
                           "course",
                           "Course_price",
                         ].includes(active) ||
-                        [
-                          "Doctors",
-                          "subject",
-                          "course",
-                          "Course_price",
-                        ].includes(basePath)
+                          [
+                            "Doctors",
+                            "subject",
+                            "course",
+                            "Course_price",
+                          ].includes(basePath)
                           ? "active"
                           : ""
                       }
@@ -414,12 +531,12 @@ export default function RootLayout({
                           "postcourse-test",
                           "postcourse-qa",
                         ].includes(active) ||
-                        [
-                          "test",
-                          "precourse-qa",
-                          "postcourse-test",
-                          "postcourse-qa",
-                        ].includes(basePath)
+                          [
+                            "test",
+                            "precourse-qa",
+                            "postcourse-test",
+                            "postcourse-qa",
+                          ].includes(basePath)
                           ? "active"
                           : ""
                       }
@@ -650,15 +767,15 @@ export default function RootLayout({
                           "BotProfiles",
                           "BotsFrequency",
                         ].includes(active) ||
-                        [
-                          "tagSubjectGame",
-                          "levels",
-                          "game-questions",
-                          "CurrencyConfigPage",
-                          "GameConfig",
-                          "BotProfiles",
-                          "BotsFrequency",
-                        ].includes(basePath)
+                          [
+                            "tagSubjectGame",
+                            "levels",
+                            "game-questions",
+                            "CurrencyConfigPage",
+                            "GameConfig",
+                            "BotProfiles",
+                            "BotsFrequency",
+                          ].includes(basePath)
                           ? "active"
                           : ""
                       }
@@ -863,11 +980,11 @@ export default function RootLayout({
                           "StepathonConcept",
                           "StepathonStep",
                         ].includes(active) ||
-                        [
-                          "StepathonChapter",
-                          "StepathonConcept",
-                          "StepathonStep",
-                        ].includes(basePath)
+                          [
+                            "StepathonChapter",
+                            "StepathonConcept",
+                            "StepathonStep",
+                          ].includes(basePath)
                           ? "active"
                           : ""
                       }
