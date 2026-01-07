@@ -124,7 +124,7 @@ const GameSubscriptions = () => {
         try {
             const token = localStorage.getItem("token");
             const response = await fetch(
-                `${baseUrl}/admin/subscriptions/list/${token}?status=${statusFilter}`,
+                `${baseUrl}/api/admin/subscriptions/list/${token}?status=${statusFilter}`,
                 { method: "GET" }
             );
 

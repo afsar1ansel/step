@@ -105,7 +105,7 @@ const GameSubscriptionPayments = () => {
         try {
             const token = localStorage.getItem("token");
             const response = await fetch(
-                `${baseUrl}/admin/subscriptions/payments/${token}`,
+                `${baseUrl}/api/admin/subscriptions/payments/${token}`,
                 { method: "GET" }
             );
 

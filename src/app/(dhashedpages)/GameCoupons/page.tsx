@@ -123,7 +123,7 @@ const GameCoupons = () => {
         try {
             const token = localStorage.getItem("token");
             const response = await fetch(
-                `${baseUrl}/admin/subscriptions/coupons/${token}`,
+                `${baseUrl}/api/admin/subscriptions/coupons/${token}`,
                 { method: "GET" }
             );
 
@@ -151,7 +151,7 @@ const GameCoupons = () => {
     async function createCoupon() {
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`${baseUrl}/admin/subscriptions/coupons/create`, {
+            const response = await fetch(`${baseUrl}/api/admin/subscriptions/coupons/create`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -196,7 +196,7 @@ const GameCoupons = () => {
     async function toggleCouponStatus(couponId: number, newStatus: number) {
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`${baseUrl}/admin/subscriptions/coupons/toggle`, {
+            const response = await fetch(`${baseUrl}/api/admin/subscriptions/coupons/toggle`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
