@@ -28,7 +28,7 @@ import {
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const GameCoupons = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_GAME_BASE_URL || process.env.NEXT_PUBLIC_BASE_URL;
+    const baseUrl = "https://step-game-app-jvzwm.ondigitalocean.app";
     const [rowData, setRowData] = useState<any[]>([]);
     const toast = useToast();
     const { isOpen, onOpen, onClose } = useDisclosure();
