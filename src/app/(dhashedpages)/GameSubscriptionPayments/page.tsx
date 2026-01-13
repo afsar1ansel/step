@@ -39,7 +39,7 @@ const GameSubscriptionPayments = () => {
             field: "amount_inr",
             maxWidth: 120,
             cellRenderer: (params: { value: any }) => {
-                return `₹${params.value || 0}`;
+                return `₹${Math.round(params.value || 0)}`;
             },
         },
         {
