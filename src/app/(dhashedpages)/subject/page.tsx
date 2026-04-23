@@ -31,10 +31,16 @@ const SubjectMaster = () => {
   const toast = useToast();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
+  const [selectedCourseFilter, setSelectedCourseFilter] = useState("");
+  const [rowData, setRowData] = useState<any[]>();
+
   useEffect(() => {
-    fetchData();
     fetchCourseData();
   }, []);
+
+  useEffect(() => {
+    fetchData(selectedCourseFilter);
+  }, [selectedCourseFilter]);
 
   async function fetchCourseData() {
     setLoading(true);
@@ -47,13 +53,20 @@ const SubjectMaster = () => {
         }
       );
       const data = await response.json();
-      console.log(data);
       setallCourse(data);
+
+      // Set default course filter if not set
+      if (!selectedCourseFilter && data.length > 0) {
+        // You could default to NEET PG (id: 1) if it exists
+        const defaultCourse = data.find((c: any) => c.id === 1) || data[0];
+        setSelectedCourseFilter(defaultCourse.id.toString());
+      }
+
       setLoading(false);
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to fetch data",
+        description: "Failed to fetch course data",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -61,35 +74,31 @@ const SubjectMaster = () => {
     }
   }
 
-  async function fetchData() {
+  async function fetchData(courseId?: string) {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${baseUrl}/masters/subjects/get-all-subjects/${token}`,
-        {
-          method: "GET",
-        }
-      );
+      let url = `${baseUrl}/masters/subjects/get-all-subjects/${token}`;
+      if (courseId) {
+        url += `?courseId=${courseId}`;
+      }
 
-      // if (!response.ok) {
-      //   throw new Error("Network response was not ok");
-      // }
+      const response = await fetch(url, {
+        method: "GET",
+      });
 
       const data = await response.json();
-      setRowData(data);
-      console.log(data);
+      setRowData(Array.isArray(data) ? data : data.subjects);
+      console.log("DEBUG_API_INFO:", data.debug_info);
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to fetch data",
+        description: "Failed to fetch subjects",
         status: "error",
         duration: 3000,
         isClosable: true,
       });
     }
   }
-
-  const [rowData, setRowData] = useState<any[]>();
 
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([
     {
@@ -269,7 +278,7 @@ const SubjectMaster = () => {
           duration: 3000,
           isClosable: true,
         });
-        fetchData();
+        fetchData(selectedCourseFilter);
       } else {
         toast({
           title: "Error",
@@ -314,7 +323,7 @@ const SubjectMaster = () => {
           duration: 3000,
           isClosable: true,
         });
-        fetchData();
+        fetchData(selectedCourseFilter);
       } else {
         toast({
           title: "Error",
@@ -344,7 +353,8 @@ const SubjectMaster = () => {
     <div style={{ width: "100%", height: "auto" }}>
       <div
         style={{
-          height: "60px",
+          height: "auto",
+          minHeight: "60px",
           width: "100%",
           backgroundColor: "white",
           padding: "20px",
@@ -352,12 +362,30 @@ const SubjectMaster = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexWrap: "wrap",
+          gap: "10px"
         }}
       >
-        <p style={{ fontSize: "16px", fontWeight: "600" }}>Subject</p>
-        <Button onClick={onAddModalOpen} colorScheme="green">
-          Add Subject
-        </Button>
+        <p style={{ fontSize: "16px", fontWeight: "600" }}>Subject Master</p>
+        
+        <HStack spacing={4}>
+          <Select
+            minW="200px"
+            placeholder="Filter by Course"
+            value={selectedCourseFilter}
+            onChange={(e) => setSelectedCourseFilter(e.target.value)}
+          >
+            {allCourse.map((course: any) => (
+              <option key={course.id} value={course.id}>
+                {course.course_name}
+              </option>
+            ))}
+          </Select>
+          
+          <Button onClick={onAddModalOpen} colorScheme="green">
+            Add Subject
+          </Button>
+        </HStack>
       </div>
       <div style={{ height: "100%", width: "100%" }}>
         <AgGridReact

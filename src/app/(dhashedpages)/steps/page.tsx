@@ -440,7 +440,7 @@ const StepsTab = () => {
   const handleEdit = (data: any) => {
     // console.log(data)
     fetchTeachers();
-    fetchSubjects();
+    fetchSubjectsByCourse(data.course_id); // Fetch subjects for this course
     fetchCourse();
     onShowModalClose();
     setSelectedCourse(data.course_id);
@@ -466,7 +466,10 @@ const StepsTab = () => {
   function openAddModal() {
     resetForm();
     fetchTeachers();
-    fetchSubjects();
+    if (selectedCourseFilter) {
+      fetchSubjectsByCourse(selectedCourseFilter);
+      setSelectedCourse(selectedCourseFilter);
+    }
     fetchCourse();
 
     isAddModalOpen ? onAddModalClose() : onAddModalOpen();
@@ -708,6 +711,13 @@ const StepsTab = () => {
     }
   }, [step, selectedCourseFilter]);
 
+  // Handle course changes in the Add/Edit modal
+  useEffect(() => {
+    if (selectedCourse && (isAddModalOpen || isEditModalOpen)) {
+      fetchSubjectsByCourse(selectedCourse);
+    }
+  }, [selectedCourse, isAddModalOpen, isEditModalOpen]);
+
   async function fetchCourseData() {
     try {
       const token = localStorage.getItem("token");
@@ -736,7 +746,8 @@ const StepsTab = () => {
         { method: "GET" }
       );
       const data = await response.json();
-      setSubject(data);
+      setSubject(Array.isArray(data) ? data : data.subjects);
+      console.log("DEBUG_API_INFO (byCourse):", data.debug_info);
     } catch (error) {
       console.log(error);
     }
@@ -793,8 +804,8 @@ const StepsTab = () => {
         }
       );
       const data = await response.json();
-      setSubject(data);
-      console.log(data);
+      setSubject(Array.isArray(data) ? data : data.subjects);
+      console.log("DEBUG_API_INFO (all):", data.debug_info);
     } catch (error) {
       console.log(error);
     }
